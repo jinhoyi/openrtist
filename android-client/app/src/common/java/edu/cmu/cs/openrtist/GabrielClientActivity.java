@@ -166,7 +166,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
         Const.STYLES_RETRIEVED = false;
         Const.ITERATION_STARTED = false;
 
-        // Set ContentView based on the mode
         if (Const.STEREO_ENABLED) {
             setContentView(R.layout.activity_stereo);
         } else {
