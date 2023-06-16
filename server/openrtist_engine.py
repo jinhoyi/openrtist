@@ -90,7 +90,7 @@ class OpenrtistEngine(cognitive_engine.Engine):
         send_style_list = False
         emotion_enabled = False
 
-        if extras.style == "?":
+        if extras.style == "?": # Style list is not retrieved by the client
             new_style = True
             send_style_list = True
         elif self.face_supported and extras.style == "aaa_emotion_enabled":

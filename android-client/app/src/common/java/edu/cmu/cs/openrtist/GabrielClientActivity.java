@@ -55,6 +55,8 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.view.PreviewView;
 
+//import android.hardware.SensorManager;
+
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -103,7 +105,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     // major components for streaming sensor data and receiving information
     String serverIP = null;
-    private String styleType = "?";
+    private String styleType = "?"; // "?" when style is not retrieved from the server, "none" if style is retrieved but not selected
 
     private OpenrtistComm openrtistComm;
 
@@ -158,6 +160,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private volatile boolean localRunnerBusy = false;
     private RenderScript rs = null;
     private Bitmap bitmapCache;
+//    private SensorManager sensorManager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,6 +188,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
         ImageView imgRecord =  findViewById(R.id.imgRecord);
         ImageView screenshotButton = findViewById(R.id.imgScreenshot);
+
+//        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         if (Const.SHOW_RECORDER) {
             imgRecord.setOnClickListener(new View.OnClickListener() {

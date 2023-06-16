@@ -26,10 +26,7 @@
             app:title="@string/app_name" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <RelativeLayout
-        android:id="@+id/fragment_serverlist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+
 
     <View
         android:layout_width="match_parent"
@@ -50,5 +47,10 @@
         android:textColor="@color/navigationBarColor"
         android:textSize="18sp"
         android:textStyle="bold" />
+
+    <RelativeLayout
+        android:id="@+id/fragment_serverlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
