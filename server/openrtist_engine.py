@@ -38,6 +38,7 @@ from gabriel_protocol import gabriel_pb2
 import openrtist_pb2
 import os
 from io import BytesIO
+from time import time
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +50,17 @@ import json
 from emotion_to_style import emotion_to_style_map
 
 
+
+
 class OpenrtistEngine(cognitive_engine.Engine):
     SOURCE_NAME = "openrtist"
+
+    # For Acceleration Sensor Event
+    GRAVITY_EARTH =  9.80665 ** 2
+    THRESOLD = 40
+    WAIT_TIME = 1000
+    SHAKE_STYLE = "going_to_work"
+
 
     def __init__(self, compression_params, adapter):
         self.compression_params = compression_params
@@ -67,6 +77,14 @@ class OpenrtistEngine(cognitive_engine.Engine):
         self.mrk, _, _, mrk_alpha = cv2.split(wtr_mrk4)
 
         self.alpha = mrk_alpha.astype(float) / 255
+
+        self.curr_accel = self.GRAVITY_EARTH
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.mv_accel = self.GRAVITY_EARTH
+        self.isShaking = False
+        self.lastTimeShakeDetected = 0
 
         # TODO support server display
 
@@ -90,22 +108,64 @@ class OpenrtistEngine(cognitive_engine.Engine):
         send_style_list = False
         emotion_enabled = False
 
+
+
+
+        # Calculate Acceleration (see if it is shaking)
+        self.x = extras.imu_value.x
+        self.y = extras.imu_value.y
+        self.z = extras.imu_value.z
+
+        
+
+        accel = self.x * self.x + self.y * self.y + self.z * self.z
+        accel_diff = accel - self.curr_accel
+        self.curr_accel = accel
+
+        self.mv_accel = self.mv_accel * 0.9 + accel_diff
+
+        # logger.info("Accel: %f, %f, %f | %f", self.x, self.y, self.z, self.mv_accel)
+
         if extras.style == "?": # Style list is not retrieved by the client
             new_style = True
             send_style_list = True
-        elif self.face_supported and extras.style == "aaa_emotion_enabled":
-            emotion_enabled = True
-            style = self.emotion_detection(input_frame.payloads[0])
-            if style:
-                self.adapter.set_style(style)
-                new_style = True
-        elif extras.style != self.adapter.get_style():
-            self.adapter.set_style(extras.style)
-            logger.info("New Style: %s", extras.style)
-            new_style = True
+
+        else:
+            if (self.mv_accel > self.THRESOLD):
+                self.lastTimeShakeDetected = int(time()*1000)
+                self.isShaking = True
+                if extras.style != self.SHAKE_STYLE:
+                    new_style = True
+                    extras.style = self.SHAKE_STYLE
+                self.adapter.set_style(self.SHAKE_STYLE)
+                logger.info("SHAKING")
+
+            else:
+                timeDelta = (int(time()*1000) - self.lastTimeShakeDetected)
+                if (timeDelta > self.WAIT_TIME and self.isShaking):
+                    self.isShaking = False
+                    logger.info("SHAKING STOPPED")
+
+                if (self.isShaking == False):
+                    if self.face_supported and extras.style == "aaa_emotion_enabled":
+                        emotion_enabled = True
+                        style = self.emotion_detection(input_frame.payloads[0])
+                        if style:
+                            self.adapter.set_style(style)
+                            new_style = True
+                    elif extras.style != self.adapter.get_style():
+                        self.adapter.set_style(extras.style)
+                        logger.info("New Style: %s", extras.style)
+                        new_style = True
+
+
+                
 
         if not emotion_enabled:
             style = self.adapter.get_style()
+
+        
+
 
         # Preprocessing steps used by both engines
         np_data = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)

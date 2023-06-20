@@ -18,7 +18,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.MediaActionSound;
@@ -95,7 +100,7 @@ import edu.cmu.cs.openrtist.Protos.Extras;
 import edu.cmu.cs.openrtist.R;
 
 public class GabrielClientActivity extends AppCompatActivity implements
-        AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener, SensorEventListener {
     private static final String LOG_TAG = "GabrielClientActivity";
     private static final int DISPLAY_WIDTH = 640;
     private static final int DISPLAY_HEIGHT = 480;
@@ -127,6 +132,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private TextView fpsLabel;
     private PreviewView preview;
 
+    private TextView accelLabel;
+
     // Stereo views
     private ImageView stereoView1;
     private ImageView stereoView2;
@@ -152,6 +159,34 @@ public class GabrielClientActivity extends AppCompatActivity implements
         }
     }
 
+    // SensorListener
+    private SensorManager sensorManager;
+    private Sensor mSensor;
+    private float imu_x;
+    private float imu_y;
+    private float imu_z;
+    @Override
+    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Do something here if sensor accuracy changes.
+    }
+
+    @Override
+    public final void onSensorChanged(SensorEvent event) {
+        // The light sensor returns a single value.
+        // Many sensors return 3 values, one for each axis.
+        imu_x = event.values[0];
+        imu_y = event.values[1];
+        imu_z = event.values[2];
+
+        float currentAcceleration = (float) Math.sqrt(imu_x * imu_x + imu_y * imu_y + imu_z * imu_z);
+
+        String updateText = String.format("Acc: (x,y,z) = (%.4f, %.4f, %.4f) = %.4f", imu_x, imu_y, imu_z, currentAcceleration);
+//        String updateText = "Acceleration: (x,y,z) = (" + Float.toString(x) + ", " + Float.toString(y) +
+        // Do something with this sensor value.
+//        TextView textView = (TextView) findViewById(R.id.accelLabel);
+        accelLabel.setText(updateText);
+    }
+
     // local execution
     private boolean runLocally = false;
     private LocalTransfer localRunner = null;
@@ -161,6 +196,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private RenderScript rs = null;
     private Bitmap bitmapCache;
 //    private SensorManager sensorManager = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,6 +218,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         imgView = findViewById(R.id.guidance_image);
         iconView = findViewById(R.id.style_image);
         fpsLabel = findViewById(R.id.fpsLabel);
+        accelLabel = findViewById(R.id.accelLabel);
 
         stereoView1 = findViewById(R.id.guidance_image1);
         stereoView2 = findViewById(R.id.guidance_image2);
@@ -189,7 +226,10 @@ public class GabrielClientActivity extends AppCompatActivity implements
         ImageView imgRecord =  findViewById(R.id.imgRecord);
         ImageView screenshotButton = findViewById(R.id.imgScreenshot);
 
-//        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        // Sensor Registration
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        List<Sensor> gravSensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+        mSensor = gravSensors.get(0);
 
         if (Const.SHOW_RECORDER) {
             imgRecord.setOnClickListener(new View.OnClickListener() {
@@ -314,6 +354,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
             fpsHandler.postDelayed(fpsCalculator, 1000);
         }
 
+        accelLabel.setVisibility(View.VISIBLE);
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mScreenDensity = metrics.densityDpi;
@@ -357,7 +399,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
             }
             String msg= "FPS: " + framesProcessed;
-            fpsLabel.setText( msg );
+//            fpsLabel.setText( msg );
 
             framesProcessed = 0;
             fpsHandler.postDelayed(this, 1000);
@@ -444,6 +486,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
         super.onResume();
         Log.v(LOG_TAG, "++onResume");
 
+        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         initOnce();
         Intent intent = getIntent();
         serverIP = intent.getStringExtra("SERVER_IP");
@@ -454,6 +498,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         Log.v(LOG_TAG, "++onPause");
+        sensorManager.unregisterListener(this);
+
 
         if(iterationHandler != null) {
             iterationHandler.removeCallbacks(styleIterator);
@@ -715,7 +761,15 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     private void sendFrameCloudlet(@NonNull ImageProxy image) {
         openrtistComm.sendSupplier(() -> {
-            Extras extras = Extras.newBuilder().setStyle(styleType).build();
+            Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
+                    .setX(imu_x)
+                    .setY(imu_y)
+                    .setZ(imu_z)
+                    .build();
+
+            Extras extras = Extras.newBuilder().setStyle(styleType)
+                    .setImuValue(imuValue)
+                    .build();
 
             return InputFrame.newBuilder()
                     .setPayloadType(PayloadType.IMAGE)
@@ -763,6 +817,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     };
 
     int getPort() {
+        Log.d(LOG_TAG, this.serverIP);
         int port = URI.create(this.serverIP).getPort();
         if (port == -1) {
             return Const.PORT;

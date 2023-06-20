@@ -13,9 +13,16 @@ message Extras {
         bytes value = 1;
     }
 
+    message IMUValue {
+        float x = 1;
+        float y = 2;
+        float z = 3;
+    }
+
     string style = 1;
     map<string, string> style_list = 2;
     BytesValue style_image = 3;
     int32 depth_threshold = 4;
     BytesValue depth_map = 5;
+    IMUValue imu_value = 6;
 }

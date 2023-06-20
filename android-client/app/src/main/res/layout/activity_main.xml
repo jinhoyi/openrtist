@@ -115,6 +115,18 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
+            <TextView
+                android:id="@+id/accelLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:background="@color/navigationBarColor"
+                android:text="accel"
+                android:gravity="center_horizontal"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
         </FrameLayout>
     </RelativeLayout>
 </LinearLayout>
