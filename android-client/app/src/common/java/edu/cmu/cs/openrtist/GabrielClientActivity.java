@@ -102,8 +102,8 @@ import edu.cmu.cs.openrtist.R;
 public class GabrielClientActivity extends AppCompatActivity implements
         AdapterView.OnItemSelectedListener, SensorEventListener {
     private static final String LOG_TAG = "GabrielClientActivity";
-    private static final int DISPLAY_WIDTH = 640;
-    private static final int DISPLAY_HEIGHT = 480;
+    private static final int DISPLAY_WIDTH = 480;
+    private static final int DISPLAY_HEIGHT = 640;
     private static final int BITRATE = 1024 * 1024;
     private static final int MEDIA_TYPE_IMAGE = 1;
     private static final int MEDIA_TYPE_VIDEO = 2;

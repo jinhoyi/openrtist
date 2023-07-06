@@ -39,8 +39,11 @@ import openrtist_pb2
 import os
 from io import BytesIO
 from time import time
+import zmq
 
 logger = logging.getLogger(__name__)
+zmq_address = "tcp://localhost:5559"
+zmq_imu_address = "tcp://*:5560"
 
 from azure.cognitiveservices.vision.face import FaceClient
 from azure.cognitiveservices.vision.face.models import FaceAttributeType
@@ -48,8 +51,6 @@ from msrest.authentication import CognitiveServicesCredentials
 import http.client, urllib.request, urllib.parse, urllib.error, base64
 import json
 from emotion_to_style import emotion_to_style_map
-
-
 
 
 class OpenrtistEngine(cognitive_engine.Engine):
@@ -86,6 +87,14 @@ class OpenrtistEngine(cognitive_engine.Engine):
         self.isShaking = False
         self.lastTimeShakeDetected = 0
 
+        self.zmq_context = zmq.Context()
+        self.zmq_socket = self.zmq_context.socket(zmq.REQ)
+        self.zmq_socket.connect(zmq_address)
+
+        self.zmq_imu_socket = self.zmq_context.socket(zmq.REP)
+        self.zmq_imu_socket.bind(zmq_imu_address)
+
+
         # TODO support server display
 
         # check if Face api is supported
@@ -97,34 +106,52 @@ class OpenrtistEngine(cognitive_engine.Engine):
 
         logger.info("FINISHED INITIALISATION")
 
+    def grab_frame(self):
+        self.zmq_socket.send_string("0")
+        raw_msg = self.zmq_socket.recv()
+
+        input_frame = gabriel_pb2.InputFrame()
+        input_frame.ParseFromString(raw_msg)
+        orig_img = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
+        orig_img = orig_img.reshape((640,480,4))
+        orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2BGR)
+
+        return orig_img
+    
+    def send_imu(self, extras):
+        raw_msg = self.zmq_imu_socket.recv()
+        self.zmq_imu_socket.send(extras.SerializeToString())
+        return
+
+
     def handle(self, input_frame):
         if input_frame.payload_type != gabriel_pb2.PayloadType.IMAGE:
             status = gabriel_pb2.ResultWrapper.Status.WRONG_INPUT_FORMAT
             return cognitive_engine.create_result_wrapper(status)
 
         extras = cognitive_engine.unpack_extras(openrtist_pb2.Extras, input_frame)
+        self.send_imu(extras)
+        # self.zmq_imu_socket.send(extras.SerializeToString())
 
         new_style = False
         send_style_list = False
         emotion_enabled = False
 
 
-
-
-        # Calculate Acceleration (see if it is shaking)
-        self.x = extras.imu_value.x
-        self.y = extras.imu_value.y
-        self.z = extras.imu_value.z
+        # # Calculate Acceleration (see if it is shaking)
+        # self.x = extras.imu_value.x
+        # self.y = extras.imu_value.y
+        # self.z = extras.imu_value.z
 
         
 
-        accel = self.x * self.x + self.y * self.y + self.z * self.z
-        accel_diff = accel - self.curr_accel
-        self.curr_accel = accel
+        # accel = self.x * self.x + self.y * self.y + self.z * self.z
+        # accel_diff = accel - self.curr_accel
+        # self.curr_accel = accel
 
-        self.mv_accel = self.mv_accel * 0.9 + accel_diff
+        self.mv_accel = 0
 
-        # logger.info("Accel: %f, %f, %f | %f", self.x, self.y, self.z, self.mv_accel)
+        # # logger.info("Accel: %f, %f, %f | %f", self.x, self.y, self.z, self.mv_accel)
 
         if extras.style == "?": # Style list is not retrieved by the client
             new_style = True
@@ -161,8 +188,8 @@ class OpenrtistEngine(cognitive_engine.Engine):
 
                 
 
-        if not emotion_enabled:
-            style = self.adapter.get_style()
+        # if not emotion_enabled:
+        #     style = self.adapter.get_style()
 
         
 
@@ -172,55 +199,58 @@ class OpenrtistEngine(cognitive_engine.Engine):
         orig_img = cv2.imdecode(np_data, cv2.IMREAD_COLOR)
         orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGR2RGB)
 
-        # It is possible that no face is detected and style is None, if so bypass processing
-        if style:
-            image = self.process_image(orig_img)
-        else:
-            image = orig_img
+        image = self.grab_frame()
 
-        image = image.astype("uint8")
-        if extras.HasField("depth_map"):
-            # protobuf contains depth_map
-            depth_map = extras.depth_map.value
-            # get depth map (bytes) and perform depth thresholding to create foreground mask with 3 channels
-            depth_threshold = extras.depth_threshold
+        # # It is possible that no face is detected and style is None, if so bypass processing
+        # if style:
+        #     image = self.process_image(orig_img)
+        # else:
+        #     image = orig_img
 
-            # data type conversion from bytes to a scaled-out 2d numpy array (480*640)
-            np_depth_1d = np.frombuffer(depth_map, dtype=np.uint16)
-            np_depth_2d = np.reshape(np_depth_1d, (-1, 160))
+        # image = image.astype("uint8")
+        # if extras.HasField("depth_map"):
+        #     # protobuf contains depth_map
+        #     depth_map = extras.depth_map.value
+        #     # get depth map (bytes) and perform depth thresholding to create foreground mask with 3 channels
+        #     depth_threshold = extras.depth_threshold
 
-            # threshold on the distance
-            mask_fg = cv2.inRange(np_depth_2d, 0, depth_threshold)
+        #     # data type conversion from bytes to a scaled-out 2d numpy array (480*640)
+        #     np_depth_1d = np.frombuffer(depth_map, dtype=np.uint16)
+        #     np_depth_2d = np.reshape(np_depth_1d, (-1, 160))
 
-            # resize to match the image
-            orig_h, orig_w, _ = orig_img.shape
-            mask_fg = cv2.resize(
-                mask_fg, (orig_w, orig_h), interpolation=cv2.INTER_NEAREST
-            )
+        #     # threshold on the distance
+        #     mask_fg = cv2.inRange(np_depth_2d, 0, depth_threshold)
 
-            # Apply morphology to the thresholded image to remove extraneous white regions and save a mask
-            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-            mask_fg = cv2.morphologyEx(mask_fg, cv2.MORPH_OPEN, kernel)
-            mask_fg = cv2.morphologyEx(mask_fg, cv2.MORPH_CLOSE, kernel)
+        #     # resize to match the image
+        #     orig_h, orig_w, _ = orig_img.shape
+        #     mask_fg = cv2.resize(
+        #         mask_fg, (orig_w, orig_h), interpolation=cv2.INTER_NEAREST
+        #     )
 
-            fg = cv2.bitwise_and(orig_img, orig_img, mask=mask_fg)
+        #     # Apply morphology to the thresholded image to remove extraneous white regions and save a mask
+        #     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        #     mask_fg = cv2.morphologyEx(mask_fg, cv2.MORPH_OPEN, kernel)
+        #     mask_fg = cv2.morphologyEx(mask_fg, cv2.MORPH_CLOSE, kernel)
 
-            # get background mask by inversion
-            mask_bg = cv2.bitwise_not(mask_fg)
+        #     fg = cv2.bitwise_and(orig_img, orig_img, mask=mask_fg)
 
-            # get background from transformed image
-            bg = cv2.bitwise_and(image, image, mask=mask_bg)
+        #     # get background mask by inversion
+        #     mask_bg = cv2.bitwise_not(mask_fg)
 
-            # stitch transformed background and original foreground
-            image = cv2.bitwise_or(fg, bg)
+        #     # get background from transformed image
+        #     bg = cv2.bitwise_and(image, image, mask=mask_bg)
 
-        # scale image back to original size to get a better watermark
-        if orig_img.shape != image.shape:
-            orig_h, orig_w, _ = orig_img.shape
-            image = cv2.resize(
-                image, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR
-            )
-        image = self._apply_watermark(image)
+        #     # stitch transformed background and original foreground
+        #     image = cv2.bitwise_or(fg, bg)
+
+        # # scale image back to original size to get a better watermark
+
+        # if orig_img.shape != image.shape:
+        #     orig_h, orig_w, _ = orig_img.shape
+        #     image = cv2.resize(
+        #         image, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR
+        #     )
+        # image = self._apply_watermark(image)
 
         _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
         img_data = jpeg_img.tostring()
@@ -231,8 +261,8 @@ class OpenrtistEngine(cognitive_engine.Engine):
 
         extras = openrtist_pb2.Extras()
 
-        if style:
-            extras.style = style
+        # if style:
+        #     extras.style = style
 
         if new_style:
             extras.style_image.value = self.adapter.get_style_image()

@@ -48,7 +48,7 @@
         <activity
             android:name=".GabrielClientActivity"
             android:label="@string/title_activity_main"
-            android:screenOrientation="landscape"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar">
 
             <!-- Enable this intent-filter for regular Android Application -->
