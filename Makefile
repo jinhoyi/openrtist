@@ -42,7 +42,8 @@ REQUIREMENTS = \
 	'black==$(BLACK_VERSION)' \
 	flake8 \
 	flake8-bugbear \
-	grpcio-tools
+	'grpcio-tools==1.44.0'\
+	'protobuf==3.20.3'\
 
 all: $(GENERATED_FILES)
 

@@ -36,7 +36,7 @@ public class Const {
     public static final int REFERENCE_IMAGE = 99;
 
     // image size and frame rate
-    public static int CAPTURE_FPS = 30;
+    public static int CAPTURE_FPS = 120;
 
     // options: 320x180, 640x360, 1280x720, 1920x1080
     public static int IMAGE_WIDTH = 320;

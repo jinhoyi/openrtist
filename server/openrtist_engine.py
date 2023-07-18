@@ -113,8 +113,8 @@ class OpenrtistEngine(cognitive_engine.Engine):
         input_frame = gabriel_pb2.InputFrame()
         input_frame.ParseFromString(raw_msg)
         orig_img = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
-        orig_img = orig_img.reshape((640,480,4))
-        orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2BGR)
+        orig_img = np.flipud(orig_img.reshape((640,480,4)))
+        orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2RGB)
 
         return orig_img
     
@@ -195,15 +195,15 @@ class OpenrtistEngine(cognitive_engine.Engine):
 
 
         # Preprocessing steps used by both engines
-        np_data = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
-        orig_img = cv2.imdecode(np_data, cv2.IMREAD_COLOR)
-        orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGR2RGB)
+        # np_data = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
+        # orig_img = cv2.imdecode(np_data, cv2.IMREAD_COLOR)
+        # orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGR2RGB)
 
         image = self.grab_frame()
 
         # # It is possible that no face is detected and style is None, if so bypass processing
         # if style:
-        #     image = self.process_image(orig_img)
+        image = self.process_image(image)
         # else:
         #     image = orig_img
 
@@ -313,14 +313,15 @@ class OpenrtistEngine(cognitive_engine.Engine):
         return style
 
     def process_image(self, image):
-        preprocessed = self.adapter.preprocessing(image)
-        post_inference = self.inference(preprocessed)
-        img_out = self.adapter.postprocessing(post_inference)
-        return img_out
+        # preprocessed = self.adapter.preprocessing(image)
+        post_inference = self.inference(image)
+        # img_out = self.adapter.postprocessing(post_inference)
+        return image
 
     def inference(self, preprocessed):
         """Allow timing engine to override this"""
-        return self.adapter.inference(preprocessed)
+        # return self.adapter.inference(preprocessed)
+        return preprocessed
 
     def _apply_watermark(self, image):
         img_mrk = image[-30:, -120:]  # The waterMark is of dimension 30x120

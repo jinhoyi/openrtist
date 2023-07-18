@@ -20,12 +20,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
+import android.media.Image;
 import android.media.MediaActionSound;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
@@ -49,14 +51,19 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.os.Looper;
+import android.view.Choreographer;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageInfo;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.view.PreviewView;
 
@@ -101,6 +108,49 @@ import edu.cmu.cs.openrtist.R;
 
 public class GabrielClientActivity extends AppCompatActivity implements
         AdapterView.OnItemSelectedListener, SensorEventListener {
+
+//    public class FrameUpdateThread extends Thread {
+//        private Handler handler;
+//        private boolean isRunning = true;
+//
+//        private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
+//            @Override
+//            public void doFrame(long frameTimeNanos) {
+//                // This code will run every time a new frame is drawn
+//
+//                // Repost frame callback for the next frame
+//                sendIMUCloudlet();
+////                Log.v(LOG_TAG, "calledIMU");
+////                framesProcessed++;
+//
+//                if (isRunning) {
+//                    Choreographer.getInstance().postFrameCallback(this);
+//                }
+//            }
+//        };
+//
+//        @Override
+//        public void run() {
+//            Looper.prepare();
+//            handler = new Handler(Looper.myLooper());
+//
+//            // Post the initial frame callback to start the loop
+//            handler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Choreographer.getInstance().postFrameCallback(frameCallback);
+//                }
+//            });
+//
+//            Looper.loop();
+//        }
+//
+//        public void stopThread() {
+//            isRunning = false;
+//        }
+//    }
+
+    private static boolean running = false;
     private static final String LOG_TAG = "GabrielClientActivity";
     private static final int DISPLAY_WIDTH = 480;
     private static final int DISPLAY_HEIGHT = 640;
@@ -128,6 +178,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private ImageView imgView;
     private ImageView iconView;
     private Handler iterationHandler;
+    private Handler frameHandler;
     private Handler fpsHandler;
     private TextView fpsLabel;
     private PreviewView preview;
@@ -162,9 +213,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
     // SensorListener
     private SensorManager sensorManager;
     private Sensor mSensor;
-    private float imu_x;
-    private float imu_y;
-    private float imu_z;
+    private float imu_x = 0;
+    private float imu_y = 0;
+    private float imu_z = 0;
     @Override
     public final void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Do something here if sensor accuracy changes.
@@ -178,13 +229,14 @@ public class GabrielClientActivity extends AppCompatActivity implements
         imu_y = event.values[1];
         imu_z = event.values[2];
 
-        float currentAcceleration = (float) Math.sqrt(imu_x * imu_x + imu_y * imu_y + imu_z * imu_z);
+        // float currentAcceleration = (float) Math.sqrt(imu_x * imu_x + imu_y * imu_y + imu_z * imu_z);
 
-        String updateText = String.format("Acc: (x,y,z) = (%.4f, %.4f, %.4f) = %.4f", imu_x, imu_y, imu_z, currentAcceleration);
+        // String updateText = String.format("Acc: (x,y,z) = (%.4f, %.4f, %.4f) = %.4f", imu_x, imu_y, imu_z, currentAcceleration);
 //        String updateText = "Acceleration: (x,y,z) = (" + Float.toString(x) + ", " + Float.toString(y) +
         // Do something with this sensor value.
 //        TextView textView = (TextView) findViewById(R.id.accelLabel);
-        accelLabel.setText(updateText);
+//        accelLabel.setText(updateText);
+//        sendIMUCloudlet(imu_x, imu_y, imu_z);
     }
 
     // local execution
@@ -330,17 +382,17 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     if (Const.USING_FRONT_CAMERA) {
                         camButton.setImageResource(R.drawable.ic_baseline_camera_front_24px);
 
-                        cameraCapture = new CameraCapture(
-                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
-                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_BACK_CAMERA);
+//                        cameraCapture = new CameraCapture(
+//                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
+//                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_BACK_CAMERA);
 
                         Const.USING_FRONT_CAMERA = false;
                     } else {
                         camButton.setImageResource(R.drawable.ic_baseline_camera_rear_24px);
 
-                        cameraCapture = new CameraCapture(
-                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
-                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_FRONT_CAMERA);
+//                        cameraCapture = new CameraCapture(
+//                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
+//                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_FRONT_CAMERA);
 
                         Const.USING_FRONT_CAMERA = true;
                     }
@@ -354,7 +406,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
             fpsHandler.postDelayed(fpsCalculator, 1000);
         }
 
-        accelLabel.setVisibility(View.VISIBLE);
+        accelLabel.setVisibility(View.INVISIBLE);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -385,10 +437,37 @@ public class GabrielClientActivity extends AppCompatActivity implements
             );
             rs = RenderScript.create(this);
         }
+//        FrameUpdateThread frameUpdateThread = new FrameUpdateThread();
+//        frameUpdateThread.start();
+
+        running = true;
+        frameHandler = new Handler();
+        frameHandler.post(frameIterator);
     }
+
+    private final Runnable frameIterator = new Runnable() {
+        @Override
+        public void run() {
+            Choreographer.getInstance().postFrameCallback(frameCallback);
+        }
+    };
+
+    private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
+        @Override
+        public void doFrame(long frameTimeNanos) {
+            // This code will run every time a new frame is drawn
+//            framesProcessed++;
+            sendIMUCloudlet();
+            // Repost frame callback for the next frame
+            if (running) {
+                Choreographer.getInstance().postFrameCallback(this);
+            }
+        }
+    };
 
     public void addFrameProcessed() {
         framesProcessed++;
+        // Log.e("FRAME!!!!", "Frame is  " + framesProcessed);
     }
 
     private final Runnable fpsCalculator = new Runnable() {
@@ -399,7 +478,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
             }
             String msg= "FPS: " + framesProcessed;
-//            fpsLabel.setText( msg );
+            fpsLabel.setText( msg );
 
             framesProcessed = 0;
             fpsHandler.postDelayed(this, 1000);
@@ -423,6 +502,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
             Log.e(LOG_TAG, "IOException when attempting to store screenshot", e);
         }
     }
+
+    //FLAG FOR LATER
+
 
     private final Runnable styleIterator = new Runnable() {
         private int position = 1;
@@ -505,6 +587,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
             iterationHandler.removeCallbacks(styleIterator);
         }
 
+        if(frameHandler != null) {
+            running = false;
+            frameHandler.removeCallbacks(frameIterator);
+        }
+
         if(capturingScreen) {
             stopRecording();
         }
@@ -517,6 +604,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
         if (iterationHandler != null) {
             iterationHandler.removeCallbacks(styleIterator);
+        }
+
+        if(frameHandler != null) {
+            running = false;
+            frameHandler.removeCallbacks(frameIterator);
         }
 
         if (capturingScreen) {
@@ -537,7 +629,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
             this.openrtistComm.stop();
             this.openrtistComm = null;
         }
-        cameraCapture.shutdown();
+//        cameraCapture.shutdown();
     }
 
     /**
@@ -717,9 +809,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
         yuvToNV21Converter = new YuvToNV21Converter();
         yuvToJPEGConverter = new YuvToJPEGConverter(this);
 
-        cameraCapture = new CameraCapture(
-                this, analyzer, Const.IMAGE_WIDTH, Const.IMAGE_HEIGHT,
-                preview, CameraSelector.DEFAULT_BACK_CAMERA);
+        running = true;
+        frameHandler.post(frameIterator);
+
+//        cameraCapture = new CameraCapture(
+//                this, analyzer, Const.IMAGE_WIDTH, Const.IMAGE_HEIGHT,
+//                preview, CameraSelector.DEFAULT_BACK_CAMERA);
     }
 
     // Based on
@@ -759,6 +854,26 @@ public class GabrielClientActivity extends AppCompatActivity implements
         });
     }
 
+    private void sendIMUCloudlet() {
+        openrtistComm.sendSupplier(() -> {
+            Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
+                    .setX(imu_x)
+                    .setY(imu_y)
+                    .setZ(imu_z)
+                    .build();
+
+            Extras extras = Extras.newBuilder().setStyle(styleType)
+                    .setImuValue(imuValue)
+                    .build();
+
+            return InputFrame.newBuilder()
+                    .setPayloadType(PayloadType.IMAGE)
+                    // .addPayloads(yuvToJPEGConverter.convert(image))
+                    .setExtras(GabrielClientActivity.pack(extras))
+                    .build();
+        });
+    }
+
     private void sendFrameCloudlet(@NonNull ImageProxy image) {
         openrtistComm.sendSupplier(() -> {
             Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
@@ -773,11 +888,23 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
             return InputFrame.newBuilder()
                     .setPayloadType(PayloadType.IMAGE)
-                    .addPayloads(yuvToJPEGConverter.convert(image))
+                    // .addPayloads(yuvToJPEGConverter.convert(image))
                     .setExtras(GabrielClientActivity.pack(extras))
                     .build();
         });
     }
+
+//    frameCallback = new Choreographer.FrameCallback() {
+//        @Override
+//        public void doFrame(long frameTimeNanos) {
+//            // This code will run every time a new frame is drawn
+//
+//            // Repost frame callback for the next frame
+//            if (isRunning) {
+//                Choreographer.getInstance().postFrameCallback(this);
+//            }
+//        }
+//    };
 
     final private ImageAnalysis.Analyzer analyzer = new ImageAnalysis.Analyzer() {
         @Override
@@ -789,7 +916,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                         localExecution(image);
                     }
                 } else if (GabrielClientActivity.this.openrtistComm != null) {
-                    sendFrameCloudlet(image);
+//                    sendFrameCloudlet(image);
                 }
                 if (Const.STEREO_ENABLED) {
                     runOnUiThread(() -> {

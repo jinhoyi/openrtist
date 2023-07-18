@@ -114,7 +114,7 @@
                 android:textColor="@color/textColorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:visibility="gone" />
+                android:visibility="visible" />
             <TextView
                 android:id="@+id/accelLabel"
                 android:layout_width="wrap_content"
