@@ -250,7 +250,7 @@ class OpenrtistEngine(cognitive_engine.Engine):
         #     image = cv2.resize(
         #         image, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR
         #     )
-        # image = self._apply_watermark(image)
+        image = self._apply_watermark(image)
 
         _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
         img_data = jpeg_img.tostring()
@@ -314,7 +314,7 @@ class OpenrtistEngine(cognitive_engine.Engine):
 
     def process_image(self, image):
         # preprocessed = self.adapter.preprocessing(image)
-        post_inference = self.inference(image)
+        # post_inference = self.inference(image)
         # img_out = self.adapter.postprocessing(post_inference)
         return image
 
@@ -330,6 +330,6 @@ class OpenrtistEngine(cognitive_engine.Engine):
         img_mrk[:, :, 2] = (1 - self.alpha) * img_mrk[:, :, 2] + self.alpha * self.mrk
         image[-30:, -120:] = img_mrk
         # img_out = image.astype("uint8")
-        img_out = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        img_out = cv2.cvtColor(image, cv2.COLOR_RGB2RGB)
 
         return img_out

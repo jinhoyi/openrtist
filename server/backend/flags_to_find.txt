@@ -1,0 +1,60 @@
+FLAG:SCREEN_SIZE 
+    set default screen size
+FLAG:SCENE_SETUP
+    instantiate scense
+FLAG:CREATE_CONTEXT
+    create openGL context
+FLAG:RENGERING_OPTION
+
+FLAG:INITIAL_SCENE_SETTING
+    List of scene settings
+
+FLAG:FLUID_COLOR
+
+FLAG:SIM_GRAVITY
+
+FLAG:SETTING_PARTICLE_DISTANCE
+
+FLAG:INITIAL_CAMERA_POSITION
+
+FLAG:CREATE_SOLVER
+
+FLAG:MAIN_CALLING_INIT
+
+FLAG:MAIN_CALLING_MAIN_GUI_LOOP
+
+FLAG:SHUTTING_DOWN
+
+FLAG:MAIN_GUI_LOOP:SDLMainLoop()
+
+FLAG:UPDATE_FRAME
+
+FLAG:UPDATE_CAMERA
+
+FLAG:UPDATE_SCENE
+
+FLAG:END_OF_RENDERING
+
+//FLAG:READ_FRAME
+
+FLAG:VIDEO_SOCKET
+
+float g_dt = 1.0f / 60.0f;	// the time delta used for simulation
+float g_realdt;				// the real world time delta between updates
+
+
+How to save the frame buffer and ten retrieve it back
+https://stackoverflow.com/questions/873984/how-to-save-the-frame-buffer-and-then-retrieve-it-back
+
+Remote OpenGL Setup without X
+https://gist.github.com/shehzan10/8d36c908af216573a1f0
+/usr/bin/X :0 &
+env DISPLAY=:0 ./NvFlexDemoReleaseCUDA_x64
+
+Terminate
+pgrep -a X
+kill <process_number>
+
+
+OpenGL threads
+https://stackoverflow.com/questions/64484835/how-to-setup-one-shared-opengl-contexts-per-thread-with-sdl2
