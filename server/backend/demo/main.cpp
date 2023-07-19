@@ -64,6 +64,7 @@
 
 SDL_Window* g_window;			// window handle
 unsigned int g_windowId;		// window id
+SDL_Texture* g_targetTexture;
 
 #define SDL_CONTROLLER_BUTTON_LEFT_TRIGGER (SDL_CONTROLLER_BUTTON_MAX + 1)
 #define SDL_CONTROLLER_BUTTON_RIGHT_TRIGGER (SDL_CONTROLLER_BUTTON_MAX + 2)
@@ -2215,6 +2216,10 @@ void UpdateFrame()
 
 	EndFrame();
 
+	bitmap_mtx.lock();
+	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
+	bitmap_mtx.unlock();
+
 	// If user has disabled async compute, ensure that no compute can overlap 
 	// graphics by placing a sync between them	
 	if (!g_useAsyncCompute)
@@ -2232,9 +2237,9 @@ void UpdateFrame()
 	}
 
 	// Copy Frame Buffer
-	bitmap_mtx.lock();
-	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
-	bitmap_mtx.unlock();
+	// bitmap_mtx.lock();
+	// ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
+	// bitmap_mtx.unlock();
 
 	if (g_capture)
 	{
@@ -2827,12 +2832,14 @@ void SDLInit(const char* title)
 		// For Sharing Context
 		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
-		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
+		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
 	}
 #endif
 
 	g_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		g_screenWidth, g_screenHeight, flags);
+	
+	// g_window  = SDL_CreateWindow(title, 0, 0, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
 
 	g_windowId = SDL_GetWindowID(g_window);
 }

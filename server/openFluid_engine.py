@@ -44,6 +44,8 @@ import os
 import signal
 import subprocess
 import sys
+from easyprocess import EasyProcess
+from pyvirtualdisplay.smartdisplay import SmartDisplay
 
 logger = logging.getLogger(__name__)
 zmq_address = "tcp://localhost:5559"
@@ -100,6 +102,7 @@ class OpenrtistEngine(cognitive_engine.Engine):
         self.zmq_imu_socket.bind(zmq_imu_address)
 
         self.phys_simulator = None
+        self.xvfb = None
         self.sendStyle = True
         self.screen_w = 720
         self.screen_h = 640
@@ -119,6 +122,8 @@ class OpenrtistEngine(cognitive_engine.Engine):
     def __del__(self):
         if self.phys_simulator != None:
             self.phys_simulator.kill()
+        if self.xvfb != None:    
+            self.xvfb.kill()
 
     def grab_frame(self):
         self.zmq_socket.send_string("0")
@@ -144,8 +149,14 @@ class OpenrtistEngine(cognitive_engine.Engine):
             return cognitive_engine.create_result_wrapper(status)
         
         extras = cognitive_engine.unpack_extras(openrtist_pb2.Extras, input_frame)
-        ratio = extras.screen_value.height / extras.screen_value.width
+        
+        # if extras.screen_value.height != 0:
+        #     print(f'-windowed={self.screen_w }x{self.screen_h}')
+        #     ratio = extras.screen_value.height / extras.screen_value.width
+        #     self.screen_w = extras.screen_value.width
+        #     self.screen_h = extras.screen_value.height
 
+        ratio = extras.screen_value.height / extras.screen_value.width
         if int(self.screen_w  * ratio) != self.screen_h:
             self.screen_h = int(ratio * self.screen_w)
             if self.phys_simulator != None:

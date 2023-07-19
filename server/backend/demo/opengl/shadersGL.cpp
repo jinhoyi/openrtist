@@ -46,7 +46,6 @@
 #include "android/AndroidMatrixTool.h"
 #endif
 
-
 #define CudaCheck(x) { cudaError_t err = x; if (err != cudaSuccess) { printf("Cuda error: %d in %s at %s:%d\n", err, #x, __FILE__, __LINE__); assert(0); } }
 
 typedef unsigned int VertexBuffer;
@@ -230,6 +229,9 @@ GLuint g_msaaFbo;
 GLuint g_msaaColorBuf;
 GLuint g_msaaDepthBuf;
 
+GLuint fbo;
+GLuint render_buf;
+
 int g_screenWidth;
 int g_screenHeight;
 
@@ -279,6 +281,8 @@ void InitRender(const RenderInitOptions& options)
 
 	g_msaaSamples = msaaSamples;
 	g_window = window;
+
+	
 }
 
 void DestroyRender()
@@ -307,14 +311,13 @@ void EndFrame()
 	{
 		// blit the msaa buffer to the window
 		glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, g_msaaFbo));
-		glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0));
+		glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fbo));
 		glVerify(glBlitFramebuffer(0, 0, g_screenWidth, g_screenHeight, 0, 0, g_screenWidth, g_screenHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
 	}
 
-		// render help to back buffer
-	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+	// render help to back buffer
+	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
 	glVerify(glClear(GL_DEPTH_BUFFER_BIT));
-
 }
 
 void SetView(Matrix44 view, Matrix44 proj)
@@ -397,9 +400,10 @@ void imguiGraphDraw()
 
 void ReshapeRender(int width, int height, bool minimized)
 {
-	if (g_msaaSamples)
+	// if (g_msaaSamples)
+	if (1 == 1)
 	{
-		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
 
 		if (g_msaaFbo)
 		{
@@ -435,6 +439,27 @@ void ReshapeRender(int width, int height, bool minimized)
 
 	g_screenWidth = width;
 	g_screenHeight = height;
+
+	// Generate and bind the FBO
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	// Generate and bind the RBO
+	glGenRenderbuffers(1, &render_buf);
+	glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
+
+	// Create storage for the RBO
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
+
+	// Attach the RBO to the FBO
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
+
+	// Check if everything worked
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		printf("Failed to create FBO\n");
+		return -1;
+	}
+	printf("created FBO\n");
 }
 
 void GetViewRay(int x, int y, Vec3& origin, Vec3& dir)
@@ -476,8 +501,7 @@ Vec3 GetScreenCoord(Vec3& pos) {
 
 void ReadFrame(int* backbuffer, int width, int height)
 {
-	glVerify(glReadBuffer(GL_BACK));
-	// glReadBuffer(GL_BACK);
+	glVerify(glReadBuffer(GL_COLOR_ATTACHMENT0));
 	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer);
 }
 
