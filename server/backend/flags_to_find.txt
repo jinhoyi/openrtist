@@ -48,7 +48,8 @@ https://stackoverflow.com/questions/873984/how-to-save-the-frame-buffer-and-then
 
 Remote OpenGL Setup without X
 https://gist.github.com/shehzan10/8d36c908af216573a1f0
-/usr/bin/X :0 &
+
+/usr/bin/X :0 -config /path/to/your/xorg.conf &
 env DISPLAY=:0 ./NvFlexDemoReleaseCUDA_x64
 
 Terminate
