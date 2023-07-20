@@ -45,10 +45,10 @@ DemoContext* GetDemoContext()
 	return s_context;
 }
 
-void ReshapeRender(SDL_Window* window)
+void ReshapeRender(SDL_Window* window, int width, int height)
 {
-	int width, height;
-	SDL_GetWindowSize(window, &width, &height);
+	// int width, height;
+	// SDL_GetWindowSize(window, &width, &height);
 	s_context->onSizeChanged(width, height, false);
 }
 

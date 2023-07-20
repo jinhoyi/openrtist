@@ -49,6 +49,7 @@ build/flexDemoCUDA_release/main.cpp.o: ../../main.cpp \
  ../../../external/SDL2-2.0.4/include/SDL_system.h \
  ../../../external/SDL2-2.0.4/include/SDL_timer.h \
  ../../../external/SDL2-2.0.4/include/SDL_version.h \
+ ../../../external/EGL/egl.h ../../../external/EGL/eglext.h \
  ../../../include/NvFlex.h ../../../include/NvFlexExt.h \
  ../../../include/NvFlex.h ../../../include/NvFlexDevice.h \
  ../../proto/gabriel.pb.h ../../proto/openrtist.pb.h ../../shaders.h \
@@ -129,6 +130,7 @@ build/flexDemoCUDA_release/main.cpp.o: ../../main.cpp \
  ../../../external/SDL2-2.0.4/include/SDL_system.h :
  ../../../external/SDL2-2.0.4/include/SDL_timer.h :
  ../../../external/SDL2-2.0.4/include/SDL_version.h :
+ ../../../external/EGL/egl.h ../../../external/EGL/eglext.h :
  ../../../include/NvFlex.h ../../../include/NvFlexExt.h :
  ../../../include/NvFlex.h ../../../include/NvFlexDevice.h :
  ../../proto/gabriel.pb.h ../../proto/openrtist.pb.h ../../shaders.h :

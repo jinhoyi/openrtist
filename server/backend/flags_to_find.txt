@@ -59,6 +59,12 @@ kill <process_number>
 OR 
 https://kovyrin.net/2007/10/01/how-to-run-gui-programs-on-a-server-without-any-monitor/
 
+OR
+EGL: 
+https://registry.khronos.org/EGL/sdk/docs/man/
+https://github.com/Dav1dde/glad/blob/glad2/example/c/egl_x11/egl_x11.c
+
+
 
 OpenGL threads
 https://stackoverflow.com/questions/64484835/how-to-setup-one-shared-opengl-contexts-per-thread-with-sdl2

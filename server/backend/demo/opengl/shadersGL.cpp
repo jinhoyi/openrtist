@@ -34,6 +34,8 @@
 
 #include "../../external/SDL2-2.0.4/include/SDL.h"
 #include "../../external/glad/src/glad.c"
+#include "../../external/EGL/egl.h"
+#include "../../external/EGL/eglext.h"
 
 #include "imguiRenderGL.h"
 #include "utilsGL.h"
@@ -232,6 +234,24 @@ GLuint g_msaaDepthBuf;
 GLuint fbo;
 GLuint render_buf;
 
+static const EGLint configAttribs[] = {
+		EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+		EGL_BLUE_SIZE, 8,
+		EGL_GREEN_SIZE, 8,
+		EGL_RED_SIZE, 8,
+		EGL_ALPHA_SIZE, 8,
+		EGL_DEPTH_SIZE, 24,
+		EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+		EGL_NONE
+};   
+
+EGLDisplay eglDpy;
+EGLint major, minor;
+EGLint numConfigs;
+EGLConfig eglCfg;
+EGLSurface eglSurf;
+EGLContext eglCtx;
+
 int g_screenWidth;
 int g_screenHeight;
 
@@ -257,27 +277,31 @@ void InitRender(const RenderInitOptions& options)
 	SDL_Window* window = options.window;
 	int msaaSamples = options.numMsaaSamples;
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	// //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
-	// Turn on double buffering with a 24bit Z buffer.
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	// // Turn on double buffering with a 24bit Z buffer.
+	// SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	// SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	SDL_GL_CreateContext(window);
+	// SDL_GL_CreateContext(window);
 
 	// This makes our buffer swap syncronized with the monitor's vertical refresh
-	SDL_GL_SetSwapInterval(1);
+	// SDL_GL_SetSwapInterval(1);
 
-	if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
-	{
-		printf("Could not initialize GL extensions\n");
-	}
+	// if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
+	// {
+	// 	printf("Could not initialize GL extensions\n");
+	// }
 
-	imguiRenderGLInit(GetFilePathByPlatform("backend/data/DroidSans.ttf").c_str());
+
+
+
+
+	// imguiRenderGLInit(GetFilePathByPlatform("backend/data/DroidSans.ttf").c_str());
 
 	g_msaaSamples = msaaSamples;
 	g_window = window;
@@ -287,6 +311,7 @@ void InitRender(const RenderInitOptions& options)
 
 void DestroyRender()
 {
+	eglTerminate(eglDpy);
 }
 
 void StartFrame(Vec4 clearColor)
@@ -307,17 +332,16 @@ void StartFrame(Vec4 clearColor)
 
 void EndFrame()
 {
-	// if (g_msaaFbo)
-	// {
-	// 	// blit the msaa buffer to the window
-	// 	glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, g_msaaFbo));
-	// 	glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fbo));
-	// 	glVerify(glBlitFramebuffer(0, 0, g_screenWidth, g_screenHeight, 0, 0, g_screenWidth, g_screenHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
-	// }
-
+	if (g_msaaFbo)
+	{
+		// blit the msaa buffer to the window
+		glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, g_msaaFbo));
+		glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fbo));
+		glVerify(glBlitFramebuffer(0, 0, g_screenWidth, g_screenHeight, 0, 0, g_screenWidth, g_screenHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
+	}
 	// render help to back buffer
-	// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
-	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
+	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
+	// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
 	glVerify(glClear(GL_DEPTH_BUFFER_BIT));
 }
 
@@ -401,11 +425,55 @@ void imguiGraphDraw()
 
 void ReshapeRender(int width, int height, bool minimized)
 {
-	// if (g_msaaSamples)
-	if (1 == 1)
-	{
-		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
+
+	printf("width = %d, height = %d\n",width, height);
+	printf("width = %d, height = %d\n",g_screenWidth, g_screenHeight);
+	// EGL ATTEMPT
+	printf("Test1\n");
+	eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	printf("Test2\n");
+	eglInitialize(eglDpy, &major, &minor);
+	printf("Test3\n");
+	eglChooseConfig(eglDpy, configAttribs, &eglCfg, 1, &numConfigs);
+	printf("Test4\n");
+	EGLint pbufferAttribs[] = {
+		EGL_WIDTH, width,
+		EGL_HEIGHT, height,
+		EGL_NONE,
+	};
+	printf("width = %d, height = %d\n",width, height);
+	printf("width = %d, height = %d\n",g_screenWidth, g_screenHeight);
+
+	eglSurf = eglCreatePbufferSurface(eglDpy, eglCfg, 
+                                               pbufferAttribs);
+	printf("Test5\n");
+	eglBindAPI(EGL_OPENGL_API);
+	printf("Test6\n");
+	eglCtx = eglCreateContext(eglDpy, eglCfg, EGL_NO_CONTEXT, 
+                                       NULL);
+	printf("Test7\n");
+	eglMakeCurrent(eglDpy, eglSurf, eglSurf, eglCtx);
+	printf("Test8\n");
+
+
+	
+
+	if (!gladLoadGLLoader((GLADloadproc)eglGetProcAddress)) {
+		printf("Failed to initialize GLAD\n");
+		return -1;
+	}
+
+	imguiRenderGLInit(GetFilePathByPlatform("backend/data/DroidSans.ttf").c_str());
+	printf("Test9\n");
+
+	printf("Test10\n");
+	if (g_msaaSamples)
+	// if (1 == 1)
+	{	
+		printf("Test10\n");
+		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
 		// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		printf("Test10.1\n");
 
 		if (g_msaaFbo)
 		{
@@ -413,15 +481,18 @@ void ReshapeRender(int width, int height, bool minimized)
 			glVerify(glDeleteRenderbuffers(1, &g_msaaColorBuf));
 			glVerify(glDeleteRenderbuffers(1, &g_msaaDepthBuf));
 		}
+		printf("Test10.2\n");
 
 		int samples;
 		glGetIntegerv(GL_MAX_SAMPLES_EXT, &samples);
+		printf("Test10.3\n");
 
 		// clamp samples to 4 to avoid problems with point sprite scaling
 		samples = Min(samples, Min(g_msaaSamples, 4));
 
 		glVerify(glGenFramebuffers(1, &g_msaaFbo));
 		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
+		printf("Test10.4\n");
 
 		glVerify(glGenRenderbuffers(1, &g_msaaColorBuf));
 		glVerify(glBindRenderbuffer(GL_RENDERBUFFER, g_msaaColorBuf));
@@ -440,30 +511,94 @@ void ReshapeRender(int width, int height, bool minimized)
 
 		glEnable(GL_MULTISAMPLE);
 	}
-
+	printf("Test13\n");	
 	g_screenWidth = width;
 	g_screenHeight = height;
 
-	// // Generate and bind the FBO
-	// glGenFramebuffers(1, &fbo);
-	// glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	GLint maxRenderbufferSize;
+	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &maxRenderbufferSize);
+	printf("Max renderbuffer size: %d\n", maxRenderbufferSize);
+	printf("width = %d, height = %d\n",width, height);
+	printf("width = %d, height = %d\n",g_screenWidth, g_screenHeight);
 
-	// // Generate and bind the RBO
-	// glGenRenderbuffers(1, &render_buf);
-	// glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
+	// Generate and bind the FBO
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	// // Create storage for the RBO
-	// glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
+	// Generate and bind the RBO
+	glGenRenderbuffers(1, &render_buf);
+	glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
 
-	// // Attach the RBO to the FBO
-	// glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
+	// Create storage for the RBO
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
 
-	// // Check if everything worked
+	// Attach the RBO to the FBO
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		printf("Incomplete framebuffer after attaching color buffer: status=0x%04X\n", status);
+		return -1;
+	}
+
+	// GLuint depth_buf;
+	// glGenRenderbuffers(1, &depth_buf);
+	// glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
+
+	// // Create storage for the depth buffer
+	// glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+
+	// // Attach the depth buffer to the FBO
+	// glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
+	// status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	// if (status != GL_FRAMEBUFFER_COMPLETE) {
+	// 	printf("Incomplete framebuffer after attaching color buffer: status=0x%04X\n", status);
+	// 	return -1;
+	// }
+
+	printf("Test14\n");
+	// Check if everything worked
 	// if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 	// 	printf("Failed to create FBO\n");
 	// 	return -1;
 	// }
-	// printf("created FBO\n");
+
+	
+	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		GLenum error = glGetError();
+		printf("OpenGL error code: 0x%04X\n", error);
+		if (status == GL_FRAMEBUFFER_UNDEFINED){
+			printf("GL_FRAMEBUFFER_UNDEFINED\n");
+		}
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT){
+			printf("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
+		}
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT){
+			printf("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
+		}
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER){
+			printf("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
+		}
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER){
+			printf("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
+		}
+		if (status == GL_FRAMEBUFFER_UNSUPPORTED){
+			printf("GL_FRAMEBUFFER_UNSUPPORTED\n");
+		}
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE){
+			printf("GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
+		}
+		if (status == GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS){
+			printf("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS\n");
+		}
+
+
+		return -1;
+	}
+
+	printf("created FBO\n");
+
+	
 }
 
 void GetViewRay(int x, int y, Vec3& origin, Vec3& dir)

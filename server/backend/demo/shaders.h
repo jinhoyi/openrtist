@@ -59,7 +59,7 @@ struct RenderInitOptions
 
 void InitRender(const RenderInitOptions& options);
 void DestroyRender();
-void ReshapeRender(SDL_Window* window);
+void ReshapeRender(SDL_Window* window, int width, int height);
 
 void StartFrame(Vec4 clearColor);
 void EndFrame();

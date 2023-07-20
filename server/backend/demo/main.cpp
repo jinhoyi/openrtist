@@ -38,6 +38,8 @@
 #include "../core/cloth.h"
 
 #include "../external/SDL2-2.0.4/include/SDL.h"
+#include "../external/EGL/egl.h"
+#include "../external/EGL/eglext.h"
 
 #include "../include/NvFlex.h"
 #include "../include/NvFlexExt.h"
@@ -2394,7 +2396,7 @@ void ReshapeWindow(int width, int height)
 	if (!g_benchmark)
 		printf("Reshaping\n");
 
-	ReshapeRender(g_window);
+	ReshapeRender(g_window, width, height);
 
 	if (!g_fluidRenderer || (width != g_screenWidth || height != g_screenHeight))
 	{
@@ -2821,27 +2823,27 @@ void SDLInit(const char* title)
 	// if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)	// Initialize SDL's Video subsystem and game controllers
 	// 	printf("Unable to initialize SDL");
 
-	if (SDL_Init(SDL_INIT_VIDEO ) < 0)	// Initialize SDL's Video subsystem and game controllers
-		printf("Unable to initialize SDL");
+	// if (SDL_Init(SDL_INIT_VIDEO ) < 0)	// Initialize SDL's Video subsystem and game controllers
+	// 	printf("Unable to initialize SDL");
 
-	unsigned int flags = SDL_WINDOW_RESIZABLE;
-#if !FLEX_DX
-	if (g_graphics == 0)
-	{
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		// For Sharing Context
-		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+// 	unsigned int flags = SDL_WINDOW_RESIZABLE;
+// #if !FLEX_DX
+// 	if (g_graphics == 0)
+// 	{
+// 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+// 		// For Sharing Context
+// 		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
-		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
-	}
-#endif
+// 		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
+// 	}
+// #endif
 
-	g_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		g_screenWidth, g_screenHeight, flags);
+	// g_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+	// 	g_screenWidth, g_screenHeight, flags);
 	
-	// g_window  = SDL_CreateWindow(title, 0, 0, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+	// // g_window  = SDL_CreateWindow(title, 0, 0, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
 
-	g_windowId = SDL_GetWindowID(g_window);
+	// g_windowId = SDL_GetWindowID(g_window);
 }
 
 
@@ -3128,6 +3130,7 @@ int main(int argc, char* argv[])
 
 	InitRender(options);
 
+	printf("g_screenWidth = %d, g_screenHeight = %d\n",g_screenWidth, g_screenHeight );
 	if (g_fullscreen)
 		SDL_SetWindowFullscreen(g_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 

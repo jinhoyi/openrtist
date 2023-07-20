@@ -55,8 +55,9 @@ build/flexDemoCUDA_release/opengl/shadersGL.cpp.o: \
  ../../opengl/../../external/glad/src/glad.c \
  ../../opengl/../../external/glad/src/../include/glad/glad.h \
  ../../opengl/../../external/glad/src/../include/glad/../KHR/khrplatform.h \
- ../../opengl/imguiRenderGL.h ../../opengl/utilsGL.h \
- ../../opengl/shader.h \
+ ../../opengl/../../external/EGL/egl.h \
+ ../../opengl/../../external/EGL/eglext.h ../../opengl/imguiRenderGL.h \
+ ../../opengl/utilsGL.h ../../opengl/shader.h \
  ../../opengl/../../external/glad/include/glad/glad.h \
  ../../opengl/../../core/png.h ../../opengl/../demoContext.h \
  ../../opengl/demoContextOGL.h
@@ -116,8 +117,9 @@ build/flexDemoCUDA_release/opengl/shadersGL.cpp.o: \
  ../../opengl/../../external/glad/src/glad.c :
  ../../opengl/../../external/glad/src/../include/glad/glad.h :
  ../../opengl/../../external/glad/src/../include/glad/../KHR/khrplatform.h :
- ../../opengl/imguiRenderGL.h ../../opengl/utilsGL.h :
- ../../opengl/shader.h :
+ ../../opengl/../../external/EGL/egl.h :
+ ../../opengl/../../external/EGL/eglext.h ../../opengl/imguiRenderGL.h :
+ ../../opengl/utilsGL.h ../../opengl/shader.h :
  ../../opengl/../../external/glad/include/glad/glad.h :
  ../../opengl/../../core/png.h ../../opengl/../demoContext.h :
  ../../opengl/demoContextOGL.h :
