@@ -307,16 +307,17 @@ void StartFrame(Vec4 clearColor)
 
 void EndFrame()
 {
-	if (g_msaaFbo)
-	{
-		// blit the msaa buffer to the window
-		glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, g_msaaFbo));
-		glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fbo));
-		glVerify(glBlitFramebuffer(0, 0, g_screenWidth, g_screenHeight, 0, 0, g_screenWidth, g_screenHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
-	}
+	// if (g_msaaFbo)
+	// {
+	// 	// blit the msaa buffer to the window
+	// 	glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, g_msaaFbo));
+	// 	glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fbo));
+	// 	glVerify(glBlitFramebuffer(0, 0, g_screenWidth, g_screenHeight, 0, 0, g_screenWidth, g_screenHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
+	// }
 
 	// render help to back buffer
-	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
+	// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
+	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
 	glVerify(glClear(GL_DEPTH_BUFFER_BIT));
 }
 
@@ -403,7 +404,8 @@ void ReshapeRender(int width, int height, bool minimized)
 	// if (g_msaaSamples)
 	if (1 == 1)
 	{
-		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
+		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
+		// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 		if (g_msaaFbo)
 		{
@@ -423,11 +425,13 @@ void ReshapeRender(int width, int height, bool minimized)
 
 		glVerify(glGenRenderbuffers(1, &g_msaaColorBuf));
 		glVerify(glBindRenderbuffer(GL_RENDERBUFFER, g_msaaColorBuf));
-		glVerify(glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, width, height));
+		// glVerify(glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, width, height));
+		glVerify(glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height));
 
 		glVerify(glGenRenderbuffers(1, &g_msaaDepthBuf));
 		glVerify(glBindRenderbuffer(GL_RENDERBUFFER, g_msaaDepthBuf));
-		glVerify(glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT, width, height));
+		// glVerify(glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT, width, height));
+		glVerify(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height));
 		glVerify(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, g_msaaDepthBuf));
 
 		glVerify(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, g_msaaColorBuf));
@@ -440,26 +444,26 @@ void ReshapeRender(int width, int height, bool minimized)
 	g_screenWidth = width;
 	g_screenHeight = height;
 
-	// Generate and bind the FBO
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	// // Generate and bind the FBO
+	// glGenFramebuffers(1, &fbo);
+	// glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	// Generate and bind the RBO
-	glGenRenderbuffers(1, &render_buf);
-	glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
+	// // Generate and bind the RBO
+	// glGenRenderbuffers(1, &render_buf);
+	// glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
 
-	// Create storage for the RBO
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
+	// // Create storage for the RBO
+	// glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
 
-	// Attach the RBO to the FBO
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
+	// // Attach the RBO to the FBO
+	// glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
 
-	// Check if everything worked
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		printf("Failed to create FBO\n");
-		return -1;
-	}
-	printf("created FBO\n");
+	// // Check if everything worked
+	// if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+	// 	printf("Failed to create FBO\n");
+	// 	return -1;
+	// }
+	// printf("created FBO\n");
 }
 
 void GetViewRay(int x, int y, Vec3& origin, Vec3& dir)
