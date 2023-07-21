@@ -234,16 +234,7 @@ GLuint g_msaaDepthBuf;
 GLuint fbo;
 GLuint render_buf;
 
-static const EGLint configAttribs[] = {
-		EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
-		EGL_BLUE_SIZE, 8,
-		EGL_GREEN_SIZE, 8,
-		EGL_RED_SIZE, 8,
-		EGL_ALPHA_SIZE, 8,
-		EGL_DEPTH_SIZE, 24,
-		EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-		EGL_NONE
-};   
+
 
 EGLDisplay eglDpy;
 EGLint major, minor;
@@ -296,9 +287,6 @@ void InitRender(const RenderInitOptions& options)
 	// {
 	// 	printf("Could not initialize GL extensions\n");
 	// }
-
-
-
 
 
 	// imguiRenderGLInit(GetFilePathByPlatform("backend/data/DroidSans.ttf").c_str());
@@ -425,38 +413,32 @@ void imguiGraphDraw()
 
 void ReshapeRender(int width, int height, bool minimized)
 {
-
-	printf("width = %d, height = %d\n",width, height);
-	printf("width = %d, height = %d\n",g_screenWidth, g_screenHeight);
 	// EGL ATTEMPT
-	printf("Test1\n");
-	eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-	printf("Test2\n");
-	eglInitialize(eglDpy, &major, &minor);
-	printf("Test3\n");
-	eglChooseConfig(eglDpy, configAttribs, &eglCfg, 1, &numConfigs);
-	printf("Test4\n");
+	EGLint configAttribs[] = {
+		EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+		EGL_BLUE_SIZE, 8,
+		EGL_GREEN_SIZE, 8,
+		EGL_RED_SIZE, 8,
+		EGL_ALPHA_SIZE, 8,
+		EGL_DEPTH_SIZE, 24,
+		EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+		EGL_NONE
+	};   
+
 	EGLint pbufferAttribs[] = {
 		EGL_WIDTH, width,
 		EGL_HEIGHT, height,
 		EGL_NONE,
 	};
-	printf("width = %d, height = %d\n",width, height);
-	printf("width = %d, height = %d\n",g_screenWidth, g_screenHeight);
 
-	eglSurf = eglCreatePbufferSurface(eglDpy, eglCfg, 
-                                               pbufferAttribs);
-	printf("Test5\n");
-	eglBindAPI(EGL_OPENGL_API);
-	printf("Test6\n");
-	eglCtx = eglCreateContext(eglDpy, eglCfg, EGL_NO_CONTEXT, 
-                                       NULL);
-	printf("Test7\n");
-	eglMakeCurrent(eglDpy, eglSurf, eglSurf, eglCtx);
-	printf("Test8\n");
-
-
+	eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	eglInitialize(eglDpy, &major, &minor);
+	eglChooseConfig(eglDpy, configAttribs, &eglCfg, 1, &numConfigs);
 	
+	eglSurf = eglCreatePbufferSurface(eglDpy, eglCfg, pbufferAttribs);
+	eglBindAPI(EGL_OPENGL_API);
+	eglCtx = eglCreateContext(eglDpy, eglCfg, EGL_NO_CONTEXT, NULL);
+	eglMakeCurrent(eglDpy, eglSurf, eglSurf, eglCtx);
 
 	if (!gladLoadGLLoader((GLADloadproc)eglGetProcAddress)) {
 		printf("Failed to initialize GLAD\n");
@@ -464,16 +446,12 @@ void ReshapeRender(int width, int height, bool minimized)
 	}
 
 	imguiRenderGLInit(GetFilePathByPlatform("backend/data/DroidSans.ttf").c_str());
-	printf("Test9\n");
 
-	printf("Test10\n");
 	if (g_msaaSamples)
 	// if (1 == 1)
 	{	
-		printf("Test10\n");
 		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
 		// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-		printf("Test10.1\n");
 
 		if (g_msaaFbo)
 		{
@@ -481,18 +459,15 @@ void ReshapeRender(int width, int height, bool minimized)
 			glVerify(glDeleteRenderbuffers(1, &g_msaaColorBuf));
 			glVerify(glDeleteRenderbuffers(1, &g_msaaDepthBuf));
 		}
-		printf("Test10.2\n");
 
 		int samples;
 		glGetIntegerv(GL_MAX_SAMPLES_EXT, &samples);
-		printf("Test10.3\n");
 
 		// clamp samples to 4 to avoid problems with point sprite scaling
 		samples = Min(samples, Min(g_msaaSamples, 4));
 
 		glVerify(glGenFramebuffers(1, &g_msaaFbo));
 		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
-		printf("Test10.4\n");
 
 		glVerify(glGenRenderbuffers(1, &g_msaaColorBuf));
 		glVerify(glBindRenderbuffer(GL_RENDERBUFFER, g_msaaColorBuf));
@@ -511,15 +486,11 @@ void ReshapeRender(int width, int height, bool minimized)
 
 		glEnable(GL_MULTISAMPLE);
 	}
-	printf("Test13\n");	
 	g_screenWidth = width;
 	g_screenHeight = height;
 
 	GLint maxRenderbufferSize;
 	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &maxRenderbufferSize);
-	printf("Max renderbuffer size: %d\n", maxRenderbufferSize);
-	printf("width = %d, height = %d\n",width, height);
-	printf("width = %d, height = %d\n",g_screenWidth, g_screenHeight);
 
 	// Generate and bind the FBO
 	glGenFramebuffers(1, &fbo);
@@ -535,35 +506,6 @@ void ReshapeRender(int width, int height, bool minimized)
 	// Attach the RBO to the FBO
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		printf("Incomplete framebuffer after attaching color buffer: status=0x%04X\n", status);
-		return -1;
-	}
-
-	// GLuint depth_buf;
-	// glGenRenderbuffers(1, &depth_buf);
-	// glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
-
-	// // Create storage for the depth buffer
-	// glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-
-	// // Attach the depth buffer to the FBO
-	// glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
-	// status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	// if (status != GL_FRAMEBUFFER_COMPLETE) {
-	// 	printf("Incomplete framebuffer after attaching color buffer: status=0x%04X\n", status);
-	// 	return -1;
-	// }
-
-	printf("Test14\n");
-	// Check if everything worked
-	// if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-	// 	printf("Failed to create FBO\n");
-	// 	return -1;
-	// }
-
-	
-	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		GLenum error = glGetError();
 		printf("OpenGL error code: 0x%04X\n", error);
@@ -591,14 +533,10 @@ void ReshapeRender(int width, int height, bool minimized)
 		if (status == GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS){
 			printf("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS\n");
 		}
-
-
 		return -1;
 	}
 
-	printf("created FBO\n");
-
-	
+	printf("created FBO\n");	
 }
 
 void GetViewRay(int x, int y, Vec3& origin, Vec3& dir)

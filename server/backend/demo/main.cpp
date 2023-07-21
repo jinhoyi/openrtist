@@ -443,7 +443,7 @@ Vec3 g_lightTarget;
 bool g_pause = false;
 bool g_step = false;
 bool g_capture = false;
-bool g_showHelp = true;
+bool g_showHelp = false;
 bool g_tweakPanel = true;
 bool g_fullscreen = false;
 bool g_wireframe = false;
@@ -493,7 +493,7 @@ bool g_diffuseShadow;
 float g_diffuseInscatter;
 float g_diffuseOutscatter;
 
-float g_dt = 1.0f / 120.0f;	// the time delta used for simulation
+float g_dt = 1.0f / 90.0f;	// the time delta used for simulation
 float g_realdt;				// the real world time delta between updates
 
 float g_waitTime;		// the CPU time spent waiting for the GPU
@@ -994,8 +994,9 @@ void Init(int scene, bool centerCamera = true)
 	// center camera on particles
 	if (centerCamera)
 	{
-		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*2.0f);
-		g_camAngle = Vec3(0.0f, -DegToRad(15.0f), 0.0f);
+		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*2.0f);
+		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
+		g_camAngle = Vec3(0.0f, -DegToRad(5.0f), 0.0f);
 
 		// give scene a chance to modify camera position
 		g_scenes[g_scene]->CenterCamera();

@@ -46,7 +46,7 @@ float g_realdt;				// the real world time delta between updates
 How to save the frame buffer and ten retrieve it back
 https://stackoverflow.com/questions/873984/how-to-save-the-frame-buffer-and-then-retrieve-it-back
 
-Remote OpenGL Setup without X
+Remote OpenGL Setup without Display
 https://gist.github.com/shehzan10/8d36c908af216573a1f0
 
 /usr/bin/X :0 -config /path/to/your/xorg.conf &
@@ -60,9 +60,12 @@ OR
 https://kovyrin.net/2007/10/01/how-to-run-gui-programs-on-a-server-without-any-monitor/
 
 OR
-EGL: 
+!!!EGL: Headless openGL (without X)
+https://stackoverflow.com/questions/3326641/opengl-without-x-org-in-linux
+https://developer.nvidia.com/blog/egl-eye-opengl-visualization-without-x-server/
+
 https://registry.khronos.org/EGL/sdk/docs/man/
-https://github.com/Dav1dde/glad/blob/glad2/example/c/egl_x11/egl_x11.c
+
 
 
 
