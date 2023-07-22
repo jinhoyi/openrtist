@@ -1,0 +1,4 @@
+build/flexDemoCUDA_debug/proto/gabriel.pb.cc.o: ../../proto/gabriel.pb.cc \
+ ../../proto/gabriel.pb.h
+../../proto/gabriel.pb.cc :
+ ../../proto/gabriel.pb.h :

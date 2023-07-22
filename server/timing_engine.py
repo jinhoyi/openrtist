@@ -1,10 +1,10 @@
-from openrtist_engine import OpenrtistEngine
+from openfluid_engine import OpenrfluidEngine
 import time
 
 
-class TimingEngine(OpenrtistEngine):
-    def __init__(self, compression_params, adapter):
-        super().__init__(compression_params, adapter)
+class TimingEngine(OpenrfluidEngine):
+    def __init__(self, compression_params, args_engine = None):
+        super().__init__(compression_params)
         self.count = 0
         self.lasttime = time.time()
         self.lastcount = 0
@@ -19,7 +19,7 @@ class TimingEngine(OpenrtistEngine):
         if self.t3 - self.lastprint > 5:
             pre = (self.t1 - self.t0) * 1000
             infer = (self.t2 - self.t1) * 1000
-            post = (self.t3 - self.t2) * 1000
+            post = (self.t3 - self.t0) * 1000
             wait = (self.t0 - self.lasttime) * 1000
             fps = 1.0 / (self.t3 - self.lasttime)
             avg_fps = (self.count - self.lastcount) / (self.t3 - self.lastprint)

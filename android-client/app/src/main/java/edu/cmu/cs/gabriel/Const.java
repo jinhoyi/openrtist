@@ -50,7 +50,7 @@ public class Const {
     // token size
     public static String TOKEN_LIMIT = "None";
 
-    public static final String SOURCE_NAME = "openrtist";
+    public static final String SOURCE_NAME = "openfluid";
 
     public static void loadPref(SharedPreferences sharedPreferences, String key) {
         Boolean b = null;

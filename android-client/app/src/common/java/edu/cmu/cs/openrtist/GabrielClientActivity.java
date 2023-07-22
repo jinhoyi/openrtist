@@ -136,6 +136,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private boolean recordingInitiated = false;
     private String mOutputPath = null;
 
+    private boolean help = false;
+
     // views
     private ImageView imgView;
     private ImageView iconView;
@@ -160,6 +162,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     private final List<String> styleDescriptions = new ArrayList<>(
             Collections.singletonList("Clear Display"));
+
 
     private final List<String> styleIds = new ArrayList<>(Collections.singletonList("none"));
 
@@ -343,7 +346,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                             android.view.HapticFeedbackConstants.LONG_PRESS);
                     if (Const.USING_FRONT_CAMERA) {
                         camButton.setImageResource(R.drawable.ic_baseline_camera_front_24px);
-
+                        help = true;
 //                        cameraCapture = new CameraCapture(
 //                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
 //                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_BACK_CAMERA);
@@ -351,6 +354,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                         Const.USING_FRONT_CAMERA = false;
                     } else {
                         camButton.setImageResource(R.drawable.ic_baseline_camera_rear_24px);
+                        help = true;
 
 //                        cameraCapture = new CameraCapture(
 //                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
@@ -753,7 +757,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
             preview = findViewById(R.id.camera_preview);
         }
 
-        sendIMUCloudlet();
 
         yuvToNV21Converter = new YuvToNV21Converter();
         yuvToJPEGConverter = new YuvToJPEGConverter(this);
@@ -775,24 +778,40 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 .build();
     }
 
+    int counter = 0;
     private void sendIMUCloudlet() {
+        Log.v(LOG_TAG, "++sendIMUScreenCloudlet " + counter);
         openrtistComm.sendSupplier(() -> {
             Extras.ScreenValue screenValue = Extras.ScreenValue.newBuilder()
                     .setHeight(mScreenHeight)
                     .setWidth(mScreenWidth)
                     .build();
-
+//            counter++;
             Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
                     .setX(imu_x)
                     .setY(imu_y)
                     .setZ(imu_z)
                     .build();
+            int scene = 0;
+            if (!(styleType.equals("?") || styleType.equals("none"))) {
+                scene = Integer.parseInt(styleType);
+            }
+            scene = scene + 1;
+            if (help) {
+                scene = -scene;
+                help = !help;
+            }
 
-            Extras extras = Extras.newBuilder().setStyle(styleType)
+//            Extras extras = Extras.newBuilder().setStyle(styleType)
+//                    .setScreenValue(screenValue)
+//                    .setImuValue(imuValue)
+//                    .build();
+
+            Extras extras = Extras.newBuilder().setDepthThreshold(scene)
+                    .setStyle(styleType)
                     .setScreenValue(screenValue)
                     .setImuValue(imuValue)
                     .build();
-
             return InputFrame.newBuilder()
                     .setPayloadType(PayloadType.IMAGE)
                     // .addPayloads(yuvToJPEGConverter.convert(image))
@@ -802,6 +821,27 @@ public class GabrielClientActivity extends AppCompatActivity implements
     }
 
 //    private void sendIMUCloudlet() {
+//        Log.v(LOG_TAG, "++sendIMUCloudlet " + counter);
+//        openrtistComm.sendSupplier(() -> {
+//            Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
+//                    .setX(imu_x)
+//                    .setY(imu_y)
+//                    .setZ(imu_z)
+//                    .build();
+//            counter++;
+//            Extras extras = Extras.newBuilder().setStyle(styleType)
+//                    .setImuValue(imuValue)
+//                    .build();
+//
+//            return InputFrame.newBuilder()
+//                    .setPayloadType(PayloadType.IMAGE)
+//                    // .addPayloads(yuvToJPEGConverter.convert(image))
+//                    .setExtras(GabrielClientActivity.pack(extras))
+//                    .build();
+//        });
+//    }
+
+//    private void sendFrameCloudlet(@NonNull ImageProxy image) {
 //        openrtistComm.sendSupplier(() -> {
 //            Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
 //                    .setX(imu_x)
@@ -820,26 +860,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //                    .build();
 //        });
 //    }
-
-    private void sendFrameCloudlet(@NonNull ImageProxy image) {
-        openrtistComm.sendSupplier(() -> {
-            Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
-                    .setX(imu_x)
-                    .setY(imu_y)
-                    .setZ(imu_z)
-                    .build();
-
-            Extras extras = Extras.newBuilder().setStyle(styleType)
-                    .setImuValue(imuValue)
-                    .build();
-
-            return InputFrame.newBuilder()
-                    .setPayloadType(PayloadType.IMAGE)
-                    // .addPayloads(yuvToJPEGConverter.convert(image))
-                    .setExtras(GabrielClientActivity.pack(extras))
-                    .build();
-        });
-    }
 
 //    frameCallback = new Choreographer.FrameCallback() {
 //        @Override
@@ -944,6 +964,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
             } else {
                 styleType = "none";
             }
+        }
+        else {
+            styleType = styleIds.get(position);
         }
         if (imgView.getVisibility() == View.INVISIBLE) {
             imgView.setVisibility(View.VISIBLE);
