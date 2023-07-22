@@ -47,6 +47,7 @@
 
 #include <iostream>
 #include <map>
+#include <jpeglib.h>
 
 // For Sending Frames to the Gabriel Server
 #include <thread>
@@ -601,6 +602,43 @@ std::mutex bitmap_mtx;
 zmq::context_t context(1);
 std::atomic_bool running(false);
 
+std::vector<unsigned char> compressJpeg(const int* bitmap, int width, int height, int quality) {
+    struct jpeg_compress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_compress(&cinfo);
+
+    unsigned char* outputBuffer = NULL;
+    unsigned long outputSize = 0;
+
+    jpeg_mem_dest(&cinfo, &outputBuffer, &outputSize);
+
+    cinfo.image_width = width;
+    cinfo.image_height = height;
+    cinfo.input_components = 3;
+    cinfo.in_color_space = JCS_RGB;
+
+    jpeg_set_defaults(&cinfo);
+    jpeg_set_quality(&cinfo, quality, TRUE);
+
+    jpeg_start_compress(&cinfo, TRUE);
+
+    JSAMPROW row_pointer[1];
+    while (cinfo.next_scanline < cinfo.image_height) {
+        row_pointer[0] = (unsigned char*)&bitmap[cinfo.next_scanline * cinfo.image_width];
+        jpeg_write_scanlines(&cinfo, row_pointer, 1);
+    }
+
+    jpeg_finish_compress(&cinfo);
+
+    std::vector<unsigned char> jpegData(outputBuffer, outputBuffer + outputSize);
+
+    jpeg_destroy_compress(&cinfo);
+    free(outputBuffer);
+
+    return jpegData;
+}
 
 void send_image(const int* bitmap, zmq::socket_t& socket) {
     gabriel::InputFrame frame;

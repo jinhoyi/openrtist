@@ -1,0 +1,15 @@
+Benchmark for simple streaming version
+(zeroMQ request-reply streaming from Flex to Gabrial, raw frame buffer)
+For Screen scaled so Height = 640
+
+pre = serial zeroMQ calls, infer = cv2 image compression to jpeg
+Big_screen:
+pre 6.8, infer 5.7, post 12.9 ms
+Small_screen:
+pre 2.5, infer 4.7ms
+
+After switching to BGR (from RGB whlie doing glReadPixel)
+Big_screen:
+pre 6.7, infer 5.8, post 12.9 ms
+Small_screen:
+pre 2.4, infer 3.6, post 7.8ms

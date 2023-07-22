@@ -134,7 +134,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         input_frame.ParseFromString(raw_msg)
         orig_img = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
         orig_img = np.flipud(orig_img.reshape((self.screen_h,self.screen_w,4)))
-        orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2RGB)
+        orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2BGR)
 
         return orig_img
     
@@ -198,9 +198,9 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
         # Encode the Image to jpg
         # _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
-        print("image" + str(image.size * 4))
+        # print("image" + str(image.size * 4))
         img_data = self.process_image(image)
-        print(len(img_data))
+        # print(len(img_data))
 
 
         # Serialize the result (protobuf)
