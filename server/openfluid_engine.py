@@ -47,6 +47,7 @@ import sys
 from easyprocess import EasyProcess
 from pyvirtualdisplay.smartdisplay import SmartDisplay
 import time
+from threading import Thread, Lock
 
 logger = logging.getLogger(__name__)
 
@@ -78,8 +79,8 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         if args_engine == None:
             args_engine = {'frame_port': '5559', 'imu_port': '5560'}
         
-        zmq_address = "tcp://localhost:" + args_engine['frame_port']
-        zmq_imu_address = "tcp://*:" + args_engine['imu_port']
+        self.zmq_address = "tcp://localhost:" + args_engine['frame_port']
+        self.zmq_imu_address = "tcp://*:" + args_engine['imu_port']
 
         # Water Mark
         self.compression_params = compression_params
@@ -98,10 +99,11 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         self.zmq_context = zmq.Context()
 
         self.frame_socket = self.zmq_context.socket(zmq.REQ)
-        self.frame_socket.connect(zmq_address)
+        # self.frame_socket.setsockopt( zmq.RCVTIMEO, 500 ) # milliseconds
+        self.frame_socket.connect(self.zmq_address)
 
         self.imu_socket = self.zmq_context.socket(zmq.REP)
-        self.imu_socket.bind(zmq_imu_address)
+        self.imu_socket.bind(self.zmq_imu_address)
 
         # IMU sensor Data
         self.x = 0
@@ -123,8 +125,11 @@ class OpenrfluidEngine(cognitive_engine.Engine):
     def __del__(self):
         if self.phys_simulator != None:
             self.phys_simulator.kill()
+        
+        while self.phys_simulator.poll() is None:
+                    time.sleep(0.1)
 
-
+   
     # def get_frame(self):
     #     #Async Request of new rendered frame to the Simulation Engin
     #     self.frame_socket.send_string("0")
@@ -137,6 +142,11 @@ class OpenrfluidEngine(cognitive_engine.Engine):
     #     orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2BGR)
 
     #     return orig_img
+
+    def reset_my_socket(self):
+        self.frame_socket.close()
+        self.frame_socket = self.zmq_context.socket( zmq.REQ )
+        self.frame_socket.connect(self.zmq_address)
     
     def get_frame(self):
         # Async Request of new rendered frame to the Simulation Engine
@@ -146,10 +156,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         input_frame = gabriel_pb2.InputFrame()
         input_frame.ParseFromString(raw_msg)
 
-        # Now, the payload is already a JPEG image
-        jpeg_img = input_frame.payloads[0]
-
-        return jpeg_img
+        return input_frame.payloads[0]
     
     def send_imu(self, extras):
         #Async Reply to the IMU_data request from the Simulation Engine
@@ -188,11 +195,11 @@ class OpenrfluidEngine(cognitive_engine.Engine):
             self._resize_watermark()
             if self.phys_simulator != None:
                 self.phys_simulator.kill()
+                self.reset_my_socket()
                 while self.phys_simulator.poll() is None:
                     time.sleep(0.1)
                 ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
                 self.phys_simulator = subprocess.Popen(ARGS, shell=True, preexec_fn=os.setsid)
-                # outs, errs = self.phys_simulator.communicate()
 
         if self.phys_simulator == None:
             print(f'-windowed={self.screen_w }x{self.screen_h}')
@@ -201,21 +208,12 @@ class OpenrfluidEngine(cognitive_engine.Engine):
             self.phys_simulator = subprocess.Popen(ARGS, shell=True, preexec_fn=os.setsid)
             # outs, errs = self.phys_simulator.communicate()
         
-
         # send imu data/get new rendered frame from/to the Physics simulation Engine
         self.send_imu(extras)
-        # image = self.get_frame()
-
-        # Post processing of the image
-        # image = self._apply_watermark(image)
-
-        # Encode the Image to jpg
-        # _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
-        # print("image" + str(image.size * 4))
-        # img_data = self.process_image(image)
         img_data = self.process_image(None)
-        # print(len(img_data))
 
+        while (img_data == None):
+            img_data = self.process_image(None)
 
         # Serialize the result (protobuf)
         result = gabriel_pb2.ResultWrapper.Result()
@@ -241,11 +239,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         return post_inference
 
     def inference(self, image):
-        """Allow timing engine to override this"""
-        # _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
-        # img_data = jpeg_img.tostring()
-        img_data = self.get_frame()
-        return img_data
+        return self.get_frame()
     
     def _resize_watermark(self):
         self.mrk_w = int(self.screen_w / 3.0 + 0.5)

@@ -48,7 +48,6 @@
 #include <iostream>
 #include <map>
 #include <jpeglib.h>
-#include <turbojpeg.h>
 
 // For Sending Frames to the Gabriel Server
 #include <thread>
@@ -644,10 +643,6 @@ std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int h
     jpeg_start_compress(&cinfo, TRUE);
 
     // Write the pixel data.
-    // while (cinfo.next_scanline < cinfo.image_height) {
-    //     JSAMPROW rowPointer = &rgbBitmap[cinfo.next_scanline * 3 * cinfo.image_width];
-    //     jpeg_write_scanlines(&cinfo, &rowPointer, 1);
-    // }
 	while (cinfo.next_scanline < cinfo.image_height) {
         JSAMPROW rowPointer = &rgbBitmap[(cinfo.image_height - 1 - cinfo.next_scanline) * 3 * cinfo.image_width];
         jpeg_write_scanlines(&cinfo, &rowPointer, 1);
@@ -711,6 +706,7 @@ void imu_thread() {
 	
 	zmq::socket_t imu_socket(context, zmq::socket_type::req);
 	imu_socket.connect("tcp://localhost:5560");
+	// imu_socket.set(zmq::sockopt::rcvtimeo, 500);
 	const float si_g = 9.81f;
 
 	float imu_x, imu_y, imu_z;
@@ -1903,7 +1899,7 @@ int DoUI()
 		const int numDiffuse = g_buffers->diffuseCount[0];
 
 		int x = g_screenWidth - 200;
-		int y = g_screenHeight - 23;
+		int y = (int)(g_screenHeight * 0.7);
 
 		// imgui
 		unsigned char button = 0;
@@ -2228,15 +2224,12 @@ void UpdateFrame()
 		newScene = input_scene - 1;
 	} 
 
-		
-			
-
-	bitmap_mtx.lock();
+	// bitmap_mtx.lock();
 	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
 
 	// bitmap_mtx.lock();
 	// g_jpegImage = compressJpeg(g_framebuffer.m_data, g_screenWidth, g_screenHeight, 67);
-	bitmap_mtx.unlock();
+	// bitmap_mtx.unlock();
 
 	// If user has disabled async compute, ensure that no compute can overlap 
 	// graphics by placing a sync between them	
@@ -2253,11 +2246,6 @@ void UpdateFrame()
 
 		g_mousePos = origin + dir*g_mouseT;
 	}
-
-	// Copy Frame Buffer
-	// bitmap_mtx.lock();
-	// ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
-	// bitmap_mtx.unlock();
 
 	if (g_capture)
 	{
