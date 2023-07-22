@@ -1,6 +1,6 @@
 Benchmark for simple streaming version
 (zeroMQ request-reply streaming from Flex to Gabrial, raw frame buffer)
-For Screen scaled so Height = 640
+For Screen scaled to Height = 640
 
 pre = serial zeroMQ calls, infer = cv2 image compression to jpeg
 Big_screen:
@@ -13,3 +13,22 @@ Big_screen:
 pre 6.7, infer 5.8, post 12.9 ms
 Small_screen:
 pre 2.4, infer 3.6, post 7.8ms
+
+After Compressing on Flex (pre = sening imu, infer = getting frame buffer)
+Big_screen:
+pre 0.1 ms, infer 4.4 ms, post 4.6 ms, wait 0.5 ms, fps 195.8
+Small_screen:
+pre 0.1 ms, infer 3.2 ms, post 3.4 ms, wait 2.6 ms, fps 166.50
+
+For Screen scaled to Height = 960
+Big_screen:
+pre 0.0 ms, infer 7.4 ms, post 7.5 ms, wait 0.9 ms, fps 119.88
+Small_screen:
+pre 0.1 ms, infer 3.6 ms, post 3.7 ms, wait 0.6 ms, fps 233.73
+
+Calling compressJpeg during updateFrame()
+For Screen scaled to Height = 960
+Big_screen:
+pre 0.1 ms, infer 0.5 ms, post 0.7 ms, wait 8.1 ms, fps 113.31
+Small_screen:
+

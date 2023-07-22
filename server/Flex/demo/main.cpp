@@ -48,6 +48,7 @@
 #include <iostream>
 #include <map>
 #include <jpeglib.h>
+#include <turbojpeg.h>
 
 // For Sending Frames to the Gabriel Server
 #include <thread>
@@ -601,44 +602,70 @@ inline void vSync() {
 std::mutex bitmap_mtx; 
 zmq::context_t context(1);
 std::atomic_bool running(false);
+std::vector<unsigned char> g_jpegImage;
 
-std::vector<unsigned char> compressJpeg(const int* bitmap, int width, int height, int quality) {
+
+std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int height, int quality) {
     struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr jerr;
 
+    // Initialize the JPEG compression object with default error handling.
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_compress(&cinfo);
 
+    // Allocate memory for the output buffer.
     unsigned char* outputBuffer = NULL;
     unsigned long outputSize = 0;
 
+    // Set the output buffer.
     jpeg_mem_dest(&cinfo, &outputBuffer, &outputSize);
 
+    // Set the image properties.
     cinfo.image_width = width;
     cinfo.image_height = height;
-    cinfo.input_components = 3;
+    cinfo.input_components = 3; // RGB
     cinfo.in_color_space = JCS_RGB;
 
+    // Set the default compression parameters.
     jpeg_set_defaults(&cinfo);
     jpeg_set_quality(&cinfo, quality, TRUE);
 
-    jpeg_start_compress(&cinfo, TRUE);
+    // Create an intermediate buffer for the RGB image.
+    std::vector<unsigned char> rgbBitmap(3 * width * height);
 
-    JSAMPROW row_pointer[1];
-    while (cinfo.next_scanline < cinfo.image_height) {
-        row_pointer[0] = (unsigned char*)&bitmap[cinfo.next_scanline * cinfo.image_width];
-        jpeg_write_scanlines(&cinfo, row_pointer, 1);
+    // Convert the image data from BGRA to RGB.
+    for (int i = 0; i < width * height; ++i) {
+        rgbBitmap[3*i + 0] = (bitmap[i] & 0xFF0000) >> 16;
+        rgbBitmap[3*i + 1] = (bitmap[i] & 0x00FF00) >> 8;
+        rgbBitmap[3*i + 2] = (bitmap[i] & 0x0000FF);
     }
 
+    // Start the compression.
+    jpeg_start_compress(&cinfo, TRUE);
+
+    // Write the pixel data.
+    // while (cinfo.next_scanline < cinfo.image_height) {
+    //     JSAMPROW rowPointer = &rgbBitmap[cinfo.next_scanline * 3 * cinfo.image_width];
+    //     jpeg_write_scanlines(&cinfo, &rowPointer, 1);
+    // }
+	while (cinfo.next_scanline < cinfo.image_height) {
+        JSAMPROW rowPointer = &rgbBitmap[(cinfo.image_height - 1 - cinfo.next_scanline) * 3 * cinfo.image_width];
+        jpeg_write_scanlines(&cinfo, &rowPointer, 1);
+    }
+
+    // Finish the compression.
     jpeg_finish_compress(&cinfo);
 
+    // Copy the compressed JPEG data.
     std::vector<unsigned char> jpegData(outputBuffer, outputBuffer + outputSize);
 
+    // Clean up.
     jpeg_destroy_compress(&cinfo);
     free(outputBuffer);
 
     return jpegData;
 }
+
 
 void send_image(const int* bitmap, zmq::socket_t& socket) {
     gabriel::InputFrame frame;
@@ -648,7 +675,12 @@ void send_image(const int* bitmap, zmq::socket_t& socket) {
 	socket.recv(request, zmq::recv_flags::none);
 
 	bitmap_mtx.lock();
-    frame.add_payloads((char*) bitmap, g_screenHeight * g_screenWidth * sizeof(int));
+	std::vector<unsigned char> jpegData = compressJpeg(bitmap, g_screenWidth, g_screenHeight, 67);
+	frame.add_payloads((char*)jpegData.data(), jpegData.size());
+
+	// frame.add_payloads((char*)g_jpegImage.data(), g_jpegImage.size());
+
+    // frame.add_payloads((char*) bitmap, g_screenHeight * g_screenWidth * sizeof(int));
 	bitmap_mtx.unlock();
 
     std::string serialized_frame;
@@ -2201,6 +2233,9 @@ void UpdateFrame()
 
 	bitmap_mtx.lock();
 	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
+
+	// bitmap_mtx.lock();
+	// g_jpegImage = compressJpeg(g_framebuffer.m_data, g_screenWidth, g_screenHeight, 67);
 	bitmap_mtx.unlock();
 
 	// If user has disabled async compute, ensure that no compute can overlap 

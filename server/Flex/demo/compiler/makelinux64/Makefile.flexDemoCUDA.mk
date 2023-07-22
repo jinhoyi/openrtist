@@ -53,7 +53,7 @@ flexDemoCUDA_release_common_cflags    += $(addprefix -I, $(flexDemoCUDA_release_
 flexDemoCUDA_release_common_cflags  += -m64
 flexDemoCUDA_release_common_cflags  += -Wall -std=c++0x -fPIC -fpermissive -fno-strict-aliasing
 flexDemoCUDA_release_common_cflags  += -O3 -ffast-math -DNDEBUG
-flexDemoCUDA_release_common_cflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq
+flexDemoCUDA_release_common_cflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq -lturbojpeg
 
 flexDemoCUDA_release_cflags	:= $(flexDemoCUDA_release_common_cflags)
 flexDemoCUDA_release_cppflags	:= $(flexDemoCUDA_release_common_cflags)
@@ -61,7 +61,7 @@ flexDemoCUDA_release_lflags    := $(flexDemoCUDA_custom_lflags)
 flexDemoCUDA_release_lflags    += $(addprefix -L, $(flexDemoCUDA_release_lpaths))
 flexDemoCUDA_release_lflags    += -Wl,--start-group $(addprefix -l, $(flexDemoCUDA_release_libraries)) -Wl,--end-group
 flexDemoCUDA_release_lflags  += -g -L/usr/lib -L"../../../lib/linux64" -L../../../external/SDL2-2.0.4/lib/x64/ -L/usr/local/cuda-9.2/lib64 -lGL -lglut -lGLU -lcudart_static -ldl -lrt -pthread
-flexDemoCUDA_release_lflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq -lEGL -ljpeg
+flexDemoCUDA_release_lflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq -lEGL -ljpeg -lturbojpeg
 flexDemoCUDA_release_lflags  += -m64 -no-pie
 flexDemoCUDA_release_objsdir  = $(OBJS_DIR)/flexDemoCUDA_release
 flexDemoCUDA_release_cpp_o    = $(addprefix $(flexDemoCUDA_release_objsdir)/, $(subst ./, , $(subst ../, , $(patsubst %.cpp, %.cpp.o, $(flexDemoCUDA_cppfiles)))))
@@ -138,14 +138,14 @@ flexDemoCUDA_debug_common_cflags    += $(addprefix -I, $(flexDemoCUDA_debug_hpat
 flexDemoCUDA_debug_common_cflags  += -m64
 flexDemoCUDA_debug_common_cflags  += -Wall -std=c++0x -fPIC -fpermissive -fno-strict-aliasing
 flexDemoCUDA_debug_common_cflags  += -g -O0
-flexDemoCUDA_debug_common_cflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq
+flexDemoCUDA_debug_common_cflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq -lturbojpeg
 flexDemoCUDA_debug_cflags	:= $(flexDemoCUDA_debug_common_cflags)
 flexDemoCUDA_debug_cppflags	:= $(flexDemoCUDA_debug_common_cflags)
 flexDemoCUDA_debug_lflags    := $(flexDemoCUDA_custom_lflags)
 flexDemoCUDA_debug_lflags    += $(addprefix -L, $(flexDemoCUDA_debug_lpaths))
 flexDemoCUDA_debug_lflags    += -Wl,--start-group $(addprefix -l, $(flexDemoCUDA_debug_libraries)) -Wl,--end-group
 flexDemoCUDA_debug_lflags  += -g -L/usr/lib -L"../../../lib/linux64" -L../../../external/SDL2-2.0.4/lib/x64/ -L/usr/local/cuda-9.2/lib64 -lGL -lglut -lGLU -lcudart_static -ldl -lrt -pthread
-flexDemoCUDA_debug_lflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq -lEGL -ljpeg
+flexDemoCUDA_debug_lflags  += -I../../../demo/proto/include -I../../../demo/proto -L/usr/local/lib -lprotobuf -lzmq -lEGL -ljpeg -lturbojpeg
 
 flexDemoCUDA_debug_lflags  += -m64 -no-pie
 flexDemoCUDA_debug_objsdir  = $(OBJS_DIR)/flexDemoCUDA_debug

@@ -110,7 +110,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
         # Initialize Screen Resolution of the client
         self.screen_w = 480
-        self.screen_h = 640
+        self.screen_h = 1080
 
         # Pointer to the Physics Simulation Engine Process
         self.phys_simulator = None
@@ -125,18 +125,31 @@ class OpenrfluidEngine(cognitive_engine.Engine):
             self.phys_simulator.kill()
 
 
+    # def get_frame(self):
+    #     #Async Request of new rendered frame to the Simulation Engin
+    #     self.frame_socket.send_string("0")
+    #     raw_msg = self.frame_socket.recv()
+
+    #     input_frame = gabriel_pb2.InputFrame()
+    #     input_frame.ParseFromString(raw_msg)
+    #     orig_img = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
+    #     orig_img = np.flipud(orig_img.reshape((self.screen_h,self.screen_w,4)))
+    #     orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2BGR)
+
+    #     return orig_img
+    
     def get_frame(self):
-        #Async Request of new rendered frame to the Simulation Engin
+        # Async Request of new rendered frame to the Simulation Engine
         self.frame_socket.send_string("0")
         raw_msg = self.frame_socket.recv()
 
         input_frame = gabriel_pb2.InputFrame()
         input_frame.ParseFromString(raw_msg)
-        orig_img = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
-        orig_img = np.flipud(orig_img.reshape((self.screen_h,self.screen_w,4)))
-        orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2BGR)
 
-        return orig_img
+        # Now, the payload is already a JPEG image
+        jpeg_img = input_frame.payloads[0]
+
+        return jpeg_img
     
     def send_imu(self, extras):
         #Async Reply to the IMU_data request from the Simulation Engine
@@ -191,15 +204,16 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
         # send imu data/get new rendered frame from/to the Physics simulation Engine
         self.send_imu(extras)
-        image = self.get_frame()
+        # image = self.get_frame()
 
         # Post processing of the image
-        image = self._apply_watermark(image)
+        # image = self._apply_watermark(image)
 
         # Encode the Image to jpg
         # _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
         # print("image" + str(image.size * 4))
-        img_data = self.process_image(image)
+        # img_data = self.process_image(image)
+        img_data = self.process_image(None)
         # print(len(img_data))
 
 
@@ -228,8 +242,9 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
     def inference(self, image):
         """Allow timing engine to override this"""
-        _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
-        img_data = jpeg_img.tostring()
+        # _, jpeg_img = cv2.imencode(".jpg", image, self.compression_params)
+        # img_data = jpeg_img.tostring()
+        img_data = self.get_frame()
         return img_data
     
     def _resize_watermark(self):
