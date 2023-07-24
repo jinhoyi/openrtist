@@ -601,6 +601,8 @@ inline void vSync() {
 std::mutex bitmap_mtx; 
 zmq::context_t context(1);
 std::atomic_bool running(false);
+std::atomic_bool new_frame(false);
+
 std::vector<unsigned char> g_jpegImage;
 
 
@@ -662,7 +664,93 @@ std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int h
 }
 
 
+// void send_image(const int* bitmap, zmq::socket_t& socket) {
+//     gabriel::InputFrame frame;
+// 	zmq::message_t request;
+
+// 	// Wait for next request from the client
+// 	socket.recv(request, zmq::recv_flags::none);
+
+// 	bitmap_mtx.lock();
+// 	std::vector<unsigned char> jpegData = compressJpeg(bitmap, g_screenWidth, g_screenHeight, 67);
+// 	frame.add_payloads((char*)jpegData.data(), jpegData.size());
+
+// 	// frame.add_payloads((char*)g_jpegImage.data(), g_jpegImage.size());
+
+//     // frame.add_payloads((char*) bitmap, g_screenHeight * g_screenWidth * sizeof(int));
+// 	bitmap_mtx.unlock();
+
+//     std::string serialized_frame;
+//     frame.SerializeToString(&serialized_frame);
+
+//     zmq::message_t message(serialized_frame.size());
+//     memcpy(message.data(), serialized_frame.data(), serialized_frame.size());
+//     socket.send(message, zmq::send_flags::none);
+// }
+
+// // FLAG:VIDEO_SOCKET
+// TgaImage g_framebuffer;
+
+// void video_thread() {
+	
+// 	zmq::socket_t receiver(context, zmq::socket_type::rep);
+// 	receiver.bind("tcp://*:5559");
+// 	// receiver.connect("tcp://localhost:5560"); // when using router
+
+// 	int *bitmap = (int*)g_framebuffer.m_data;
+
+// 	while(running) {
+// 		send_image(bitmap, receiver);
+// 	}
+// }
+
+TgaImage g_framebuffer;
+long counter = 0;
 void send_image(const int* bitmap, zmq::socket_t& socket) {
+    gabriel::InputFrame frame;
+	zmq::message_t request;
+
+	// Wait for next request from the client
+	// socket.recv(request, zmq::recv_flags::none);
+	bitmap_mtx.lock();
+	std::vector<unsigned char> jpegData = compressJpeg(bitmap, g_screenWidth, g_screenHeight, 67);
+	frame.add_payloads((char*)jpegData.data(), jpegData.size());
+	bitmap_mtx.unlock();
+
+    std::string serialized_frame;
+    frame.SerializeToString(&serialized_frame);
+	
+	// std::string count = std::to_string(counter++);;
+    // std::string final_message = topic + " " + count;
+	// std::string final_message = topic + " " + serialized_frame;
+// 
+
+    zmq::message_t message(serialized_frame.size());
+    memcpy(message.data(), serialized_frame.data(), serialized_frame.size());
+	// zmq::message_t message(final_message.size());
+    // memcpy(message.data(), final_message.data(), final_message.size());
+    socket.send(message, zmq::send_flags::none);
+}
+
+std::vector<unsigned char> g_jpegData;
+
+void compressFrame(const int* bitmap) {
+	g_jpegData = compressJpeg(bitmap, g_screenWidth, g_screenHeight, 67);
+}
+
+void video_thread() {
+	int *bitmap = (int*)g_framebuffer.m_data;
+
+	while(running) {
+		if (new_frame){
+			new_frame = false;
+			g_jpegData = compressJpeg(bitmap, g_screenWidth, g_screenHeight, 67);
+		}
+	}
+
+}
+
+void send_image2(zmq::socket_t& socket) {
     gabriel::InputFrame frame;
 	zmq::message_t request;
 
@@ -670,8 +758,7 @@ void send_image(const int* bitmap, zmq::socket_t& socket) {
 	socket.recv(request, zmq::recv_flags::none);
 
 	bitmap_mtx.lock();
-	std::vector<unsigned char> jpegData = compressJpeg(bitmap, g_screenWidth, g_screenHeight, 67);
-	frame.add_payloads((char*)jpegData.data(), jpegData.size());
+	frame.add_payloads((char*)g_jpegData.data(), g_jpegData.size());
 
 	// frame.add_payloads((char*)g_jpegImage.data(), g_jpegImage.size());
 
@@ -686,27 +773,23 @@ void send_image(const int* bitmap, zmq::socket_t& socket) {
     socket.send(message, zmq::send_flags::none);
 }
 
-//FLAG:VIDEO_SOCKET
-TgaImage g_framebuffer;
-
-void video_thread() {
-	
+void video_thread2(){
 	zmq::socket_t receiver(context, zmq::socket_type::rep);
 	receiver.bind("tcp://*:5559");
-	// receiver.connect("tcp://localhost:5560"); // when using router
-
-	int *bitmap = (int*)g_framebuffer.m_data;
 
 	while(running) {
-		send_image(bitmap, receiver);
+		send_image2(receiver);
 	}
 }
 
 void imu_thread() {
 	
-	zmq::socket_t imu_socket(context, zmq::socket_type::req);
+	// zmq::socket_t imu_socket(context, zmq::socket_type::req);
+	zmq::socket_t imu_socket(context, zmq::socket_type::pull);
+	int hwm = 1;
+	imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
 	imu_socket.connect("tcp://localhost:5560");
-	// imu_socket.set(zmq::sockopt::rcvtimeo, 500);
+
 	const float si_g = 9.81f;
 
 	float imu_x, imu_y, imu_z;
@@ -719,11 +802,13 @@ void imu_thread() {
 
 	while(running) {
 		// Send request
-		zmq::message_t request (1);
-        memcpy(request.data(), "0", 1);
-		imu_socket.send(request, zmq::send_flags::none);
+		// zmq::message_t request (1);
+        // memcpy(request.data(), "0", 1);
+		// imu_socket.send(request, zmq::send_flags::none);
 		
 		imu_socket.recv(pulled, zmq::recv_flags::none);
+
+
 		std::string serialized_extra(static_cast<char*>(pulled.data()), pulled.size());
 
 		extras.ParseFromString(serialized_extra);
@@ -731,7 +816,9 @@ void imu_thread() {
 		imu_y = -extras.imu_value().y();
 		imu_z = -extras.imu_value().z();
 		
+		// bitmap_mtx.lock();
 		g_newScene.store(extras.depth_threshold());
+		// bitmap_mtx.unlock();
 
 		g_params.gravity[0] = imu_x;
 		g_params.gravity[1] = imu_y;
@@ -739,6 +826,7 @@ void imu_thread() {
 		// lbm_g->set_f(imu_x, imu_y, imu_z);
 		// printf("x: %f, y: %f, z: %f\n", imu_x, imu_y, imu_z);
 	}
+	imu_socket.close();
 }
 
 void Init(int scene, bool centerCamera = true)
@@ -2060,7 +2148,7 @@ int DoUI()
 				g_params.numIterations = int(n);
 
 			imguiSeparatorLine();
-			imguiSlider("Gravity X", &g_params.gravity[0], -50.0f, 50.0f, 1.0f);
+			imguiSlider("Gravity X", &g_params.gravity[0], -15.0f, 15.0f, 0.5f);
 			imguiSlider("Gravity Y", &g_params.gravity[1], -50.0f, 50.0f, 1.0f);
 			imguiSlider("Gravity Z", &g_params.gravity[2], -50.0f, 50.0f, 1.0f);
 
@@ -2213,24 +2301,26 @@ void UpdateFrame()
 	EndFrame();
 
 	int newScene = -1;
+	// bitmap_mtx.lock();
 	int input_scene = g_newScene.load();
 	if (input_scene < 0) {
 		g_showHelp = !g_showHelp;
 		input_scene = -input_scene;
 		g_newScene.store(input_scene);
 	}
+	// bitmap_mtx.unlock();
 
 	if (g_scene != input_scene - 1) {
 		newScene = input_scene - 1;
 	} 
+	
 
 	// bitmap_mtx.lock();
 	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
-
 	// bitmap_mtx.lock();
 	// g_jpegImage = compressJpeg(g_framebuffer.m_data, g_screenWidth, g_screenHeight, 67);
 	// bitmap_mtx.unlock();
-
+	new_frame = true;
 	// If user has disabled async compute, ensure that no compute can overlap 
 	// graphics by placing a sync between them	
 	if (!g_useAsyncCompute)
@@ -3243,6 +3333,7 @@ int main(int argc, char* argv[])
 	running = true;
 
 	thread video_socket(video_thread);
+	thread video_socket2(video_thread2);
 	thread imu_socket(imu_thread);
 
 	//FLAG:MAIN_CALLING_MAIN_GUI_LOOP
@@ -3267,7 +3358,10 @@ int main(int argc, char* argv[])
 
 
 	video_socket.join();
+	video_socket2.join();
 	imu_socket.join();
+
+	context.close();
 
 	exit(0);
 
