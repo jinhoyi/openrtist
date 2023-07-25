@@ -41,6 +41,9 @@ import android.os.SystemClock;
 import android.renderscript.RenderScript;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -194,14 +197,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
         imu_y = event.values[1];
         imu_z = event.values[2];
 
-        // float currentAcceleration = (float) Math.sqrt(imu_x * imu_x + imu_y * imu_y + imu_z * imu_z);
-
-        // String updateText = String.format("Acc: (x,y,z) = (%.4f, %.4f, %.4f) = %.4f", imu_x, imu_y, imu_z, currentAcceleration);
-//        String updateText = "Acceleration: (x,y,z) = (" + Float.toString(x) + ", " + Float.toString(y) +
-        // Do something with this sensor value.
-//        TextView textView = (TextView) findViewById(R.id.accelLabel);
-//        accelLabel.setText(updateText);
-//        sendIMUCloudlet(imu_x, imu_y, imu_z);
     }
 
     // local execution
@@ -237,6 +232,25 @@ public class GabrielClientActivity extends AppCompatActivity implements
         fpsLabel = findViewById(R.id.fpsLabel);
         accelLabel = findViewById(R.id.accelLabel);
 
+        String[] menuItems = {"Menu Item 1", "Menu Item 2"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose an option")
+                .setItems(menuItems, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        switch (which) {
+                            case 0: // Menu Item 1 selected
+                                // Your action here
+                                break;
+                            case 1: // Menu Item 2 selected
+                                // Your action here
+                                break;
+                        }
+                    }
+                });
+        builder.show();
+
         stereoView1 = findViewById(R.id.guidance_image1);
         stereoView2 = findViewById(R.id.guidance_image2);
 
@@ -270,16 +284,21 @@ public class GabrielClientActivity extends AppCompatActivity implements
                             android.view.HapticFeedbackConstants.LONG_PRESS);
                 }
             });
-
             screenshotButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Bitmap b = Screenshot.takescreenshotOfRootView(imgView);
-                    storeScreenshot(b,getOutputMediaFile(MEDIA_TYPE_IMAGE).getPath());
-                    screenshotButton.performHapticFeedback(
-                            android.view.HapticFeedbackConstants.LONG_PRESS);
+                    @Override
+                    public void onClick(View v) {
+                        builder.show();
                     }
-            });
+                });
+//            screenshotButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Bitmap b = Screenshot.takescreenshotOfRootView(imgView);
+//                    storeScreenshot(b,getOutputMediaFile(MEDIA_TYPE_IMAGE).getPath());
+//                    screenshotButton.performHapticFeedback(
+//                            android.view.HapticFeedbackConstants.LONG_PRESS);
+//                    }
+//            });
         } else if (!Const.STEREO_ENABLED){
             //this view doesn't exist when stereo is enabled (activity_stereo.xml)
             imgRecord.setVisibility(View.GONE);
@@ -395,6 +414,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         frameHandler = new Handler();
         frameHandler.post(frameIterator);
     }
+
 
     private final Runnable frameIterator = new Runnable() {
         @Override

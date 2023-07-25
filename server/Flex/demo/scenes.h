@@ -68,6 +68,7 @@ public:
 #include "scenes/ccdfluid.h"
 #include "scenes/clothlayers.h"
 #include "scenes/dambreak.h"
+#include "scenes/dambreak2.h"
 #include "scenes/darts.h"
 #include "scenes/debris.h"
 #include "scenes/deformables.h"

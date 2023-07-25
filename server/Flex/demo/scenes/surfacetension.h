@@ -15,8 +15,8 @@ public:
 
 		CreateParticleGrid(Vec3(0.0f, 0.2f, -1.0f), 16, 64, 16, restDistance, Vec3(0.0f), 1.0f, false, 0.0f, phase, 0.005f);
 
-		g_sceneLower = Vec3(0.0f, 0.0f, -5.0f);
-		g_sceneUpper = Vec3(10.0f, 10.0f, -5.0f);
+		g_sceneLower = Vec3(0.0f, 0.0f, -3.0f);
+		g_sceneUpper = Vec3(6.0f, 6.0f, 3.0f);
 
 		g_params.radius = radius;
 
@@ -49,13 +49,15 @@ public:
 		g_drawEllipsoids = true;
 
 		// g_fluidColor = Vec4(0.9f, 0.9f, 0.9f, 0.0f);
+		g_fluidColor = Vec4(0.0f/255.0f, 95.0f/255.0f, 45.0/255.0f, 1.0f);
+
 	}
 
-	void Update()
-	{
-		if (g_frame == 300)
-			g_params.gravity[1] = -9.8f;
-	}
+	// void Update()
+	// {
+	// 	if (g_frame == 300)
+	// 		g_params.gravity[1] = -9.8f;
+	// }
 
 	int mCounter;
 	float surfaceTension;

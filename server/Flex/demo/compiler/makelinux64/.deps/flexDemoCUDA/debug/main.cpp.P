@@ -57,17 +57,18 @@ build/flexDemoCUDA_debug/main.cpp.o: ../../main.cpp ../../../core/types.h \
  ../../helpers.h ../../scenes.h ../../scenes/adhesion.h \
  ../../scenes/armadilloshower.h ../../scenes/bananas.h \
  ../../scenes/bouyancy.h ../../scenes/bunnybath.h ../../scenes/ccdfluid.h \
- ../../scenes/clothlayers.h ../../scenes/dambreak.h ../../scenes/darts.h \
- ../../scenes/debris.h ../../scenes/deformables.h ../../scenes/envcloth.h \
- ../../scenes/flag.h ../../scenes/fluidblock.h \
- ../../scenes/fluidclothcoupling.h ../../scenes/forcefield.h \
- ../../scenes/frictionmoving.h ../../scenes/frictionramp.h \
- ../../scenes/gamemesh.h ../../scenes/googun.h \
- ../../scenes/granularpile.h ../../scenes/granularshape.h \
- ../../scenes/inflatable.h ../../scenes/initialoverlap.h \
- ../../scenes/lighthouse.h ../../scenes/localspacecloth.h \
- ../../scenes/localspacefluid.h ../../scenes/lowdimensionalshapes.h \
- ../../scenes/melting.h ../../scenes/mixedpile.h ../../scenes/nonconvex.h \
+ ../../scenes/clothlayers.h ../../scenes/dambreak.h \
+ ../../scenes/dambreak2.h ../../scenes/darts.h ../../scenes/debris.h \
+ ../../scenes/deformables.h ../../scenes/envcloth.h ../../scenes/flag.h \
+ ../../scenes/fluidblock.h ../../scenes/fluidclothcoupling.h \
+ ../../scenes/forcefield.h ../../scenes/frictionmoving.h \
+ ../../scenes/frictionramp.h ../../scenes/gamemesh.h \
+ ../../scenes/googun.h ../../scenes/granularpile.h \
+ ../../scenes/granularshape.h ../../scenes/inflatable.h \
+ ../../scenes/initialoverlap.h ../../scenes/lighthouse.h \
+ ../../scenes/localspacecloth.h ../../scenes/localspacefluid.h \
+ ../../scenes/lowdimensionalshapes.h ../../scenes/melting.h \
+ ../../scenes/mixedpile.h ../../scenes/nonconvex.h \
  ../../scenes/parachutingbunnies.h ../../scenes/pasta.h \
  ../../scenes/player.h ../../scenes/potpourri.h \
  ../../scenes/rayleightaylor.h ../../scenes/restitution.h \
@@ -139,17 +140,18 @@ build/flexDemoCUDA_debug/main.cpp.o: ../../main.cpp ../../../core/types.h \
  ../../helpers.h ../../scenes.h ../../scenes/adhesion.h :
  ../../scenes/armadilloshower.h ../../scenes/bananas.h :
  ../../scenes/bouyancy.h ../../scenes/bunnybath.h ../../scenes/ccdfluid.h :
- ../../scenes/clothlayers.h ../../scenes/dambreak.h ../../scenes/darts.h :
- ../../scenes/debris.h ../../scenes/deformables.h ../../scenes/envcloth.h :
- ../../scenes/flag.h ../../scenes/fluidblock.h :
- ../../scenes/fluidclothcoupling.h ../../scenes/forcefield.h :
- ../../scenes/frictionmoving.h ../../scenes/frictionramp.h :
- ../../scenes/gamemesh.h ../../scenes/googun.h :
- ../../scenes/granularpile.h ../../scenes/granularshape.h :
- ../../scenes/inflatable.h ../../scenes/initialoverlap.h :
- ../../scenes/lighthouse.h ../../scenes/localspacecloth.h :
- ../../scenes/localspacefluid.h ../../scenes/lowdimensionalshapes.h :
- ../../scenes/melting.h ../../scenes/mixedpile.h ../../scenes/nonconvex.h :
+ ../../scenes/clothlayers.h ../../scenes/dambreak.h :
+ ../../scenes/dambreak2.h ../../scenes/darts.h ../../scenes/debris.h :
+ ../../scenes/deformables.h ../../scenes/envcloth.h ../../scenes/flag.h :
+ ../../scenes/fluidblock.h ../../scenes/fluidclothcoupling.h :
+ ../../scenes/forcefield.h ../../scenes/frictionmoving.h :
+ ../../scenes/frictionramp.h ../../scenes/gamemesh.h :
+ ../../scenes/googun.h ../../scenes/granularpile.h :
+ ../../scenes/granularshape.h ../../scenes/inflatable.h :
+ ../../scenes/initialoverlap.h ../../scenes/lighthouse.h :
+ ../../scenes/localspacecloth.h ../../scenes/localspacefluid.h :
+ ../../scenes/lowdimensionalshapes.h ../../scenes/melting.h :
+ ../../scenes/mixedpile.h ../../scenes/nonconvex.h :
  ../../scenes/parachutingbunnies.h ../../scenes/pasta.h :
  ../../scenes/player.h ../../scenes/potpourri.h :
  ../../scenes/rayleightaylor.h ../../scenes/restitution.h :

@@ -21,8 +21,8 @@ public:
 		CreateParticleGrid(Vec3(0.0f, (radius*0.5f), 0.0f), dx, dy, dz, restDistance, Vec3(0.0f), 2.0f, false, 0.0f, NvFlexMakePhase(0, eNvFlexPhaseSelfCollide | eNvFlexPhaseFluid), restDistance*0.01f);
 
 		g_solverDesc.featureMode = eNvFlexFeatureModeSimpleFluids;
-		g_sceneLower = Vec3(0.0f, 0.0f, -0.75f);
-		g_sceneUpper = Vec3(3.0f, 3.0f, -0.75f);
+		g_sceneLower = Vec3(0.0f, 0.0f, -1.5f);
+		g_sceneUpper = Vec3(3.0f, 3.0f, 1.5f);
 
 
 
@@ -81,9 +81,11 @@ public:
 		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 		
 		float scene_w = (g_sceneUpper.x - g_sceneLower.x);
-		float cam_z = g_sceneUpper.z + (scene_w / g_screenWidth) * 2030.0f;
+		float cam_z = g_sceneUpper.z + (scene_w / g_screenWidth) * 1630.0f;
+		float cam_y = g_sceneUpper.y;
 
-		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, (g_sceneLower.y + g_sceneUpper.y)*0.5f, cam_z);
+		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, g_sceneUpper.y * 1.2, cam_z);
+		g_camAngle = Vec3(0.0f, -ATan2(cam_y/2 * 1.2, cam_z), 0.0f);
 
 	}
 };

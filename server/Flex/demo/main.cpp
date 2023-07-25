@@ -444,7 +444,7 @@ Vec3 g_lightTarget;
 bool g_pause = false;
 bool g_step = false;
 bool g_capture = false;
-bool g_showHelp = true;
+bool g_showHelp = false;
 bool g_tweakPanel = true;
 bool g_fullscreen = false;
 bool g_wireframe = false;
@@ -673,40 +673,67 @@ void video_thread() {
 	while(running) {
 		if (new_frame){
 			new_frame = false;
-			std::vector<unsigned char> data = compressJpeg(bitmap, g_screenWidth, g_screenHeight, 67);
+			std::vector<unsigned char> data = compressJpeg((uint32_t *)bitmap, g_screenWidth, g_screenHeight, 67);
 			bitmap_mtx.lock();
 			g_jpegData = data;
 			bitmap_mtx.unlock();
 		}
 	}
-
 }
+
+// void send_scenes(zmq::message_t& request) {
+// 	openrtist::Extras extras;
+	
+// 	int idx = 0;
+// 	for (const auto& scene : g_scenes) {
+// 		(*extras.mutable_style_list())[std::to_string(idx++)] = scene->mName;
+//     }
+
+// 	std::string serialized_extras;
+//     extras.SerializeToString(&serialized_extras);
+
+// }
 
 void send_image(zmq::socket_t& socket) {
     gabriel::InputFrame frame;
 	zmq::message_t request;
+	openrtist::Extras extras;
+	std::string serialized_msg;
 
 	// Wait for next request from the client
 	socket.recv(request, zmq::recv_flags::none);
 
-	bitmap_mtx.lock();
-	frame.add_payloads((char*)g_jpegData.data(), g_jpegData.size());
-	bitmap_mtx.unlock();
+	std::string str(static_cast<char*>(request.data()), request.size());
+	// std::cout << str << std::endl;
+	if (str == "1"){
+		int idx = 0;
+		for (const auto& scene : g_scenes) {
+			(*extras.mutable_style_list())[std::to_string(idx++)] = scene->mName;
+		}
 
-    std::string serialized_frame;
-    frame.SerializeToString(&serialized_frame);
+		extras.SerializeToString(&serialized_msg);
+	} else {
+		bitmap_mtx.lock();
+		frame.add_payloads((char*)g_jpegData.data(), g_jpegData.size());
+		bitmap_mtx.unlock();
 
-    zmq::message_t message(serialized_frame.size());
-    memcpy(message.data(), serialized_frame.data(), serialized_frame.size());
+		frame.SerializeToString(&serialized_msg);
+	}
+
+    zmq::message_t message(serialized_msg.size());
+    memcpy(message.data(), serialized_msg.data(), serialized_msg.size());
     socket.send(message, zmq::send_flags::none);
 }
 
 void video_thread2(){
 	zmq::socket_t receiver(context, zmq::socket_type::rep);
-	receiver.connect("tcp://localhost:5559");
+	receiver.bind("tcp://*:5559");
+	printf("binded for video Thread\n");
+	send_image(receiver);
 
 	while(running) {
-		send_image(receiver);
+		if (g_jpegData.size() != 0)
+			send_image(receiver);
 	}
 	receiver.close();
 }
@@ -717,7 +744,7 @@ void imu_thread() {
 	zmq::socket_t imu_socket(context, zmq::socket_type::pull);
 	int hwm = 1;
 	imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
-	imu_socket.connect("tcp://localhost:5560");
+	imu_socket.bind("tcp://*:5560");
 
 	const float si_g = 9.81f;
 
@@ -730,6 +757,7 @@ void imu_thread() {
 	zmq::message_t pulled;
 
 	while(running) {
+		
 		imu_socket.recv(pulled, zmq::recv_flags::none);
 
 		std::string serialized_extra(static_cast<char*>(pulled.data()), pulled.size());
@@ -3057,29 +3085,34 @@ int main(int argc, char* argv[])
 	// FLAG:SCENE_SETUP
 
 	// opening scene
-	g_scenes.push_back(new DamBreak("DamBreak  7cm", 0.07f));
-	g_scenes.push_back(new DamBreak("DamBreak  10cm", 0.1f));
-	g_scenes.push_back(new DamBreak("DamBreak  15cm", 0.15f));
-	g_scenes.push_back(new RockPool("Rock Pool"));
+	// g_scenes.push_back(new DamBreak2("DamBreak2  7cm", 0.07f));
+	
+	// g_scenes.push_back(new DamBreak2("DamBreak2  15cm", 0.15f));
+	
+	
+	g_scenes.push_back(new DamBreak("DamBreak LowRes", 0.1f));
+	g_scenes.push_back(new DamBreak("DamBreak MedRes", 0.07f));
+	g_scenes.push_back(new DamBreak("DamBreak HighRes", 0.05f));
+	
 
 	// g_scenes.push_back(new PotPourri("Pot Pourri"));
 
 	// viscous fluids
-	g_scenes.push_back(new ViscosityBox("ViscosityBox Low", 1.5f));
-	g_scenes.push_back(new ViscosityBox("ViscosityBox Med", 3.0f));
+	g_scenes.push_back(new DamBreak2("Viscosity Low", 0.1f));
+	g_scenes.push_back(new ViscosityBox("Viscosity Med", 1.5f));
+	g_scenes.push_back(new ViscosityBox("Viscosity High", 3.0f));
 	// g_scenes.push_back(new Viscosity("Viscosity High", 5.0f, 0.12f));
-	g_scenes.push_back(new Viscosity("Viscosity Low", 1.5f));
-	g_scenes.push_back(new Viscosity("Viscosity Med", 3.0f));
+	g_scenes.push_back(new Viscosity("Rose Syrup", 1.5f));
+	// g_scenes.push_back(new Viscosity("Viscosity Med", 3.0f));
 
-	// regular fluids
-	g_scenes.push_back(new Buoyancy("Buoyancy"));
-	// g_scenes.push_back(new SurfaceTension("Surface Tension Low", 0.0f));
-	// g_scenes.push_back(new SurfaceTension("Surface Tension Med", 10.0f));
+	g_scenes.push_back(new SurfaceTension("Surface Tension Low", 0.0f));
+	g_scenes.push_back(new SurfaceTension("Surface Tension Med", 10.0f));
 	g_scenes.push_back(new SurfaceTension("Surface Tension High", 20.0f));
-	
-	
 
+	
 	// coupling scenes
+	g_scenes.push_back(new Buoyancy("Buoyancy"));
+	g_scenes.push_back(new RockPool("Rock Pool"));
 	g_scenes.push_back(new FluidBlock("Fluid Block"));
 	// g_scenes.push_back(new Speaker("Speaker", 0.15f));
 
@@ -3285,8 +3318,8 @@ int main(int argc, char* argv[])
 	SDL_Quit();
 
 
-	video_socket.join();
 	video_socket2.join();
+	video_socket.join();
 	imu_socket.join();
 
 	context.close();

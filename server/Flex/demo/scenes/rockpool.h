@@ -76,6 +76,14 @@ public:
 		g_emitters.push_back(e2);
 	}
 
+	void Update()
+	{
+		if (g_frame == 200)
+			g_emit = true;
+		if (g_frame == 300)
+			g_emit = false;
+	}
+
 	void CenterCamera() {
 		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 		
