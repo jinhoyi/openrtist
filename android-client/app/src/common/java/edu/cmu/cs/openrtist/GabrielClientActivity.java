@@ -170,8 +170,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
         this.styleType = "none";
         for (Map.Entry<String, String> entry : entrySet) {
             Log.v(LOG_TAG, "style: " + entry.getKey() + ", desc: " + entry.getValue());
-            styleDescriptions.add(entry.getValue().trim());
-            styleIds.add(entry.getKey().trim());
+            styleDescriptions.add(entry.getValue());
+            styleIds.add(entry.getKey());
         }
     }
 

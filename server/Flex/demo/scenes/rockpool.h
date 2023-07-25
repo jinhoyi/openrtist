@@ -9,7 +9,7 @@ public:
 
 	void Initialize()
 	{
-		float radius = 0.1f;
+		float radius = 0.1f; // 10cm
 
 		// convex rocks
 		float minSize = 0.1f;
@@ -17,7 +17,7 @@ public:
 
 		for (int i=0; i < 4; i++)
 			for (int j=0; j < 2; j++)
-			AddRandomConvex(10, Vec3(48*radius*0.5f + i*maxSize*2.0f, 0.0f, j*maxSize*2.0f), minSize, maxSize, Vec3(0.0f, 1.0f, 0.0f), Randf(0.0f, k2Pi));
+			AddRandomConvex(10, Vec3(20*radius*0.5f + i*maxSize*2.0f, 0.0f, j*maxSize*2.0f), minSize, maxSize, Vec3(0.0f, 1.0f, 0.0f), Randf(0.0f, k2Pi));
 
 		CreateParticleGrid(Vec3(0.0f, radius*0.5f, -1.0f), 32, 32, 32, radius*0.55f, Vec3(0.0f), 1.0f, false, 0.0f, NvFlexMakePhase(0, eNvFlexPhaseSelfCollide | eNvFlexPhaseFluid), 0.005f);
 
@@ -26,7 +26,7 @@ public:
 		g_numSubsteps = 2;
 
 		g_params.radius = radius;
-		g_params.dynamicFriction = 0.00f;
+		g_params.dynamicFriction = 0.01f;
 		g_params.viscosity = 0.01f;
 		g_params.numIterations = 2;
 		g_params.vorticityConfinement = 75.0f;
@@ -74,5 +74,16 @@ public:
 
 		g_emitters.push_back(e1);
 		g_emitters.push_back(e2);
+	}
+
+	void CenterCamera() {
+		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
+		
+		float scene_w = (g_sceneUpper.x - g_sceneLower.x);
+		float cam_z = g_sceneUpper.z + (scene_w / g_screenWidth) * 1530.0f;
+
+		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, (g_sceneLower.y + g_sceneUpper.y)*0.5f, cam_z);
+		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, g_sceneUpper.y + cam_z * 0.1, cam_z);
+		g_camAngle = Vec3(0.0f, -DegToRad(5.0f), 0.0f);
 	}
 };

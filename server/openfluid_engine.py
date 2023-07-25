@@ -62,25 +62,25 @@ class OpenrfluidEngine(cognitive_engine.Engine):
     SOURCE_NAME = "openfluid"
     SHAKE_STYLE = "going_to_work"
 
-    scene_list = {"0":"Rock Pool",
-                  "1":"Pot Pourri",
-                  "2":"Viscosity Low",
-                  "3":"Viscosity Med",
-                  "4":"Viscosity High",
-                  "5":"Buoyancy",
-                  "6":"Surface Tension Low",
-                  "7":"Surface Tension Med",
-                  "8":"Surface Tension High",
-                  "9":"DamBreak",
-                  "10":"Fluid Block"
-                  }
+    scene_list = [("00","Rock Pool"),
+                  ("01","Pot Pourri"),
+                  ("02","Viscosity Low"),
+                  ("03","Viscosity Med"),
+                  ("04","Viscosity High"),
+                  ("05","Buoyancy"),
+                  ("06","Surface Tension Low"),
+                  ("07","Surface Tension Med"),
+                  ("08","Surface Tension High"),
+                  ("09","DamBreak"),
+                  ("10","Fluid Block")
+                    ]
 
     def __init__(self, compression_params, args_engine = None):
         if args_engine == None:
             args_engine = {'frame_port': '5559', 'imu_port': '5560'}
         
-        self.zmq_address = "tcp://localhost:" + args_engine['frame_port']
-        self.zmq_imu_address = "tcp://*:" + args_engine['imu_port']
+        self.zmq_address = args_engine['frame_port']
+        self.zmq_imu_address = args_engine['imu_port']
 
         # Water Mark
         self.compression_params = compression_params
@@ -98,12 +98,18 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         # Initialize ZeroMQ Context and Socket
         self.zmq_context = zmq.Context()
 
+        # self.frame_socket = self.zmq_context.socket(zmq.PULL)
+        # self.frame_socket.setsockopt(zmq.RCVHWM, 1)
+        # self.frame_socket.connect(self.zmq_address)
+        # # self.frame_socket.setsockopt_string(zmq.SUBSCRIBE, "Img")
         self.frame_socket = self.zmq_context.socket(zmq.REQ)
         # self.frame_socket.setsockopt( zmq.RCVTIMEO, 500 ) # milliseconds
-        self.frame_socket.connect(self.zmq_address)
+        self.frame_socket.bind("tcp://*:" + self.zmq_address)
 
-        self.imu_socket = self.zmq_context.socket(zmq.REP)
-        self.imu_socket.bind(self.zmq_imu_address)
+        self.imu_socket = self.zmq_context.socket(zmq.PUSH)
+        # self.imu_socket.setsockopt(zmq.SNDHWM , 1)
+        self.imu_socket.bind("tcp://*:" + self.zmq_imu_address)
+        
 
         # IMU sensor Data
         self.x = 0
@@ -113,6 +119,8 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         # Initialize Screen Resolution of the client
         self.screen_w = 480
         self.screen_h = 1080
+        # self.screen_h = 1440
+        # self.screen_h = 2176
 
         # Pointer to the Physics Simulation Engine Process
         self.phys_simulator = None
@@ -129,7 +137,8 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         while self.phys_simulator.poll() is None:
                     time.sleep(0.1)
 
-   
+    
+
     # def get_frame(self):
     #     #Async Request of new rendered frame to the Simulation Engin
     #     self.frame_socket.send_string("0")
@@ -146,12 +155,35 @@ class OpenrfluidEngine(cognitive_engine.Engine):
     def reset_my_socket(self):
         self.frame_socket.close()
         self.frame_socket = self.zmq_context.socket( zmq.REQ )
-        self.frame_socket.connect(self.zmq_address)
+        self.frame_socket.connect("tcp://localhost:" + self.zmq_address)
+        pass
+        # self.imu_socket.unbind(self.zmq_imu_address)
+        
+        # url = self.imu_socket.LAST_ENDPOINT
+        # self.imu_socket.unbind(url)
+        # self.imu_socket.close()
+        # self.imu_socket = self.zmq_context.socket(zmq.PUSH)
+        # self.imu_socket.setsockopt(zmq.SNDHWM , 1)
+        # self.imu_socket.bind(self.zmq_imu_address)
     
+    # def get_frame(self):
+    #     # Async Request of new rendered frame to the Simulation Engine
+    #     raw_msg = self.frame_socket.recv()
+    #     input_frame = gabriel_pb2.InputFrame()
+    #     input_frame.ParseFromString(raw_msg)
+    #     return input_frame.payloads[0]
     def get_frame(self):
         # Async Request of new rendered frame to the Simulation Engine
+        # print("sending 0")
         self.frame_socket.send_string("0")
+        # print("asking for frame")
         raw_msg = self.frame_socket.recv()
+        # except:
+        #     return None
+
+        # print("done")
+        if raw_msg == None:
+            return None
 
         input_frame = gabriel_pb2.InputFrame()
         input_frame.ParseFromString(raw_msg)
@@ -160,7 +192,6 @@ class OpenrfluidEngine(cognitive_engine.Engine):
     
     def send_imu(self, extras):
         #Async Reply to the IMU_data request from the Simulation Engine
-        raw_msg = self.imu_socket.recv()
         self.imu_socket.send(extras.SerializeToString())
         return
 
@@ -178,15 +209,6 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         if extras.style == "?":
             self.sendStyle = True
 
-        # launch/update Simulation Machine if needed
-        # if extras.screen_value.height != 0.0:
-        #     print("HERE1")
-        #     print(f'-windowed={self.screen_w }x{self.screen_h}')
-        #     ratio = extras.screen_value.height / extras.screen_value.width
-        #     self.screen_w = extras.screen_value.width
-        #     self.screen_h = extras.screen_value.height
-            
-
         ratio = extras.screen_value.width / extras.screen_value.height
         # ratio = self.screen_h / self.screen_w
         if int(ratio * self.screen_h) != self.screen_w :
@@ -195,9 +217,9 @@ class OpenrfluidEngine(cognitive_engine.Engine):
             self._resize_watermark()
             if self.phys_simulator != None:
                 self.phys_simulator.kill()
-                self.reset_my_socket()
                 while self.phys_simulator.poll() is None:
                     time.sleep(0.1)
+                self.reset_my_socket()
                 ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
                 self.phys_simulator = subprocess.Popen(ARGS, shell=True, preexec_fn=os.setsid)
 
@@ -215,6 +237,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         while (img_data == None):
             img_data = self.process_image(None)
 
+
         # Serialize the result (protobuf)
         result = gabriel_pb2.ResultWrapper.Result()
         result.payload_type = gabriel_pb2.PayloadType.IMAGE
@@ -222,7 +245,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
         extras = openrtist_pb2.Extras()
         if self.sendStyle:
-            for k, v in self.scene_list.items():
+            for k, v in self.scene_list:
                 extras.style_list[k] = v
             self.sendStyle = False
             

@@ -78,7 +78,8 @@ build/flexDemoCUDA_release/main.cpp.o: ../../main.cpp \
  ../../scenes/spherecloth.h ../../scenes/surfacetension.h \
  ../../scenes/tearing.h ../../scenes/thinbox.h \
  ../../scenes/trianglecollision.h ../../scenes/triggervolume.h \
- ../../scenes/viscosity.h ../../scenes/waterballoon.h ../../benchmark.h
+ ../../scenes/viscosity.h ../../scenes/viscosityBox.h \
+ ../../scenes/speaker.h ../../scenes/waterballoon.h ../../benchmark.h
 ../../main.cpp :
  ../../../core/types.h ../../../core/maths.h ../../../core/core.h :
  ../../../core/vec2.h ../../../core/vec3.h ../../../core/vec4.h :
@@ -159,4 +160,5 @@ build/flexDemoCUDA_release/main.cpp.o: ../../main.cpp \
  ../../scenes/spherecloth.h ../../scenes/surfacetension.h :
  ../../scenes/tearing.h ../../scenes/thinbox.h :
  ../../scenes/trianglecollision.h ../../scenes/triggervolume.h :
- ../../scenes/viscosity.h ../../scenes/waterballoon.h ../../benchmark.h :
+ ../../scenes/viscosity.h ../../scenes/viscosityBox.h :
+ ../../scenes/speaker.h ../../scenes/waterballoon.h ../../benchmark.h :

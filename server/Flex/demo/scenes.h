@@ -112,4 +112,6 @@ public:
 #include "scenes/trianglecollision.h"
 #include "scenes/triggervolume.h"
 #include "scenes/viscosity.h"
+#include "scenes/viscosityBox.h"
+#include "scenes/speaker.h"
 #include "scenes/waterballoon.h"
