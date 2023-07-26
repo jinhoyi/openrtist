@@ -44,6 +44,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -184,6 +185,23 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private float imu_x = 0;
     private float imu_y = 0;
     private float imu_z = 0;
+
+//    private ScaleGestureDetector SGD;
+//    private float scaleFactor = 1;
+//    private boolean inScale = false;
+    private float sceneScaleFactor = 1.0f;
+    private float sceneX = 0.0f;
+    private float sceneY= 0.0f;
+
+    public void setScaleFactor(float factor){
+        sceneScaleFactor = factor;
+    }
+
+    public void setXY(float x, float y){
+        sceneX = x;
+        sceneY = y;
+    }
+
     @Override
     public final void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Do something here if sensor accuracy changes.
@@ -232,6 +250,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
         fpsLabel = findViewById(R.id.fpsLabel);
         accelLabel = findViewById(R.id.accelLabel);
 
+        imgView.setOnTouchListener(new SceneScaleGestures(this, this));
+
         String[] menuItems = {"Menu Item 1", "Menu Item 2"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose an option")
@@ -249,7 +269,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
                         }
                     }
                 });
-        builder.show();
 
         stereoView1 = findViewById(R.id.guidance_image1);
         stereoView2 = findViewById(R.id.guidance_image2);
@@ -261,6 +280,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> gravSensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         mSensor = gravSensors.get(0);
+
+        ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(
+                this, R.layout.mylist, styleDescriptions);
 
         if (Const.SHOW_RECORDER) {
             imgRecord.setOnClickListener(new View.OnClickListener() {
@@ -284,12 +306,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                             android.view.HapticFeedbackConstants.LONG_PRESS);
                 }
             });
-            screenshotButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        builder.show();
-                    }
-                });
+
 //            screenshotButton.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
@@ -350,8 +367,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
             } else {
                 playPauseButton.setVisibility(View.GONE);
 
-                ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(
-                        this, R.layout.mylist, styleDescriptions);
+
                 // Spinner click listener
                 spinner.setOnItemSelectedListener(this);
                 spinner.setAdapter(spinner_adapter);
@@ -384,6 +400,31 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 }
             });
         }
+
+        screenshotButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                builder.show();
+//            }
+            @Override
+            public void onClick(View v) {
+                // Create an ArrayAdapter
+                ArrayAdapter<String> adapter = spinner_adapter;
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(GabrielClientActivity.this);
+                builder.setTitle("Choose an option")
+                        .setAdapter(adapter, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String selectedItem = adapter.getItem(which);
+                                // Do something with the selected item
+                            }
+                        });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
 
 
         if (Const.SHOW_FPS) {
@@ -800,7 +841,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     int counter = 0;
     private void sendIMUCloudlet() {
-        Log.v(LOG_TAG, "++sendIMUScreenCloudlet " + counter);
         openrtistComm.sendSupplier(() -> {
             Extras.ScreenValue screenValue = Extras.ScreenValue.newBuilder()
                     .setHeight(mScreenHeight)
@@ -812,6 +852,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setY(imu_y)
                     .setZ(imu_z)
                     .build();
+            Extras.TouchInput touchValue = Extras.TouchInput.newBuilder()
+                    .setX(sceneX / mScreenDensity)
+                    .setY(sceneY / mScreenDensity)
+                    .setScale(sceneScaleFactor)
+                    .build();
+
             int scene = 0;
             if (!(styleType.equals("?") || styleType.equals("none"))) {
                 scene = Integer.parseInt(styleType);
@@ -821,6 +867,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 scene = -scene;
                 help = !help;
             }
+            sceneX = 0;
+            sceneY = 0;
 
 //            Extras extras = Extras.newBuilder().setStyle(styleType)
 //                    .setScreenValue(screenValue)
@@ -831,6 +879,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setStyle(styleType)
                     .setScreenValue(screenValue)
                     .setImuValue(imuValue)
+                    .setTouchValue(touchValue)
                     .build();
             return InputFrame.newBuilder()
                     .setPayloadType(PayloadType.IMAGE)

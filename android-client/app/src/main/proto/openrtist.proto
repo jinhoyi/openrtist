@@ -19,6 +19,12 @@ message Extras {
         float z = 3;
     }
 
+    message TouchInput {
+        float scale = 1;
+        float x = 2;
+        float y = 3;
+    }
+
     message ScreenValue {
         int32 height = 1;
         int32 width = 2;
@@ -31,4 +37,5 @@ message Extras {
     BytesValue depth_map = 5;
     IMUValue imu_value = 6;
     ScreenValue screen_value = 7;
+    TouchInput touch_value = 8;
 }
