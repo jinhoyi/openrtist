@@ -68,6 +68,9 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "cfenv": "cpp",
+        "csignal": "cpp",
+        "shared_mutex": "cpp"
     }
 }

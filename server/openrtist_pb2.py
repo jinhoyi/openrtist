@@ -14,13 +14,14 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fopenrtist.proto\x12\topenrtist\"\xd8\x03\n\x06\x45xtras\x12\r\n\x05style\x18\x01 \x01(\t\x12\x34\n\nstyle_list\x18\x02 \x03(\x0b\x32 .openrtist.Extras.StyleListEntry\x12\x31\n\x0bstyle_image\x18\x03 \x01(\x0b\x32\x1c.openrtist.Extras.BytesValue\x12\x17\n\x0f\x64\x65pth_threshold\x18\x04 \x01(\x05\x12/\n\tdepth_map\x18\x05 \x01(\x0b\x32\x1c.openrtist.Extras.BytesValue\x12-\n\timu_value\x18\x06 \x01(\x0b\x32\x1a.openrtist.Extras.IMUValue\x12\x33\n\x0cscreen_value\x18\x07 \x01(\x0b\x32\x1d.openrtist.Extras.ScreenValue\x1a\x1b\n\nBytesValue\x12\r\n\x05value\x18\x01 \x01(\x0c\x1a+\n\x08IMUValue\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\x12\t\n\x01z\x18\x03 \x01(\x02\x1a,\n\x0bScreenValue\x12\x0e\n\x06height\x18\x01 \x01(\x05\x12\r\n\x05width\x18\x02 \x01(\x05\x1a\x30\n\x0eStyleListEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x1e\n\x14\x65\x64u.cmu.cs.openrtistB\x06Protosb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fopenrtist.proto\x12\topenrtist\"\xbe\x04\n\x06\x45xtras\x12\r\n\x05style\x18\x01 \x01(\t\x12\x34\n\nstyle_list\x18\x02 \x03(\x0b\x32 .openrtist.Extras.StyleListEntry\x12\x31\n\x0bstyle_image\x18\x03 \x01(\x0b\x32\x1c.openrtist.Extras.BytesValue\x12\x17\n\x0f\x64\x65pth_threshold\x18\x04 \x01(\x05\x12/\n\tdepth_map\x18\x05 \x01(\x0b\x32\x1c.openrtist.Extras.BytesValue\x12-\n\timu_value\x18\x06 \x01(\x0b\x32\x1a.openrtist.Extras.IMUValue\x12\x33\n\x0cscreen_value\x18\x07 \x01(\x0b\x32\x1d.openrtist.Extras.ScreenValue\x12\x31\n\x0btouch_value\x18\x08 \x01(\x0b\x32\x1c.openrtist.Extras.TouchInput\x1a\x1b\n\nBytesValue\x12\r\n\x05value\x18\x01 \x01(\x0c\x1a+\n\x08IMUValue\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\x12\t\n\x01z\x18\x03 \x01(\x02\x1a\x31\n\nTouchInput\x12\r\n\x05scale\x18\x01 \x01(\x02\x12\t\n\x01x\x18\x02 \x01(\x02\x12\t\n\x01y\x18\x03 \x01(\x02\x1a,\n\x0bScreenValue\x12\x0e\n\x06height\x18\x01 \x01(\x05\x12\r\n\x05width\x18\x02 \x01(\x05\x1a\x30\n\x0eStyleListEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x1e\n\x14\x65\x64u.cmu.cs.openrtistB\x06Protosb\x06proto3')
 
 
 
 _EXTRAS = DESCRIPTOR.message_types_by_name['Extras']
 _EXTRAS_BYTESVALUE = _EXTRAS.nested_types_by_name['BytesValue']
 _EXTRAS_IMUVALUE = _EXTRAS.nested_types_by_name['IMUValue']
+_EXTRAS_TOUCHINPUT = _EXTRAS.nested_types_by_name['TouchInput']
 _EXTRAS_SCREENVALUE = _EXTRAS.nested_types_by_name['ScreenValue']
 _EXTRAS_STYLELISTENTRY = _EXTRAS.nested_types_by_name['StyleListEntry']
 Extras = _reflection.GeneratedProtocolMessageType('Extras', (_message.Message,), {
@@ -36,6 +37,13 @@ Extras = _reflection.GeneratedProtocolMessageType('Extras', (_message.Message,),
     'DESCRIPTOR' : _EXTRAS_IMUVALUE,
     '__module__' : 'openrtist_pb2'
     # @@protoc_insertion_point(class_scope:openrtist.Extras.IMUValue)
+    })
+  ,
+
+  'TouchInput' : _reflection.GeneratedProtocolMessageType('TouchInput', (_message.Message,), {
+    'DESCRIPTOR' : _EXTRAS_TOUCHINPUT,
+    '__module__' : 'openrtist_pb2'
+    # @@protoc_insertion_point(class_scope:openrtist.Extras.TouchInput)
     })
   ,
 
@@ -59,6 +67,7 @@ Extras = _reflection.GeneratedProtocolMessageType('Extras', (_message.Message,),
 _sym_db.RegisterMessage(Extras)
 _sym_db.RegisterMessage(Extras.BytesValue)
 _sym_db.RegisterMessage(Extras.IMUValue)
+_sym_db.RegisterMessage(Extras.TouchInput)
 _sym_db.RegisterMessage(Extras.ScreenValue)
 _sym_db.RegisterMessage(Extras.StyleListEntry)
 
@@ -69,13 +78,15 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _EXTRAS_STYLELISTENTRY._options = None
   _EXTRAS_STYLELISTENTRY._serialized_options = b'8\001'
   _EXTRAS._serialized_start=31
-  _EXTRAS._serialized_end=503
-  _EXTRAS_BYTESVALUE._serialized_start=335
-  _EXTRAS_BYTESVALUE._serialized_end=362
-  _EXTRAS_IMUVALUE._serialized_start=364
-  _EXTRAS_IMUVALUE._serialized_end=407
-  _EXTRAS_SCREENVALUE._serialized_start=409
-  _EXTRAS_SCREENVALUE._serialized_end=453
-  _EXTRAS_STYLELISTENTRY._serialized_start=455
-  _EXTRAS_STYLELISTENTRY._serialized_end=503
+  _EXTRAS._serialized_end=605
+  _EXTRAS_BYTESVALUE._serialized_start=386
+  _EXTRAS_BYTESVALUE._serialized_end=413
+  _EXTRAS_IMUVALUE._serialized_start=415
+  _EXTRAS_IMUVALUE._serialized_end=458
+  _EXTRAS_TOUCHINPUT._serialized_start=460
+  _EXTRAS_TOUCHINPUT._serialized_end=509
+  _EXTRAS_SCREENVALUE._serialized_start=511
+  _EXTRAS_SCREENVALUE._serialized_end=555
+  _EXTRAS_STYLELISTENTRY._serialized_start=557
+  _EXTRAS_STYLELISTENTRY._serialized_end=605
 # @@protoc_insertion_point(module_scope)

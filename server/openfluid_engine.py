@@ -130,7 +130,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
         print(f'-windowed={480}x{640}')
         ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={480}x{640}']
-        self.phys_simulator = subprocess.Popen(ARGS, shell=True, stdout=subprocess.PIPE, start_new_session=True)
+        self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
         self.get_scenes()
 
         logger.info("FINISHED INITIALISATION")
@@ -205,7 +205,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
 
         ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
-        self.phys_simulator = subprocess.Popen(ARGS, shell=True, stdout=subprocess.PIPE, start_new_session=True)
+        self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
 
 
 

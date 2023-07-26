@@ -50,7 +50,7 @@ struct TableStruct_openrtist_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -73,6 +73,9 @@ extern Extras_ScreenValueDefaultTypeInternal _Extras_ScreenValue_default_instanc
 class Extras_StyleListEntry_DoNotUse;
 class Extras_StyleListEntry_DoNotUseDefaultTypeInternal;
 extern Extras_StyleListEntry_DoNotUseDefaultTypeInternal _Extras_StyleListEntry_DoNotUse_default_instance_;
+class Extras_TouchInput;
+class Extras_TouchInputDefaultTypeInternal;
+extern Extras_TouchInputDefaultTypeInternal _Extras_TouchInput_default_instance_;
 }  // namespace openrtist
 PROTOBUF_NAMESPACE_OPEN
 template<> ::openrtist::Extras* Arena::CreateMaybeMessage<::openrtist::Extras>(Arena*);
@@ -80,6 +83,7 @@ template<> ::openrtist::Extras_BytesValue* Arena::CreateMaybeMessage<::openrtist
 template<> ::openrtist::Extras_IMUValue* Arena::CreateMaybeMessage<::openrtist::Extras_IMUValue>(Arena*);
 template<> ::openrtist::Extras_ScreenValue* Arena::CreateMaybeMessage<::openrtist::Extras_ScreenValue>(Arena*);
 template<> ::openrtist::Extras_StyleListEntry_DoNotUse* Arena::CreateMaybeMessage<::openrtist::Extras_StyleListEntry_DoNotUse>(Arena*);
+template<> ::openrtist::Extras_TouchInput* Arena::CreateMaybeMessage<::openrtist::Extras_TouchInput>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace openrtist {
 
@@ -397,6 +401,165 @@ class Extras_IMUValue PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class Extras_TouchInput PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:openrtist.Extras.TouchInput) */ {
+ public:
+  inline Extras_TouchInput() : Extras_TouchInput(nullptr) {};
+  virtual ~Extras_TouchInput();
+
+  Extras_TouchInput(const Extras_TouchInput& from);
+  Extras_TouchInput(Extras_TouchInput&& from) noexcept
+    : Extras_TouchInput() {
+    *this = ::std::move(from);
+  }
+
+  inline Extras_TouchInput& operator=(const Extras_TouchInput& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Extras_TouchInput& operator=(Extras_TouchInput&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Extras_TouchInput& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Extras_TouchInput* internal_default_instance() {
+    return reinterpret_cast<const Extras_TouchInput*>(
+               &_Extras_TouchInput_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(Extras_TouchInput& a, Extras_TouchInput& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Extras_TouchInput* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Extras_TouchInput* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Extras_TouchInput* New() const final {
+    return CreateMaybeMessage<Extras_TouchInput>(nullptr);
+  }
+
+  Extras_TouchInput* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Extras_TouchInput>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Extras_TouchInput& from);
+  void MergeFrom(const Extras_TouchInput& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Extras_TouchInput* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "openrtist.Extras.TouchInput";
+  }
+  protected:
+  explicit Extras_TouchInput(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_openrtist_2eproto);
+    return ::descriptor_table_openrtist_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kScaleFieldNumber = 1,
+    kXFieldNumber = 2,
+    kYFieldNumber = 3,
+  };
+  // float scale = 1;
+  void clear_scale();
+  float scale() const;
+  void set_scale(float value);
+  private:
+  float _internal_scale() const;
+  void _internal_set_scale(float value);
+  public:
+
+  // float x = 2;
+  void clear_x();
+  float x() const;
+  void set_x(float value);
+  private:
+  float _internal_x() const;
+  void _internal_set_x(float value);
+  public:
+
+  // float y = 3;
+  void clear_y();
+  float y() const;
+  void set_y(float value);
+  private:
+  float _internal_y() const;
+  void _internal_set_y(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:openrtist.Extras.TouchInput)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  float scale_;
+  float x_;
+  float y_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_openrtist_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Extras_ScreenValue PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:openrtist.Extras.ScreenValue) */ {
  public:
@@ -439,7 +602,7 @@ class Extras_ScreenValue PROTOBUF_FINAL :
                &_Extras_ScreenValue_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(Extras_ScreenValue& a, Extras_ScreenValue& b) {
     a.Swap(&b);
@@ -571,7 +734,7 @@ public:
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
     ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_openrtist_2eproto);
-    return ::descriptor_table_openrtist_2eproto.file_level_metadata[3];
+    return ::descriptor_table_openrtist_2eproto.file_level_metadata[4];
   }
 
   public:
@@ -621,7 +784,7 @@ class Extras PROTOBUF_FINAL :
                &_Extras_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(Extras& a, Extras& b) {
     a.Swap(&b);
@@ -691,6 +854,7 @@ class Extras PROTOBUF_FINAL :
 
   typedef Extras_BytesValue BytesValue;
   typedef Extras_IMUValue IMUValue;
+  typedef Extras_TouchInput TouchInput;
   typedef Extras_ScreenValue ScreenValue;
 
   // accessors -------------------------------------------------------
@@ -702,6 +866,7 @@ class Extras PROTOBUF_FINAL :
     kDepthMapFieldNumber = 5,
     kImuValueFieldNumber = 6,
     kScreenValueFieldNumber = 7,
+    kTouchValueFieldNumber = 8,
     kDepthThresholdFieldNumber = 4,
   };
   // map<string, string> style_list = 2;
@@ -818,6 +983,24 @@ class Extras PROTOBUF_FINAL :
       ::openrtist::Extras_ScreenValue* screen_value);
   ::openrtist::Extras_ScreenValue* unsafe_arena_release_screen_value();
 
+  // .openrtist.Extras.TouchInput touch_value = 8;
+  bool has_touch_value() const;
+  private:
+  bool _internal_has_touch_value() const;
+  public:
+  void clear_touch_value();
+  const ::openrtist::Extras_TouchInput& touch_value() const;
+  ::openrtist::Extras_TouchInput* release_touch_value();
+  ::openrtist::Extras_TouchInput* mutable_touch_value();
+  void set_allocated_touch_value(::openrtist::Extras_TouchInput* touch_value);
+  private:
+  const ::openrtist::Extras_TouchInput& _internal_touch_value() const;
+  ::openrtist::Extras_TouchInput* _internal_mutable_touch_value();
+  public:
+  void unsafe_arena_set_allocated_touch_value(
+      ::openrtist::Extras_TouchInput* touch_value);
+  ::openrtist::Extras_TouchInput* unsafe_arena_release_touch_value();
+
   // int32 depth_threshold = 4;
   void clear_depth_threshold();
   ::PROTOBUF_NAMESPACE_ID::int32 depth_threshold() const;
@@ -845,6 +1028,7 @@ class Extras PROTOBUF_FINAL :
   ::openrtist::Extras_BytesValue* depth_map_;
   ::openrtist::Extras_IMUValue* imu_value_;
   ::openrtist::Extras_ScreenValue* screen_value_;
+  ::openrtist::Extras_TouchInput* touch_value_;
   ::PROTOBUF_NAMESPACE_ID::int32 depth_threshold_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_openrtist_2eproto;
@@ -1003,6 +1187,70 @@ inline void Extras_IMUValue::_internal_set_z(float value) {
 inline void Extras_IMUValue::set_z(float value) {
   _internal_set_z(value);
   // @@protoc_insertion_point(field_set:openrtist.Extras.IMUValue.z)
+}
+
+// -------------------------------------------------------------------
+
+// Extras_TouchInput
+
+// float scale = 1;
+inline void Extras_TouchInput::clear_scale() {
+  scale_ = 0;
+}
+inline float Extras_TouchInput::_internal_scale() const {
+  return scale_;
+}
+inline float Extras_TouchInput::scale() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.TouchInput.scale)
+  return _internal_scale();
+}
+inline void Extras_TouchInput::_internal_set_scale(float value) {
+  
+  scale_ = value;
+}
+inline void Extras_TouchInput::set_scale(float value) {
+  _internal_set_scale(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.TouchInput.scale)
+}
+
+// float x = 2;
+inline void Extras_TouchInput::clear_x() {
+  x_ = 0;
+}
+inline float Extras_TouchInput::_internal_x() const {
+  return x_;
+}
+inline float Extras_TouchInput::x() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.TouchInput.x)
+  return _internal_x();
+}
+inline void Extras_TouchInput::_internal_set_x(float value) {
+  
+  x_ = value;
+}
+inline void Extras_TouchInput::set_x(float value) {
+  _internal_set_x(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.TouchInput.x)
+}
+
+// float y = 3;
+inline void Extras_TouchInput::clear_y() {
+  y_ = 0;
+}
+inline float Extras_TouchInput::_internal_y() const {
+  return y_;
+}
+inline float Extras_TouchInput::y() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.TouchInput.y)
+  return _internal_y();
+}
+inline void Extras_TouchInput::_internal_set_y(float value) {
+  
+  y_ = value;
+}
+inline void Extras_TouchInput::set_y(float value) {
+  _internal_set_y(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.TouchInput.y)
 }
 
 // -------------------------------------------------------------------
@@ -1509,9 +1757,92 @@ inline void Extras::set_allocated_screen_value(::openrtist::Extras_ScreenValue* 
   // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.screen_value)
 }
 
+// .openrtist.Extras.TouchInput touch_value = 8;
+inline bool Extras::_internal_has_touch_value() const {
+  return this != internal_default_instance() && touch_value_ != nullptr;
+}
+inline bool Extras::has_touch_value() const {
+  return _internal_has_touch_value();
+}
+inline void Extras::clear_touch_value() {
+  if (GetArena() == nullptr && touch_value_ != nullptr) {
+    delete touch_value_;
+  }
+  touch_value_ = nullptr;
+}
+inline const ::openrtist::Extras_TouchInput& Extras::_internal_touch_value() const {
+  const ::openrtist::Extras_TouchInput* p = touch_value_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::openrtist::Extras_TouchInput*>(
+      &::openrtist::_Extras_TouchInput_default_instance_);
+}
+inline const ::openrtist::Extras_TouchInput& Extras::touch_value() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.touch_value)
+  return _internal_touch_value();
+}
+inline void Extras::unsafe_arena_set_allocated_touch_value(
+    ::openrtist::Extras_TouchInput* touch_value) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(touch_value_);
+  }
+  touch_value_ = touch_value;
+  if (touch_value) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:openrtist.Extras.touch_value)
+}
+inline ::openrtist::Extras_TouchInput* Extras::release_touch_value() {
+  auto temp = unsafe_arena_release_touch_value();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::openrtist::Extras_TouchInput* Extras::unsafe_arena_release_touch_value() {
+  // @@protoc_insertion_point(field_release:openrtist.Extras.touch_value)
+  
+  ::openrtist::Extras_TouchInput* temp = touch_value_;
+  touch_value_ = nullptr;
+  return temp;
+}
+inline ::openrtist::Extras_TouchInput* Extras::_internal_mutable_touch_value() {
+  
+  if (touch_value_ == nullptr) {
+    auto* p = CreateMaybeMessage<::openrtist::Extras_TouchInput>(GetArena());
+    touch_value_ = p;
+  }
+  return touch_value_;
+}
+inline ::openrtist::Extras_TouchInput* Extras::mutable_touch_value() {
+  // @@protoc_insertion_point(field_mutable:openrtist.Extras.touch_value)
+  return _internal_mutable_touch_value();
+}
+inline void Extras::set_allocated_touch_value(::openrtist::Extras_TouchInput* touch_value) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete touch_value_;
+  }
+  if (touch_value) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(touch_value);
+    if (message_arena != submessage_arena) {
+      touch_value = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, touch_value, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  touch_value_ = touch_value;
+  // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.touch_value)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
