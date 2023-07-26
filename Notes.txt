@@ -32,3 +32,7 @@ Big_screen:
 pre 0.1 ms, infer 0.5 ms, post 0.7 ms, wait 8.1 ms, fps 113.31
 Small_screen:
 
+
+
+https://stackoverflow.com/questions/47181993/list-of-available-icons
+

@@ -18,16 +18,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
-import android.media.Image;
 import android.media.MediaActionSound;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
@@ -37,14 +34,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.SystemClock;
 import android.renderscript.RenderScript;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -55,7 +47,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.os.Looper;
 import android.view.Choreographer;
 
 import androidx.activity.result.ActivityResult;
@@ -63,11 +54,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.ImageInfo;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.view.PreviewView;
 
@@ -75,7 +63,6 @@ import androidx.camera.view.PreviewView;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -98,17 +85,12 @@ import edu.cmu.cs.gabriel.camera.CameraCapture;
 import edu.cmu.cs.gabriel.camera.ImageViewUpdater;
 import edu.cmu.cs.gabriel.camera.YuvToNV21Converter;
 import edu.cmu.cs.gabriel.camera.YuvToJPEGConverter;
-import edu.cmu.cs.gabriel.client.comm.ServerComm;
-import edu.cmu.cs.gabriel.client.results.ErrorType;
 import edu.cmu.cs.gabriel.network.OpenrtistComm;
 import edu.cmu.cs.gabriel.network.StereoViewUpdater;
 import edu.cmu.cs.gabriel.protocol.Protos.InputFrame;
 import edu.cmu.cs.gabriel.protocol.Protos.PayloadType;
-import edu.cmu.cs.gabriel.util.Screenshot;
 import edu.cmu.cs.localtransfer.LocalTransfer;
-import edu.cmu.cs.localtransfer.Utils;
 import edu.cmu.cs.openrtist.Protos.Extras;
-import edu.cmu.cs.openrtist.R;
 
 public class GabrielClientActivity extends AppCompatActivity implements
         AdapterView.OnItemSelectedListener, SensorEventListener {
@@ -267,6 +249,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                                 // Your action here
                                 break;
                         }
+
                     }
                 });
 
@@ -274,7 +257,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         stereoView2 = findViewById(R.id.guidance_image2);
 
         ImageView imgRecord =  findViewById(R.id.imgRecord);
-        ImageView screenshotButton = findViewById(R.id.imgScreenshot);
+        ImageView screenshotButton = findViewById(R.id.imgSceneMenu);
 
         // Sensor Registration
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -319,7 +302,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         } else if (!Const.STEREO_ENABLED){
             //this view doesn't exist when stereo is enabled (activity_stereo.xml)
             imgRecord.setVisibility(View.GONE);
-            findViewById(R.id.imgScreenshot).setVisibility(View.GONE);
+            findViewById(R.id.imgSceneMenu).setVisibility(View.GONE);
         }
 
         if (Const.STEREO_ENABLED) {
@@ -380,7 +363,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     camButton.performHapticFeedback(
                             android.view.HapticFeedbackConstants.LONG_PRESS);
                     if (Const.USING_FRONT_CAMERA) {
-                        camButton.setImageResource(R.drawable.ic_baseline_camera_front_24px);
+                        camButton.setImageResource(R.drawable.outline_info_24);
                         help = true;
 //                        cameraCapture = new CameraCapture(
 //                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
@@ -388,7 +371,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
                         Const.USING_FRONT_CAMERA = false;
                     } else {
-                        camButton.setImageResource(R.drawable.ic_baseline_camera_rear_24px);
+                        camButton.setImageResource(R.drawable.baseline_close_24);
                         help = true;
 
 //                        cameraCapture = new CameraCapture(
@@ -401,6 +384,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
             });
         }
 
+        screenshotButton.setHapticFeedbackEnabled(true);
         screenshotButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -423,8 +407,26 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
                 AlertDialog dialog = builder.create();
                 dialog.show();
+//                screenshotButton.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
             }
+
+
         });
+
+//        screenshotButton.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
 
 
         if (Const.SHOW_FPS) {
@@ -451,9 +453,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //        FrameUpdateThread frameUpdateThread = new FrameUpdateThread();
 //        frameUpdateThread.start();
 
-        running = true;
+//        running = true;
         frameHandler = new Handler();
-        frameHandler.post(frameIterator);
+//        frameHandler.post(frameIterator);
     }
 
 
@@ -869,6 +871,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
             }
             sceneX = 0;
             sceneY = 0;
+//            sceneScaleFactor = 1.0f;
 
 //            Extras extras = Extras.newBuilder().setStyle(styleType)
 //                    .setScreenValue(screenValue)

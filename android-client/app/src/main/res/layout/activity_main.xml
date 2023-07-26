@@ -11,6 +11,7 @@
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/carnegie_dgrey"
         android:dropDownWidth="match_parent"
         android:prompt="@string/dropdown_prompt" />
 
@@ -18,40 +19,215 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageButton
+            android:id="@+id/button_left"
+            android:layout_width="@android:dimen/notification_large_icon_width"
+            android:layout_height="@android:dimen/notification_large_icon_width"
+            android:layout_alignLeft="@id/guidance_image"
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:backgroundTint="@android:color/transparent"
+            android:elevation="14dp"
+            android:rotation="0"
+            android:scaleType="fitXY"
+            android:tint="@drawable/touch_selector"
+            android:visibility="visible"
+            app:srcCompat="@drawable/baseline_arrow_left_24" />
+
+        <ImageButton
+            android:id="@+id/button_right"
+            android:layout_width="@android:dimen/notification_large_icon_width"
+            android:layout_height="@android:dimen/notification_large_icon_width"
+            android:layout_alignEnd="@id/guidance_image"
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:backgroundTint="@android:color/transparent"
+            android:elevation="14dp"
+            android:rotation="180"
+            android:scaleType="fitXY"
+            android:tint="@drawable/touch_selector"
+            android:visibility="visible"
+            app:srcCompat="@drawable/baseline_arrow_left_24" />
+
+        <ImageButton
+            android:id="@+id/button_down"
+            android:layout_width="@android:dimen/notification_large_icon_width"
+            android:layout_height="@android:dimen/notification_large_icon_width"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_alignBottom="@id/guidance_image"
+            android:layout_centerInParent="false"
+            android:layout_centerHorizontal="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:backgroundTint="@android:color/transparent"
+            android:elevation="14dp"
+            android:rotation="270"
+            android:scaleType="fitXY"
+            android:tint="@drawable/touch_selector"
+            android:visibility="visible"
+            app:srcCompat="@drawable/baseline_arrow_left_24" />
+
+        <ImageButton
+            android:id="@+id/button_up"
+            android:layout_width="@android:dimen/notification_large_icon_width"
+            android:layout_height="@android:dimen/notification_large_icon_width"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_alignBaseline="@id/guidance_image"
+            android:layout_centerInParent="false"
+            android:layout_centerHorizontal="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:backgroundTint="@android:color/transparent"
+            android:elevation="14dp"
+            android:rotation="90"
+            android:scaleType="fitXY"
+            android:tint="@drawable/touch_selector"
+            android:visibility="visible"
+            app:srcCompat="@drawable/baseline_arrow_left_24" />
+
         <ImageView
             android:id="@+id/style_image"
             android:layout_width="128dp"
             android:layout_height="128dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
             android:adjustViewBounds="true"
             android:background="@color/transparent"
             android:elevation="@dimen/activity_vertical_margin"
             android:gravity="start"
             android:scaleType="fitXY"
-            android:visibility="invisible"
-            android:src="@drawable/ic_question_mark"/>
+            android:src="@drawable/ic_question_mark"
+            android:visibility="invisible" />
 
-        <FrameLayout
+        <ImageView
+            android:id="@+id/imgPlayPause"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_gravity="bottom|start"
+            android:layout_marginBottom="60dp"
+            android:background="@color/transparent"
+            android:elevation="@dimen/activity_vertical_margin"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:rotation="0"
+            android:src="@drawable/ic_play"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgSceneMenu"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="start"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/baseline_menu_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgFullScreen"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="start"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/baseline_fullscreen_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgCamControl"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="start"
+            android:layout_marginRight="@dimen/button_size"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:src="@drawable/baseline_control_camera_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <TextView
+            android:id="@+id/fpsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/navigationBarColor"
+            android:elevation="12dp"
+            android:gravity="center_horizontal"
+            android:text="@string/fps_0"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/accelLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:background="@color/navigationBarColor"
+            android:gravity="center_horizontal"
+            android:text="accel"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/guidance_image"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="#00000000"
+            android:scaleType="fitXY"
+            android:elevation="10dp"
+            />
 
-            <androidx.camera.view.PreviewView
-                android:id="@+id/camera_preview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+        <ImageView
+            android:id="@+id/imgSwitchCam"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="false"
+            android:elevation="@dimen/activity_vertical_margin"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/outline_info_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
 
-            <ImageView
-                android:id="@+id/guidance_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#00000000"
-                android:scaleType="fitXY" />
+        <ImageView
+            android:id="@+id/imgReset"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignBottom="@id/guidance_image"
+            android:layout_gravity="start"
+            android:layout_marginLeft="@dimen/button_size"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/baseline_restart_alt_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="-10px">
 
             <ImageView
                 android:id="@+id/imgRecord"
-                android:layout_width="@android:dimen/notification_large_icon_width"
-                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
                 android:layout_gravity="bottom|start"
                 android:layout_marginStart="60dp"
                 android:background="@color/transparent"
@@ -60,74 +236,19 @@
                 android:hapticFeedbackEnabled="true"
                 android:rotation="0"
                 android:src="@drawable/ic_baseline_videocam_24px"
-                app:tint="@color/colorPrimary"
-                android:visibility="visible" />
+                android:visibility="invisible"
+                app:tint="@drawable/touch_selector" />
 
-            <ImageView
-                android:id="@+id/imgPlayPause"
-                android:layout_width="@android:dimen/notification_large_icon_width"
-                android:layout_height="@android:dimen/notification_large_icon_height"
-                android:layout_gravity="bottom|start"
-                android:layout_marginBottom="60dp"
-                android:background="@color/transparent"
-                android:elevation="@dimen/activity_vertical_margin"
-                android:focusable="false"
-                android:hapticFeedbackEnabled="true"
-                android:rotation="0"
-                android:src="@drawable/ic_play"
-                app:tint="@color/colorPrimary"
-                android:visibility="visible" />
+        </androidx.camera.view.PreviewView>
 
-            <ImageView
-                android:id="@+id/imgScreenshot"
-                android:layout_width="@android:dimen/notification_large_icon_width"
-                android:layout_height="@android:dimen/notification_large_icon_height"
-                android:layout_gravity="bottom|start"
-                android:elevation="16dp"
-                android:focusable="false"
-                android:hapticFeedbackEnabled="true"
-                android:src="@drawable/ic_baseline_photo_24px"
-                app:tint="@color/colorPrimary"
-                android:visibility="visible" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="5dp">
 
-            <ImageView
-                android:id="@+id/imgSwitchCam"
-                android:layout_width="@android:dimen/notification_large_icon_width"
-                android:layout_height="@android:dimen/notification_large_icon_height"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="24dp"
-                android:elevation="@dimen/activity_vertical_margin"
-                android:focusable="false"
-                android:hapticFeedbackEnabled="true"
-                android:src="@drawable/ic_baseline_camera_front_24px"
-                app:tint="@color/colorPrimary"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/fpsLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:background="@color/navigationBarColor"
-                android:text="@string/fps_0"
-                android:gravity="center_horizontal"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:visibility="visible" />
-            <TextView
-                android:id="@+id/accelLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|start"
-                android:background="@color/navigationBarColor"
-                android:text="accel"
-                android:gravity="center_horizontal"
-                android:textColor="@color/textColorPrimary"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:visibility="visible" />
         </FrameLayout>
+
     </RelativeLayout>
+
 </LinearLayout>
 

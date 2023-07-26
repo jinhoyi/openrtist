@@ -289,8 +289,8 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         self.send_imu(extras)
         img_data = self.process_image(None)
 
-        while (img_data == None):
-            img_data = self.process_image(None)
+        # while (img_data == None):
+        #     img_data = self.process_image(None)
 
 
         # Serialize the result (protobuf)

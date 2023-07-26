@@ -742,6 +742,7 @@ void video_thread2(){
 	receiver.close();
 }
 
+float cam_th = DegToRad(0.005f);
 void imu_thread() {
 	
 	// zmq::socket_t imu_socket(context, zmq::socket_type::req);
@@ -778,8 +779,14 @@ void imu_thread() {
 
 		scale_mtx.lock();
 		g_sceneScale = extras.touch_value().scale();
+
 		g_camAngle.x -= Clamp(dx*kSensitivity, -FLT_MAX, FLT_MAX);
+		if ((g_camAngle.x - 0) * (g_camAngle.x - 0) < cam_th)
+			g_camAngle.x = 0;
 		g_camAngle.y -= Clamp(dy*kSensitivity, -FLT_MAX, FLT_MAX);
+		if ((g_camAngle.y - 0) * (g_camAngle.y - 0) < cam_th)
+			g_camAngle.y = 0;
+
 		scale_mtx.unlock();
 		// printf("g_scale = %f\n", g_sceneScale);
 		
@@ -2845,6 +2852,7 @@ void MouseMotionFunc(unsigned state, int x, int y)
 
 		g_camAngle.x -= Clamp(dx*kSensitivity, -kMaxDelta, kMaxDelta);
 		g_camAngle.y -= Clamp(dy*kSensitivity, -kMaxDelta, kMaxDelta);
+		
 	}
 }
 

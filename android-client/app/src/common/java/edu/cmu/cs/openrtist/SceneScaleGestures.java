@@ -118,15 +118,15 @@ public class SceneScaleGestures implements View.OnTouchListener, GestureDetector
 
     @Override
     public boolean onDoubleTap(MotionEvent event) {
-        doubleTab = !doubleTab;
-        if (doubleTab) {
-            scaleFactor = 1.8f;
-        } else {
-            scaleFactor = 1.0f;
-        }
-        gabrielClientActivity.setScaleFactor(scaleFactor);
-//        view.setScaleX(scaleFactor);
-//        view.setScaleY(scaleFactor);
+//        doubleTab = !doubleTab;
+//        if (doubleTab) {
+//            scaleFactor = 1.2f;
+//        } else {
+//            scaleFactor = 0.8f;
+//        }
+//        gabrielClientActivity.setScaleFactor(scaleFactor);
+////        view.setScaleX(scaleFactor);
+////        view.setScaleY(scaleFactor);
         return true;
     }
 
