@@ -50,7 +50,7 @@ struct TableStruct_openrtist_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -61,6 +61,9 @@ namespace openrtist {
 class Extras;
 class ExtrasDefaultTypeInternal;
 extern ExtrasDefaultTypeInternal _Extras_default_instance_;
+class Extras_ArrowKey;
+class Extras_ArrowKeyDefaultTypeInternal;
+extern Extras_ArrowKeyDefaultTypeInternal _Extras_ArrowKey_default_instance_;
 class Extras_BytesValue;
 class Extras_BytesValueDefaultTypeInternal;
 extern Extras_BytesValueDefaultTypeInternal _Extras_BytesValue_default_instance_;
@@ -79,6 +82,7 @@ extern Extras_TouchInputDefaultTypeInternal _Extras_TouchInput_default_instance_
 }  // namespace openrtist
 PROTOBUF_NAMESPACE_OPEN
 template<> ::openrtist::Extras* Arena::CreateMaybeMessage<::openrtist::Extras>(Arena*);
+template<> ::openrtist::Extras_ArrowKey* Arena::CreateMaybeMessage<::openrtist::Extras_ArrowKey>(Arena*);
 template<> ::openrtist::Extras_BytesValue* Arena::CreateMaybeMessage<::openrtist::Extras_BytesValue>(Arena*);
 template<> ::openrtist::Extras_IMUValue* Arena::CreateMaybeMessage<::openrtist::Extras_IMUValue>(Arena*);
 template<> ::openrtist::Extras_ScreenValue* Arena::CreateMaybeMessage<::openrtist::Extras_ScreenValue>(Arena*);
@@ -708,6 +712,176 @@ class Extras_ScreenValue PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class Extras_ArrowKey PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:openrtist.Extras.ArrowKey) */ {
+ public:
+  inline Extras_ArrowKey() : Extras_ArrowKey(nullptr) {};
+  virtual ~Extras_ArrowKey();
+
+  Extras_ArrowKey(const Extras_ArrowKey& from);
+  Extras_ArrowKey(Extras_ArrowKey&& from) noexcept
+    : Extras_ArrowKey() {
+    *this = ::std::move(from);
+  }
+
+  inline Extras_ArrowKey& operator=(const Extras_ArrowKey& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Extras_ArrowKey& operator=(Extras_ArrowKey&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Extras_ArrowKey& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Extras_ArrowKey* internal_default_instance() {
+    return reinterpret_cast<const Extras_ArrowKey*>(
+               &_Extras_ArrowKey_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  friend void swap(Extras_ArrowKey& a, Extras_ArrowKey& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Extras_ArrowKey* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Extras_ArrowKey* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Extras_ArrowKey* New() const final {
+    return CreateMaybeMessage<Extras_ArrowKey>(nullptr);
+  }
+
+  Extras_ArrowKey* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Extras_ArrowKey>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Extras_ArrowKey& from);
+  void MergeFrom(const Extras_ArrowKey& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Extras_ArrowKey* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "openrtist.Extras.ArrowKey";
+  }
+  protected:
+  explicit Extras_ArrowKey(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_openrtist_2eproto);
+    return ::descriptor_table_openrtist_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kLeftFieldNumber = 1,
+    kRightFieldNumber = 2,
+    kUpFieldNumber = 3,
+    kDownFieldNumber = 4,
+  };
+  // bool left = 1;
+  void clear_left();
+  bool left() const;
+  void set_left(bool value);
+  private:
+  bool _internal_left() const;
+  void _internal_set_left(bool value);
+  public:
+
+  // bool right = 2;
+  void clear_right();
+  bool right() const;
+  void set_right(bool value);
+  private:
+  bool _internal_right() const;
+  void _internal_set_right(bool value);
+  public:
+
+  // bool up = 3;
+  void clear_up();
+  bool up() const;
+  void set_up(bool value);
+  private:
+  bool _internal_up() const;
+  void _internal_set_up(bool value);
+  public:
+
+  // bool down = 4;
+  void clear_down();
+  bool down() const;
+  void set_down(bool value);
+  private:
+  bool _internal_down() const;
+  void _internal_set_down(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:openrtist.Extras.ArrowKey)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  bool left_;
+  bool right_;
+  bool up_;
+  bool down_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_openrtist_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Extras_StyleListEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<Extras_StyleListEntry_DoNotUse, 
     std::string, std::string,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
@@ -734,7 +908,7 @@ public:
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
     ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_openrtist_2eproto);
-    return ::descriptor_table_openrtist_2eproto.file_level_metadata[4];
+    return ::descriptor_table_openrtist_2eproto.file_level_metadata[5];
   }
 
   public:
@@ -784,7 +958,7 @@ class Extras PROTOBUF_FINAL :
                &_Extras_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(Extras& a, Extras& b) {
     a.Swap(&b);
@@ -856,6 +1030,7 @@ class Extras PROTOBUF_FINAL :
   typedef Extras_IMUValue IMUValue;
   typedef Extras_TouchInput TouchInput;
   typedef Extras_ScreenValue ScreenValue;
+  typedef Extras_ArrowKey ArrowKey;
 
   // accessors -------------------------------------------------------
 
@@ -867,6 +1042,7 @@ class Extras PROTOBUF_FINAL :
     kImuValueFieldNumber = 6,
     kScreenValueFieldNumber = 7,
     kTouchValueFieldNumber = 8,
+    kArrowKeyFieldNumber = 9,
     kDepthThresholdFieldNumber = 4,
   };
   // map<string, string> style_list = 2;
@@ -1001,6 +1177,24 @@ class Extras PROTOBUF_FINAL :
       ::openrtist::Extras_TouchInput* touch_value);
   ::openrtist::Extras_TouchInput* unsafe_arena_release_touch_value();
 
+  // .openrtist.Extras.ArrowKey arrow_key = 9;
+  bool has_arrow_key() const;
+  private:
+  bool _internal_has_arrow_key() const;
+  public:
+  void clear_arrow_key();
+  const ::openrtist::Extras_ArrowKey& arrow_key() const;
+  ::openrtist::Extras_ArrowKey* release_arrow_key();
+  ::openrtist::Extras_ArrowKey* mutable_arrow_key();
+  void set_allocated_arrow_key(::openrtist::Extras_ArrowKey* arrow_key);
+  private:
+  const ::openrtist::Extras_ArrowKey& _internal_arrow_key() const;
+  ::openrtist::Extras_ArrowKey* _internal_mutable_arrow_key();
+  public:
+  void unsafe_arena_set_allocated_arrow_key(
+      ::openrtist::Extras_ArrowKey* arrow_key);
+  ::openrtist::Extras_ArrowKey* unsafe_arena_release_arrow_key();
+
   // int32 depth_threshold = 4;
   void clear_depth_threshold();
   ::PROTOBUF_NAMESPACE_ID::int32 depth_threshold() const;
@@ -1029,6 +1223,7 @@ class Extras PROTOBUF_FINAL :
   ::openrtist::Extras_IMUValue* imu_value_;
   ::openrtist::Extras_ScreenValue* screen_value_;
   ::openrtist::Extras_TouchInput* touch_value_;
+  ::openrtist::Extras_ArrowKey* arrow_key_;
   ::PROTOBUF_NAMESPACE_ID::int32 depth_threshold_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_openrtist_2eproto;
@@ -1295,6 +1490,90 @@ inline void Extras_ScreenValue::_internal_set_width(::PROTOBUF_NAMESPACE_ID::int
 inline void Extras_ScreenValue::set_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_width(value);
   // @@protoc_insertion_point(field_set:openrtist.Extras.ScreenValue.width)
+}
+
+// -------------------------------------------------------------------
+
+// Extras_ArrowKey
+
+// bool left = 1;
+inline void Extras_ArrowKey::clear_left() {
+  left_ = false;
+}
+inline bool Extras_ArrowKey::_internal_left() const {
+  return left_;
+}
+inline bool Extras_ArrowKey::left() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.ArrowKey.left)
+  return _internal_left();
+}
+inline void Extras_ArrowKey::_internal_set_left(bool value) {
+  
+  left_ = value;
+}
+inline void Extras_ArrowKey::set_left(bool value) {
+  _internal_set_left(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.ArrowKey.left)
+}
+
+// bool right = 2;
+inline void Extras_ArrowKey::clear_right() {
+  right_ = false;
+}
+inline bool Extras_ArrowKey::_internal_right() const {
+  return right_;
+}
+inline bool Extras_ArrowKey::right() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.ArrowKey.right)
+  return _internal_right();
+}
+inline void Extras_ArrowKey::_internal_set_right(bool value) {
+  
+  right_ = value;
+}
+inline void Extras_ArrowKey::set_right(bool value) {
+  _internal_set_right(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.ArrowKey.right)
+}
+
+// bool up = 3;
+inline void Extras_ArrowKey::clear_up() {
+  up_ = false;
+}
+inline bool Extras_ArrowKey::_internal_up() const {
+  return up_;
+}
+inline bool Extras_ArrowKey::up() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.ArrowKey.up)
+  return _internal_up();
+}
+inline void Extras_ArrowKey::_internal_set_up(bool value) {
+  
+  up_ = value;
+}
+inline void Extras_ArrowKey::set_up(bool value) {
+  _internal_set_up(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.ArrowKey.up)
+}
+
+// bool down = 4;
+inline void Extras_ArrowKey::clear_down() {
+  down_ = false;
+}
+inline bool Extras_ArrowKey::_internal_down() const {
+  return down_;
+}
+inline bool Extras_ArrowKey::down() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.ArrowKey.down)
+  return _internal_down();
+}
+inline void Extras_ArrowKey::_internal_set_down(bool value) {
+  
+  down_ = value;
+}
+inline void Extras_ArrowKey::set_down(bool value) {
+  _internal_set_down(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.ArrowKey.down)
 }
 
 // -------------------------------------------------------------------
@@ -1838,9 +2117,92 @@ inline void Extras::set_allocated_touch_value(::openrtist::Extras_TouchInput* to
   // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.touch_value)
 }
 
+// .openrtist.Extras.ArrowKey arrow_key = 9;
+inline bool Extras::_internal_has_arrow_key() const {
+  return this != internal_default_instance() && arrow_key_ != nullptr;
+}
+inline bool Extras::has_arrow_key() const {
+  return _internal_has_arrow_key();
+}
+inline void Extras::clear_arrow_key() {
+  if (GetArena() == nullptr && arrow_key_ != nullptr) {
+    delete arrow_key_;
+  }
+  arrow_key_ = nullptr;
+}
+inline const ::openrtist::Extras_ArrowKey& Extras::_internal_arrow_key() const {
+  const ::openrtist::Extras_ArrowKey* p = arrow_key_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::openrtist::Extras_ArrowKey*>(
+      &::openrtist::_Extras_ArrowKey_default_instance_);
+}
+inline const ::openrtist::Extras_ArrowKey& Extras::arrow_key() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.arrow_key)
+  return _internal_arrow_key();
+}
+inline void Extras::unsafe_arena_set_allocated_arrow_key(
+    ::openrtist::Extras_ArrowKey* arrow_key) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(arrow_key_);
+  }
+  arrow_key_ = arrow_key;
+  if (arrow_key) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:openrtist.Extras.arrow_key)
+}
+inline ::openrtist::Extras_ArrowKey* Extras::release_arrow_key() {
+  auto temp = unsafe_arena_release_arrow_key();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::openrtist::Extras_ArrowKey* Extras::unsafe_arena_release_arrow_key() {
+  // @@protoc_insertion_point(field_release:openrtist.Extras.arrow_key)
+  
+  ::openrtist::Extras_ArrowKey* temp = arrow_key_;
+  arrow_key_ = nullptr;
+  return temp;
+}
+inline ::openrtist::Extras_ArrowKey* Extras::_internal_mutable_arrow_key() {
+  
+  if (arrow_key_ == nullptr) {
+    auto* p = CreateMaybeMessage<::openrtist::Extras_ArrowKey>(GetArena());
+    arrow_key_ = p;
+  }
+  return arrow_key_;
+}
+inline ::openrtist::Extras_ArrowKey* Extras::mutable_arrow_key() {
+  // @@protoc_insertion_point(field_mutable:openrtist.Extras.arrow_key)
+  return _internal_mutable_arrow_key();
+}
+inline void Extras::set_allocated_arrow_key(::openrtist::Extras_ArrowKey* arrow_key) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete arrow_key_;
+  }
+  if (arrow_key) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(arrow_key);
+    if (message_arena != submessage_arena) {
+      arrow_key = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, arrow_key, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  arrow_key_ = arrow_key;
+  // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.arrow_key)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
