@@ -30,6 +30,13 @@ message Extras {
         int32 width = 2;
     }
 
+    message ArrowKey {
+        bool left = 1;
+        bool right = 2;
+        bool up = 3;
+        bool down = 4;
+    }
+
     string style = 1;
     map<string, string> style_list = 2;
     BytesValue style_image = 3;
@@ -38,4 +45,5 @@ message Extras {
     IMUValue imu_value = 6;
     ScreenValue screen_value = 7;
     TouchInput touch_value = 8;
+    ArrowKey arrow_key = 9;
 }

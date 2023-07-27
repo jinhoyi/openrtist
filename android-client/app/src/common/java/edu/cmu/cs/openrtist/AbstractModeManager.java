@@ -1,40 +1,47 @@
 package edu.cmu.cs.openrtist;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractModeManager {
-    protected List<View> views;
-    protected Map<View, Boolean> viewUsage;
-    protected Activity currentActivity;
 
-    public AbstractModeManager(Activity currentActivity, List<View> views, Map<View, Boolean> viewUsage) {
-        this.currentActivity = currentActivity;
+    protected Map<ViewID, View> views;
+    protected Map<ViewID, Integer> visibility;
+    protected GabrielClientActivity gabrielClientActivity;
+
+    public AbstractModeManager(GabrielClientActivity gabrielClientActivity, Map<ViewID, View> views, Map<ViewID, Integer> visibility) {
+        this.gabrielClientActivity = gabrielClientActivity;
         this.views = views;
-        this.viewUsage = viewUsage;
+        this.visibility = visibility;
+
+        Log.e("ModeManager", "Visibility Size = " + this.visibility.size());
+        Log.e("ModeManager", "ViewID Size = " + ViewID.SIZE.getValue());
+
+        assert this.visibility.size() == ViewID.SIZE.getValue();
     }
 
-    public abstract void init();
-
-    protected void setViewVisibility(View view, boolean isVisible) {
-        if (isVisible) {
-            view.setVisibility(View.VISIBLE);
-        } else {
-            view.setVisibility(View.INVISIBLE);
+    public void init() {
+        for (ViewID key : visibility.keySet()) {
+            Integer view_visibility = visibility.get(key);
+            View view = views.get(key);
+            if (view_visibility == View.VISIBLE) {
+                view.setVisibility(View.VISIBLE);
+                view.setOnTouchListener(getOnTouchListener(key));
+                view.setOnClickListener(getOnClickListener(key));
+            } else {
+                view.setVisibility(View.INVISIBLE);
+                view.setOnTouchListener(null);
+                view.setOnClickListener(null);
+            }
         }
     }
 
-    protected void setViewListeners(View view, boolean isUsed, View.OnTouchListener onTouchListener, View.OnClickListener onClickListener) {
-        if (isUsed) {
-            view.setOnTouchListener(onTouchListener);
-            view.setOnClickListener(onClickListener);
-        } else {
-            view.setOnTouchListener(null);
-            view.setOnClickListener(null);
-        }
-    }
+    protected abstract View.OnTouchListener getOnTouchListener(ViewID key);
+
+    protected abstract View.OnClickListener getOnClickListener(ViewID key);
 }
-}
+

@@ -41,6 +41,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.Spinner;
@@ -74,6 +75,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -86,7 +88,6 @@ import edu.cmu.cs.gabriel.camera.ImageViewUpdater;
 import edu.cmu.cs.gabriel.camera.YuvToNV21Converter;
 import edu.cmu.cs.gabriel.camera.YuvToJPEGConverter;
 import edu.cmu.cs.gabriel.network.OpenrtistComm;
-import edu.cmu.cs.gabriel.network.StereoViewUpdater;
 import edu.cmu.cs.gabriel.protocol.Protos.InputFrame;
 import edu.cmu.cs.gabriel.protocol.Protos.PayloadType;
 import edu.cmu.cs.localtransfer.LocalTransfer;
@@ -95,6 +96,9 @@ import edu.cmu.cs.openrtist.Protos.Extras;
 public class GabrielClientActivity extends AppCompatActivity implements
         AdapterView.OnItemSelectedListener, SensorEventListener {
 
+    public enum AppMode {
+        MAIN, MENU, CAM, FULLSCREEN
+    }
     private static boolean running = false;
     private static final String LOG_TAG = "GabrielClientActivity";
     private static final int DISPLAY_WIDTH = 480;
@@ -127,6 +131,27 @@ public class GabrielClientActivity extends AppCompatActivity implements
     // views
     private ImageView imgView;
     private ImageView iconView;
+    private ImageButton buttonLeft;
+    private ImageButton buttonRight;
+    private ImageButton buttonUp;
+    private ImageButton buttonDown;
+    private ImageView viewFullScreen;
+    private ImageView viewCamControl;
+    private ImageView viewARView;
+    private ImageView viewAlignCenter;
+    private ImageView viewMenu;
+    private ImageView viewSceneList;
+    private ImageView viewReset;
+    private ImageView viewPlayPause;
+    private ImageView viewParticle;
+    private ImageView viewAutoPlay;
+    private ImageView viewRotate;
+    private ImageView viewInfo;
+    private ImageView viewHelp;
+
+    private final Map<ViewID, View> views = new EnumMap<ViewID, View>(ViewID.class);
+    private final Map<AppMode, AbstractModeManager> modeList = new EnumMap<AppMode, AbstractModeManager>(AppMode.class);
+
     private Handler iterationHandler;
     private Handler frameHandler;
     private Handler fpsHandler;
@@ -136,8 +161,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private TextView accelLabel;
 
     // Stereo views
-    private ImageView stereoView1;
-    private ImageView stereoView2;
 
     private boolean cleared = false;
 
@@ -146,19 +169,60 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private YuvToJPEGConverter yuvToJPEGConverter;
     private CameraCapture cameraCapture;
 
-    private final List<String> styleDescriptions = new ArrayList<>(
-            Collections.singletonList("Clear Display"));
-
-
+    private final List<String> styleDescriptions = new ArrayList<>(Collections.singletonList("Choose Scene"));
     private final List<String> styleIds = new ArrayList<>(Collections.singletonList("none"));
 
+    public class Pair implements Comparable<Pair> {
+        String key;
+        String value;
+
+        public Pair(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public int compareTo(Pair other) {
+            return Integer.parseInt(this.getKey()) - Integer.parseInt(other.getKey());
+        }
+    }
+
+    public void sortPairedArray(List<String> keyList, List<String> valueList) {
+        ArrayList<Pair> pairs = new ArrayList<>();
+        for (int i = 0; i < keyList.size(); i++) {
+            pairs.add(new Pair(keyList.get(i), valueList.get(i)));
+        }
+
+        Collections.sort(pairs);
+
+        for (int i = 0; i < pairs.size(); i++) {
+            Pair pair = pairs.get(i);
+            keyList.set(i, pair.getKey());
+            valueList.set(i, pair.getValue());
+        }
+    }
+
     public void addStyles(Set<Map.Entry<String, String>> entrySet) {
-        this.styleType = "none";
         for (Map.Entry<String, String> entry : entrySet) {
             Log.v(LOG_TAG, "style: " + entry.getKey() + ", desc: " + entry.getValue());
             styleDescriptions.add(entry.getValue());
             styleIds.add(entry.getKey());
         }
+        styleDescriptions.remove(0);
+        styleIds.remove(0);
+
+        // Sort the list of Pairs
+        sortPairedArray(styleIds, styleDescriptions);
+
+        this.styleType = styleIds.get(0);
     }
 
     // SensorListener
@@ -182,6 +246,32 @@ public class GabrielClientActivity extends AppCompatActivity implements
     public void setXY(float x, float y){
         sceneX = x;
         sceneY = y;
+    }
+
+    public void switchMode(AppMode mode) {
+        switch(mode) {
+            case MAIN:
+                Toast.makeText(this,
+                        "MAIN!!",
+                        Toast.LENGTH_LONG).show();
+                return;
+            case FULLSCREEN:
+                Toast.makeText(this,
+                        "FULLSCREEN!!",
+                        Toast.LENGTH_LONG).show();
+                return;
+            case CAM:
+                Toast.makeText(this,
+                        "CAM!!",
+                        Toast.LENGTH_LONG).show();
+                return;
+            case MENU:
+                Toast.makeText(this,
+                        "MENU!!",
+                        Toast.LENGTH_LONG).show();
+                return;
+        }
+        return;
     }
 
     @Override
@@ -234,6 +324,67 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
         imgView.setOnTouchListener(new SceneScaleGestures(this, this));
 
+        buttonLeft = findViewById(R.id.button_left);
+        buttonRight = findViewById(R.id.button_right);
+        buttonUp = findViewById(R.id.button_up);
+        buttonDown = findViewById(R.id.button_down);
+
+        viewFullScreen = findViewById(R.id.imgFullScreen);
+        viewCamControl = findViewById(R.id.imgCamControl);
+        viewARView = findViewById(R.id.imgARView);
+        viewAlignCenter = findViewById(R.id.imgAlignCenter);
+        viewMenu = findViewById(R.id.imgMenu);
+        viewSceneList = findViewById(R.id.imgSceneList);
+        viewReset = findViewById(R.id.imgReset);
+        viewPlayPause = findViewById(R.id.imgPlayPause);
+        viewParticle = findViewById(R.id.imgParticle);
+        viewAutoPlay = findViewById(R.id.imgAutoPlay);
+        viewRotate = findViewById(R.id.imgRotate);
+        viewInfo = findViewById(R.id.imgInfo);
+        viewHelp = findViewById(R.id.imgHelp);
+
+        views.put(ViewID.ARROW_UP, buttonUp);
+        views.put(ViewID.ARROW_DOWN, buttonDown);
+        views.put(ViewID.ARROW_LEFT, buttonLeft);
+        views.put(ViewID.ARROW_RIGHT, buttonRight);
+        views.put(ViewID.FULL_SCREEN, viewFullScreen);
+        views.put(ViewID.CAM_CONTROL, viewCamControl);
+        views.put(ViewID.AR_VIEW, viewARView);
+        views.put(ViewID.ALIGN_CENTER, viewAlignCenter);
+        views.put(ViewID.MENU, viewMenu);
+        views.put(ViewID.SCENE_LIST, viewSceneList);
+        views.put(ViewID.RESET, viewReset);
+        views.put(ViewID.PLAY_PAUSE, viewPlayPause);
+        views.put(ViewID.PARTICLE, viewParticle);
+        views.put(ViewID.AUTO_PLAY, viewAutoPlay);
+        views.put(ViewID.ROTATE, viewRotate);
+        views.put(ViewID.INFO, viewInfo);
+        views.put(ViewID.HELP, viewHelp);
+
+//        views.put(ViewID.ARROW_UP, findViewById(R.id.button_up));
+//        views.put(ViewID.ARROW_DOWN, findViewById(R.id.button_down));
+//        views.put(ViewID.ARROW_LEFT, findViewById(R.id.button_left));
+//        views.put(ViewID.ARROW_RIGHT, findViewById(R.id.button_right));
+//        views.put(ViewID.FULL_SCREEN, findViewById(R.id.imgFullScreen));
+//        views.put(ViewID.CAM_CONTROL, findViewById(R.id.imgCamControl));
+//        views.put(ViewID.AR_VIEW, findViewById(R.id.imgARView));
+//        views.put(ViewID.ALIGN_CENTER, findViewById(R.id.imgAlignCenter));
+//        views.put(ViewID.MENU, findViewById(R.id.imgMenu));
+//        views.put(ViewID.SCENE_LIST, findViewById(R.id.imgSceneList));
+//        views.put(ViewID.RESET, findViewById(R.id.imgReset));
+//        views.put(ViewID.PLAY_PAUSE, findViewById(R.id.imgPlayPause));
+//        views.put(ViewID.PARTICLE, findViewById(R.id.imgParticle));
+//        views.put(ViewID.AUTO_PLAY, findViewById(R.id.imgAutoPlay));
+//        views.put(ViewID.ROTATE, findViewById(R.id.imgRotate));
+//        views.put(ViewID.INFO, findViewById(R.id.imgInfo));
+//        views.put(ViewID.HELP, findViewById(R.id.imgHelp));
+
+//        AbstractModeManager mainMode = new MainMode(this, views);
+        modeList.put(AppMode.MAIN, new MainMode(this, views));
+
+        modeList.get(AppMode.MAIN).init();
+
+
         String[] menuItems = {"Menu Item 1", "Menu Item 2"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose an option")
@@ -253,11 +404,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     }
                 });
 
-        stereoView1 = findViewById(R.id.guidance_image1);
-        stereoView2 = findViewById(R.id.guidance_image2);
 
         ImageView imgRecord =  findViewById(R.id.imgRecord);
-        ImageView screenshotButton = findViewById(R.id.imgSceneMenu);
+//        ImageView screenshotButton = findViewById(R.id.imgSceneList);
 
         // Sensor Registration
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -290,19 +439,19 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 }
             });
 
-//            screenshotButton.setOnClickListener(new View.OnClickListener() {
+//            viewSceneList.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
 //                    Bitmap b = Screenshot.takescreenshotOfRootView(imgView);
 //                    storeScreenshot(b,getOutputMediaFile(MEDIA_TYPE_IMAGE).getPath());
-//                    screenshotButton.performHapticFeedback(
+//                    viewSceneList.performHapticFeedback(
 //                            android.view.HapticFeedbackConstants.LONG_PRESS);
 //                    }
 //            });
         } else if (!Const.STEREO_ENABLED){
             //this view doesn't exist when stereo is enabled (activity_stereo.xml)
             imgRecord.setVisibility(View.GONE);
-            findViewById(R.id.imgSceneMenu).setVisibility(View.GONE);
+            findViewById(R.id.imgSceneList).setVisibility(View.GONE);
         }
 
         if (Const.STEREO_ENABLED) {
@@ -316,30 +465,30 @@ public class GabrielClientActivity extends AppCompatActivity implements
             }
         } else {
             Spinner spinner = findViewById(R.id.spinner);
-            ImageView playPauseButton = findViewById(R.id.imgPlayPause);
-            ImageView camButton = findViewById(R.id.imgSwitchCam);
+//            ImageView playPauseButton = findViewById(R.id.imgPlayPause);
+//            ImageView camButton = findViewById(R.id.imgHelp);
 
             if (Const.ITERATE_STYLES) {
-                playPauseButton.setOnClickListener(new View.OnClickListener() {
+                viewPlayPause.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (!Const.ITERATION_STARTED) {
                             Const.ITERATION_STARTED = true;
-                            playPauseButton.setImageResource(R.drawable.ic_pause);
+                            viewPlayPause.setImageResource(R.drawable.ic_pause);
 
                             Toast.makeText(
-                                    playPauseButton.getContext(),
+                                    viewPlayPause.getContext(),
                                     getString(R.string.iteration_started),
                                     Toast.LENGTH_LONG).show();
                         } else {
                             Const.ITERATION_STARTED = false;
-                            playPauseButton.setImageResource(R.drawable.ic_play);
+                            viewPlayPause.setImageResource(R.drawable.ic_play);
                             Toast.makeText(
-                                    playPauseButton.getContext(),
+                                    viewPlayPause.getContext(),
                                     getString(R.string.iteration_stopped),
                                     Toast.LENGTH_LONG).show();
                         }
-                        playPauseButton.performHapticFeedback(
+                        viewPlayPause.performHapticFeedback(
                                 android.view.HapticFeedbackConstants.LONG_PRESS);
                     }
                 });
@@ -348,44 +497,45 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 iterationHandler = new Handler();
                 iterationHandler.postDelayed(styleIterator, 100);
             } else {
-                playPauseButton.setVisibility(View.GONE);
+                viewPlayPause.setVisibility(View.GONE);
 
 
                 // Spinner click listener
-                spinner.setOnItemSelectedListener(this);
                 spinner.setAdapter(spinner_adapter);
+                spinner.setOnItemSelectedListener(this);
+
             }
 
-            camButton.setVisibility(View.VISIBLE);
-            camButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    camButton.performHapticFeedback(
-                            android.view.HapticFeedbackConstants.LONG_PRESS);
-                    if (Const.USING_FRONT_CAMERA) {
-                        camButton.setImageResource(R.drawable.outline_info_24);
-                        help = true;
-//                        cameraCapture = new CameraCapture(
-//                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
-//                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_BACK_CAMERA);
-
-                        Const.USING_FRONT_CAMERA = false;
-                    } else {
-                        camButton.setImageResource(R.drawable.baseline_close_24);
-                        help = true;
-
-//                        cameraCapture = new CameraCapture(
-//                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
-//                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_FRONT_CAMERA);
-
-                        Const.USING_FRONT_CAMERA = true;
-                    }
-                }
-            });
+            viewHelp.setVisibility(View.VISIBLE);
+//            viewHelp.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    viewHelp.performHapticFeedback(
+//                            android.view.HapticFeedbackConstants.LONG_PRESS);
+//                    if (Const.USING_FRONT_CAMERA) {
+//                        viewHelp.setImageResource(R.drawable.outline_info_24);
+//                        help = true;
+////                        cameraCapture = new CameraCapture(
+////                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
+////                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_BACK_CAMERA);
+//
+//                        Const.USING_FRONT_CAMERA = false;
+//                    } else {
+//                        viewHelp.setImageResource(R.drawable.baseline_close_24);
+//                        help = true;
+//
+////                        cameraCapture = new CameraCapture(
+////                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
+////                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_FRONT_CAMERA);
+//
+//                        Const.USING_FRONT_CAMERA = true;
+//                    }
+//                }
+//            });
         }
 
-        screenshotButton.setHapticFeedbackEnabled(true);
-        screenshotButton.setOnClickListener(new View.OnClickListener() {
+        viewSceneList.setHapticFeedbackEnabled(true);
+        viewSceneList.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                builder.show();
@@ -399,21 +549,30 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 builder.setTitle("Choose an option")
                         .setAdapter(adapter, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String selectedItem = adapter.getItem(which);
-                                // Do something with the selected item
+                            public void onClick(DialogInterface dialog, int position) {
+                                if (styleIds.get(position).equals("none")) {
+                                    if (!Const.STYLES_RETRIEVED) {
+                                        styleType = "?";
+                                    } else {
+                                        styleType = "none";
+                                    }
+                                }
+                                else {
+                                    styleType = styleIds.get(position);
+                                }
                             }
                         });
 
                 AlertDialog dialog = builder.create();
                 dialog.show();
-//                screenshotButton.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
+//                viewSceneList.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
             }
 
 
         });
 
-//        screenshotButton.setOnTouchListener(new View.OnTouchListener() {
+
+//        viewSceneList.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View view, MotionEvent event) {
 //                switch (event.getAction()) {
@@ -555,19 +714,14 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 Toast.makeText(getApplicationContext(), styleDescriptions.get(position),
                         Toast.LENGTH_SHORT).show();
 
-                if (Const.STEREO_ENABLED) {
-                    if (stereoView1.getVisibility() == View.INVISIBLE) {
-                        stereoView1.setVisibility(View.VISIBLE);
-                        stereoView2.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    if (Const.DISPLAY_REFERENCE) {
-                        iconView.setVisibility(View.VISIBLE);
-                    }
-                    if (imgView.getVisibility() == View.INVISIBLE) {
-                        imgView.setVisibility(View.VISIBLE);
-                    }
+
+                if (Const.DISPLAY_REFERENCE) {
+                    iconView.setVisibility(View.VISIBLE);
                 }
+                if (imgView.getVisibility() == View.INVISIBLE) {
+                    imgView.setVisibility(View.VISIBLE);
+                }
+
 
                 iterationHandler.postDelayed(this, 1000 * Const.ITERATE_INTERVAL);
             } else {
@@ -860,6 +1014,13 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setScale(sceneScaleFactor)
                     .build();
 
+            Extras.ArrowKey arrowKey = Extras.ArrowKey.newBuilder()
+                    .setLeft(buttonLeft.isPressed())
+                    .setRight(buttonRight.isPressed())
+                    .setUp(buttonUp.isPressed())
+                    .setDown(buttonDown.isPressed())
+                    .build();
+
             int scene = 0;
             if (!(styleType.equals("?") || styleType.equals("none"))) {
                 scene = Integer.parseInt(styleType);
@@ -883,6 +1044,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setScreenValue(screenValue)
                     .setImuValue(imuValue)
                     .setTouchValue(touchValue)
+                    .setArrowKey(arrowKey)
                     .build();
             return InputFrame.newBuilder()
                     .setPayloadType(PayloadType.IMAGE)
@@ -953,26 +1115,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
                 } else if (GabrielClientActivity.this.openrtistComm != null) {
 //                    sendFrameCloudlet(image);
-                }
-                if (Const.STEREO_ENABLED) {
-                    runOnUiThread(() -> {
-                        stereoView1.setVisibility(View.VISIBLE);
-                        stereoView2.setVisibility(View.VISIBLE);
-                    });
                 } else {
                     runOnUiThread(() -> imgView.setVisibility(View.VISIBLE));
                 }
             } else if (!cleared) {
                 Log.v(LOG_TAG, "Display Cleared");
-
-                if (Const.STEREO_ENABLED) {
-                    runOnUiThread(() -> {
-                        stereoView1.setVisibility(View.INVISIBLE);
-                        stereoView2.setVisibility(View.INVISIBLE);
-                    });
-                } else {
-                    runOnUiThread(() -> imgView.setVisibility(View.INVISIBLE));
-                }
+                runOnUiThread(() -> imgView.setVisibility(View.INVISIBLE));
                 cleared = true;
             }
             image.close();
@@ -990,10 +1138,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     void setupComm() {
         int port = getPort();
-
-        Consumer<ByteString> imageViewUpdater = Const.STEREO_ENABLED
-                ? new StereoViewUpdater(stereoView1, stereoView2)
-                : new ImageViewUpdater(this.imgView);
+        Consumer<ByteString> imageViewUpdater = new ImageViewUpdater(this.imgView);
         this.openrtistComm = OpenrtistComm.createOpenrtistComm(
                 this.serverIP, port, this, this.iconView, imageViewUpdater, Const.TOKEN_LIMIT);
     }

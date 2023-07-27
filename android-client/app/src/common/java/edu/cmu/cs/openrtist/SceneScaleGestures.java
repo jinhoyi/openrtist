@@ -17,13 +17,12 @@ import java.util.function.Consumer;
 import edu.cmu.cs.gabriel.camera.ImageViewUpdater;
 // https://stackoverflow.com/questions/5790503/can-we-use-scale-gesture-detector-for-pinch-zoom-in-android
 
-public class SceneScaleGestures implements View.OnTouchListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, ScaleGestureDetector.OnScaleGestureListener {
-    private View view;
-    private GestureDetector gesture;
-    private ScaleGestureDetector gestureScale;
+public class SceneScaleGestures implements View.OnTouchListener, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
+    private final GestureDetector gesture;
+    private final ScaleGestureDetector gestureScale;
     private float scaleFactor = 1.0f;
     private boolean inScale = false;
-    private boolean doubleTab = false;
+    private final boolean doubleTab = false;
     private final GabrielClientActivity gabrielClientActivity;
 
 
@@ -35,7 +34,6 @@ public class SceneScaleGestures implements View.OnTouchListener, GestureDetector
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
-        this.view = view;
         gesture.onTouchEvent(event);
         gestureScale.onTouchEvent(event);
         return true;
@@ -116,27 +114,4 @@ public class SceneScaleGestures implements View.OnTouchListener, GestureDetector
         return true;
     }
 
-    @Override
-    public boolean onDoubleTap(MotionEvent event) {
-//        doubleTab = !doubleTab;
-//        if (doubleTab) {
-//            scaleFactor = 1.2f;
-//        } else {
-//            scaleFactor = 0.8f;
-//        }
-//        gabrielClientActivity.setScaleFactor(scaleFactor);
-////        view.setScaleX(scaleFactor);
-////        view.setScaleY(scaleFactor);
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event) {
-        return true;
-    }
 }

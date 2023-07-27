@@ -10,14 +10,23 @@
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:backgroundTint="@color/carnegie_dgrey"
         android:dropDownWidth="match_parent"
-        android:prompt="@string/dropdown_prompt" />
+        android:prompt="@string/dropdown_prompt"
+        android:visibility="visible" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/guidance_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00000000"
+            android:elevation="10dp"
+            android:scaleType="fitXY" />
 
         <ImageButton
             android:id="@+id/button_left"
@@ -73,7 +82,6 @@
             android:layout_width="@android:dimen/notification_large_icon_width"
             android:layout_height="@android:dimen/notification_large_icon_width"
             android:layout_alignWithParentIfMissing="false"
-            android:layout_alignBaseline="@id/guidance_image"
             android:layout_centerInParent="false"
             android:layout_centerHorizontal="true"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -98,40 +106,14 @@
             android:visibility="invisible" />
 
         <ImageView
-            android:id="@+id/imgPlayPause"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_gravity="bottom|start"
-            android:layout_marginBottom="60dp"
-            android:background="@color/transparent"
-            android:elevation="@dimen/activity_vertical_margin"
-            android:focusable="false"
-            android:hapticFeedbackEnabled="true"
-            android:rotation="0"
-            android:src="@drawable/ic_play"
-            android:visibility="visible"
-            app:tint="@drawable/touch_selector" />
-
-        <ImageView
-            android:id="@+id/imgSceneMenu"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="start"
-            android:elevation="16dp"
-            android:focusable="false"
-            android:hapticFeedbackEnabled="true"
-            android:src="@drawable/baseline_menu_24"
-            android:visibility="visible"
-            app:tint="@drawable/touch_selector" />
-
-        <ImageView
             android:id="@+id/imgFullScreen"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_gravity="start"
+            android:layout_marginEnd="@dimen/button_margin"
+            android:layout_marginBottom="@dimen/button_margin"
             android:elevation="16dp"
             android:focusable="false"
             android:hapticFeedbackEnabled="true"
@@ -143,16 +125,174 @@
             android:id="@+id/imgCamControl"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
-            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_gravity="start"
-            android:layout_marginRight="@dimen/button_size"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:layout_toStartOf="@id/imgFullScreen"
             android:elevation="16dp"
             android:focusable="false"
             android:hapticFeedbackEnabled="true"
             android:scaleX="0.9"
             android:scaleY="0.9"
             android:src="@drawable/baseline_control_camera_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgARView"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:layout_toEndOf="@id/imgAlignCenter"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:src="@drawable/baseline_view_in_ar_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgAlignCenter"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:layout_toEndOf="@id/imgMenu"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:src="@drawable/baseline_horizontal_distribute_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgMenu"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="start"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/baseline_menu_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+
+        <ImageView
+            android:id="@+id/imgSceneList"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgMenu"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="start"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/outline_landscape_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgReset"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgSceneList"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_alignParentLeft="true"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/outline_replay_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgPlayPause"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgReset"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/outline_play_arrow_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgParticle"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgPlayPause"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:src="@drawable/outline_blur_on_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgAutoPlay"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgParticle"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:src="@drawable/autoplay_fill0_wght400_grad0_opsz48"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgRotate"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgAutoPlay"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:rotation="-45"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:src="@drawable/outline_screen_rotation_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgInfo"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgRotate"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:rotation="0"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:src="@drawable/outline_info_24"
             android:visibility="visible"
             app:tint="@drawable/touch_selector" />
 
@@ -183,38 +323,15 @@
             android:visibility="visible" />
 
         <ImageView
-            android:id="@+id/guidance_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#00000000"
-            android:scaleType="fitXY"
-            android:elevation="10dp"
-            />
-
-        <ImageView
-            android:id="@+id/imgSwitchCam"
+            android:id="@+id/imgHelp"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="false"
-            android:elevation="@dimen/activity_vertical_margin"
-            android:focusable="false"
-            android:hapticFeedbackEnabled="true"
-            android:src="@drawable/outline_info_24"
-            android:visibility="visible"
-            app:tint="@drawable/touch_selector" />
-
-        <ImageView
-            android:id="@+id/imgReset"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_alignBottom="@id/guidance_image"
-            android:layout_gravity="start"
-            android:layout_marginLeft="@dimen/button_size"
             android:elevation="16dp"
             android:focusable="false"
             android:hapticFeedbackEnabled="true"
-            android:src="@drawable/baseline_restart_alt_24"
+            android:src="@drawable/outline_help_outline_24"
             android:visibility="visible"
             app:tint="@drawable/touch_selector" />
 

@@ -1,6 +1,5 @@
 package edu.cmu.cs.openrtist;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Build;
 import android.view.HapticFeedbackConstants;
@@ -9,15 +8,12 @@ import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class MainMode extends AbstractModeManager {
+public class CamMode extends AbstractModeManager {
 
-    public MainMode(GabrielClientActivity gabrielClientActivity, Map<ViewID, View> views) {
+    public CamMode(GabrielClientActivity gabrielClientActivity, Map<ViewID, View> views) {
         super(gabrielClientActivity, views, new EnumMap<ViewID, Integer>(ViewID.class) {
             {
                 put(ViewID.ARROW_UP, View.INVISIBLE);

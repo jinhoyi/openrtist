@@ -116,4 +116,6 @@
         <item>4</item>
     </string-array>
 
+    <string name="help_info">This is some helpful information</string>
+
 </resources>

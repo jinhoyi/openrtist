@@ -1,5 +1,7 @@
 package edu.cmu.cs.openrtist;
 
+
+
 public enum ViewID {
     ARROW_UP(0),
     ARROW_DOWN(1),
@@ -16,7 +18,9 @@ public enum ViewID {
     PARTICLE(12),
     AUTO_PLAY(13),
     ROTATE(14),
-    INFO(15);
+    INFO(15),
+    HELP(16),
+    SIZE(17);
 
     private final int value;
 
