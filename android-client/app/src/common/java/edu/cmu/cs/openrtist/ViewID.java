@@ -20,7 +20,8 @@ public enum ViewID {
     ROTATE(14),
     INFO(15),
     HELP(16),
-    SIZE(17);
+    IMAGE(17),
+    SIZE(18);
 
     private final int value;
 

@@ -117,5 +117,6 @@
     </string-array>
 
     <string name="help_info">This is some helpful information</string>
+    <string name="help_cam">This is some helpful information for controlling cam</string>
 
 </resources>

@@ -28,12 +28,11 @@ public abstract class AbstractModeManager {
         for (ViewID key : visibility.keySet()) {
             Integer view_visibility = visibility.get(key);
             View view = views.get(key);
+            view.setVisibility(view_visibility);
             if (view_visibility == View.VISIBLE) {
-                view.setVisibility(View.VISIBLE);
                 view.setOnTouchListener(getOnTouchListener(key));
                 view.setOnClickListener(getOnClickListener(key));
             } else {
-                view.setVisibility(View.INVISIBLE);
                 view.setOnTouchListener(null);
                 view.setOnClickListener(null);
             }

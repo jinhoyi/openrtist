@@ -152,6 +152,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private final Map<ViewID, View> views = new EnumMap<ViewID, View>(ViewID.class);
     private final Map<AppMode, AbstractModeManager> modeList = new EnumMap<AppMode, AbstractModeManager>(AppMode.class);
 
+    private AppMode currMode = AppMode.MAIN;
     private Handler iterationHandler;
     private Handler frameHandler;
     private Handler fpsHandler;
@@ -239,6 +240,23 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private float sceneX = 0.0f;
     private float sceneY= 0.0f;
 
+    private boolean alignCenter = false;
+    private boolean arView = false;
+
+    public void setAlignCenter(boolean b){
+        alignCenter = b;
+        Toast.makeText(this,
+                "setAlignCenter - Incomplete",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void setARView(boolean b){
+        arView = b;
+        Toast.makeText(this,
+                "setARView - Incomplete",
+                Toast.LENGTH_SHORT).show();
+    }
+
     public void setScaleFactor(float factor){
         sceneScaleFactor = factor;
     }
@@ -249,11 +267,13 @@ public class GabrielClientActivity extends AppCompatActivity implements
     }
 
     public void switchMode(AppMode mode) {
+        currMode = mode;
         switch(mode) {
             case MAIN:
                 Toast.makeText(this,
                         "MAIN!!",
                         Toast.LENGTH_LONG).show();
+                modeList.get(mode).init();
                 return;
             case FULLSCREEN:
                 Toast.makeText(this,
@@ -264,6 +284,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 Toast.makeText(this,
                         "CAM!!",
                         Toast.LENGTH_LONG).show();
+                modeList.get(mode).init();
                 return;
             case MENU:
                 Toast.makeText(this,
@@ -322,7 +343,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         fpsLabel = findViewById(R.id.fpsLabel);
         accelLabel = findViewById(R.id.accelLabel);
 
-        imgView.setOnTouchListener(new SceneScaleGestures(this, this));
+//        imgView.setOnTouchListener(new SceneScaleGestures(this, this));
 
         buttonLeft = findViewById(R.id.button_left);
         buttonRight = findViewById(R.id.button_right);
@@ -360,6 +381,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         views.put(ViewID.ROTATE, viewRotate);
         views.put(ViewID.INFO, viewInfo);
         views.put(ViewID.HELP, viewHelp);
+        views.put(ViewID.IMAGE, imgView);
 
 //        views.put(ViewID.ARROW_UP, findViewById(R.id.button_up));
 //        views.put(ViewID.ARROW_DOWN, findViewById(R.id.button_down));
@@ -378,11 +400,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //        views.put(ViewID.ROTATE, findViewById(R.id.imgRotate));
 //        views.put(ViewID.INFO, findViewById(R.id.imgInfo));
 //        views.put(ViewID.HELP, findViewById(R.id.imgHelp));
+//        views.put(ViewID.IMAGE, findViewById(R.id.guidance_image));
 
 //        AbstractModeManager mainMode = new MainMode(this, views);
         modeList.put(AppMode.MAIN, new MainMode(this, views));
-
-        modeList.get(AppMode.MAIN).init();
+        modeList.put(AppMode.CAM, new CamMode(this, views));
+        switchMode(AppMode.MAIN);
 
 
         String[] menuItems = {"Menu Item 1", "Menu Item 2"};
@@ -730,13 +753,27 @@ public class GabrielClientActivity extends AppCompatActivity implements
         }
     };
 
+    private boolean imuOn = false;
+    void setIMUSensor(boolean on) {
+        if (on) {
+            if (!imuOn) {
+                imuOn = true;
+                sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            }
+        } else {
+            if (imuOn) {
+                imuOn = false;
+                sensorManager.unregisterListener(this);
+            }
+        }
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.v(LOG_TAG, "++onResume");
-
-        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        setIMUSensor(true);
 
         initOnce();
         Intent intent = getIntent();
@@ -748,8 +785,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         Log.v(LOG_TAG, "++onPause");
-        sensorManager.unregisterListener(this);
-
+        setIMUSensor(false);
 
         if(iterationHandler != null) {
             iterationHandler.removeCallbacks(styleIterator);
@@ -950,6 +986,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
      */
     private void initPerRun(String serverIP) {
         Log.v(LOG_TAG, "++initPerRun");
+
+        switchMode(currMode);
 
         // don't connect to cloudlet if running locally
         // if a mobile only run is specified

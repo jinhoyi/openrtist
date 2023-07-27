@@ -6,6 +6,7 @@ import android.os.Build;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
@@ -37,32 +38,20 @@ public class MainMode extends AbstractModeManager {
                 put(ViewID.ROTATE, View.INVISIBLE);
                 put(ViewID.INFO, View.INVISIBLE);
                 put(ViewID.HELP, View.VISIBLE);
+                put(ViewID.IMAGE, View.VISIBLE);
             }});
-//        Map<ViewID, Integer> visibility = new EnumMap<>(ViewID.class);
-//        visibility.put(ViewID.ARROW_UP, View.INVISIBLE);
-//        visibility.put(ViewID.ARROW_DOWN, View.INVISIBLE);
-//        visibility.put(ViewID.ARROW_LEFT, View.INVISIBLE);
-//        visibility.put(ViewID.ARROW_RIGHT, View.INVISIBLE);
-//        visibility.put(ViewID.FULL_SCREEN, View.VISIBLE);
-//        visibility.put(ViewID.CAM_CONTROL, View.VISIBLE);
-//        visibility.put(ViewID.AR_VIEW, View.INVISIBLE);
-//        visibility.put(ViewID.ALIGN_CENTER, View.INVISIBLE);
-//        visibility.put(ViewID.MENU, View.VISIBLE);
-//        visibility.put(ViewID.SCENE_LIST, View.INVISIBLE);
-//        visibility.put(ViewID.RESET, View.INVISIBLE);
-//        visibility.put(ViewID.PLAY_PAUSE, View.INVISIBLE);
-//        visibility.put(ViewID.PARTICLE, View.INVISIBLE);
-//        visibility.put(ViewID.AUTO_PLAY, View.INVISIBLE);
-//        visibility.put(ViewID.ROTATE, View.INVISIBLE);
-//        visibility.put(ViewID.INFO, View.INVISIBLE);
-//        visibility.put(ViewID.HELP, View.VISIBLE);
-//        this.visibility = visibility;
+    }
 
+    public void init() {
+        super.init();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     @Override
     protected View.OnTouchListener getOnTouchListener(ViewID key) {
+        if (key == ViewID.IMAGE) {
+            return null;
+        }
 
         return (view, event) -> {
             switch (event.getAction()) {
@@ -84,6 +73,7 @@ public class MainMode extends AbstractModeManager {
     protected View.OnClickListener getOnClickListener(ViewID key) {
         View.OnClickListener defaultListener = (view) -> {
         };
+
 
         switch(key) {
             case FULL_SCREEN:

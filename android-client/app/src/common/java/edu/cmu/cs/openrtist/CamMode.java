@@ -5,6 +5,7 @@ import android.os.Build;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
@@ -16,15 +17,15 @@ public class CamMode extends AbstractModeManager {
     public CamMode(GabrielClientActivity gabrielClientActivity, Map<ViewID, View> views) {
         super(gabrielClientActivity, views, new EnumMap<ViewID, Integer>(ViewID.class) {
             {
-                put(ViewID.ARROW_UP, View.INVISIBLE);
-                put(ViewID.ARROW_DOWN, View.INVISIBLE);
-                put(ViewID.ARROW_LEFT, View.INVISIBLE);
-                put(ViewID.ARROW_RIGHT, View.INVISIBLE);
+                put(ViewID.ARROW_UP, View.VISIBLE);
+                put(ViewID.ARROW_DOWN, View.VISIBLE);
+                put(ViewID.ARROW_LEFT, View.VISIBLE);
+                put(ViewID.ARROW_RIGHT, View.VISIBLE);
                 put(ViewID.FULL_SCREEN, View.VISIBLE);
                 put(ViewID.CAM_CONTROL, View.VISIBLE);
-                put(ViewID.AR_VIEW, View.INVISIBLE);
-                put(ViewID.ALIGN_CENTER, View.INVISIBLE);
-                put(ViewID.MENU, View.VISIBLE);
+                put(ViewID.AR_VIEW, View.VISIBLE);
+                put(ViewID.ALIGN_CENTER, View.VISIBLE);
+                put(ViewID.MENU, View.GONE);
                 put(ViewID.SCENE_LIST, View.INVISIBLE);
                 put(ViewID.RESET, View.INVISIBLE);
                 put(ViewID.PLAY_PAUSE, View.INVISIBLE);
@@ -33,32 +34,24 @@ public class CamMode extends AbstractModeManager {
                 put(ViewID.ROTATE, View.INVISIBLE);
                 put(ViewID.INFO, View.INVISIBLE);
                 put(ViewID.HELP, View.VISIBLE);
+                put(ViewID.IMAGE, View.VISIBLE);
             }});
-//        Map<ViewID, Integer> visibility = new EnumMap<>(ViewID.class);
-//        visibility.put(ViewID.ARROW_UP, View.INVISIBLE);
-//        visibility.put(ViewID.ARROW_DOWN, View.INVISIBLE);
-//        visibility.put(ViewID.ARROW_LEFT, View.INVISIBLE);
-//        visibility.put(ViewID.ARROW_RIGHT, View.INVISIBLE);
-//        visibility.put(ViewID.FULL_SCREEN, View.VISIBLE);
-//        visibility.put(ViewID.CAM_CONTROL, View.VISIBLE);
-//        visibility.put(ViewID.AR_VIEW, View.INVISIBLE);
-//        visibility.put(ViewID.ALIGN_CENTER, View.INVISIBLE);
-//        visibility.put(ViewID.MENU, View.VISIBLE);
-//        visibility.put(ViewID.SCENE_LIST, View.INVISIBLE);
-//        visibility.put(ViewID.RESET, View.INVISIBLE);
-//        visibility.put(ViewID.PLAY_PAUSE, View.INVISIBLE);
-//        visibility.put(ViewID.PARTICLE, View.INVISIBLE);
-//        visibility.put(ViewID.AUTO_PLAY, View.INVISIBLE);
-//        visibility.put(ViewID.ROTATE, View.INVISIBLE);
-//        visibility.put(ViewID.INFO, View.INVISIBLE);
-//        visibility.put(ViewID.HELP, View.VISIBLE);
-//        this.visibility = visibility;
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        ((ImageView)this.views.get(ViewID.CAM_CONTROL)).setImageResource(R.drawable.baseline_arrow_back_ios_new_24);
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     @Override
     protected View.OnTouchListener getOnTouchListener(ViewID key) {
+
+        if (key == ViewID.IMAGE) {
+            return new SceneScaleGestures(gabrielClientActivity, gabrielClientActivity);
+        }
 
         return (view, event) -> {
             switch (event.getAction()) {
@@ -83,24 +76,33 @@ public class CamMode extends AbstractModeManager {
 
         switch(key) {
             case FULL_SCREEN:
+
                 return (view -> {
+                    ((ImageView)this.views.get(ViewID.CAM_CONTROL)).setImageResource(R.drawable.baseline_control_camera_24);
                     gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.FULLSCREEN);
                 });
             case CAM_CONTROL:
+
                 return (view -> {
-                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.CAM);
+                    ((ImageView)this.views.get(ViewID.CAM_CONTROL)).setImageResource(R.drawable.baseline_control_camera_24);
+                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.MAIN);
                 });
 
-            case MENU:
+            case ALIGN_CENTER:
                 return (view -> {
-                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.MENU);
+                    gabrielClientActivity.setAlignCenter(true);
+                });
+
+            case AR_VIEW:
+                return (view -> {
+                    gabrielClientActivity.setARView(true);
                 });
 
             case HELP:
                 return (view -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(gabrielClientActivity);
                     builder.setTitle("HELPER")
-                            .setMessage(R.string.help_info);
+                            .setMessage(R.string.help_cam);
 
                     AlertDialog dialog = builder.create();
                     dialog.show();
