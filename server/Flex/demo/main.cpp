@@ -777,15 +777,44 @@ void imu_thread() {
 		float dx = extras.touch_value().x()*100;
 		float dy = extras.touch_value().y()*100;
 
-		scale_mtx.lock();
-		g_sceneScale = extras.touch_value().scale();
+		float sceneScale = extras.touch_value().scale();
+		bool left_key = extras.arrow_key().left();
+		bool right_key = extras.arrow_key().right();
+		bool up_key = extras.arrow_key().up();
+		bool down_key = extras.arrow_key().down();
 
+		float x_speed = ((int)right_key - (int)left_key) * g_camSpeed / 3;
+		float y_speed = ((int)up_key - (int)down_key) * g_camSpeed / 3;
+		
+		scale_mtx.lock();
+		// Forward backword
+		if (sceneScale == 1.0f) {
+			g_camVel.z = 0;
+		} else {
+			if (sceneScale > 1.0f) {
+				float diff = (sceneScale - 1.0);
+				diff *= diff;
+				g_camVel.z =  diff * 70.0f +  g_camSpeed;
+			}
+				
+			else{
+				float diff = (1.0 - sceneScale);
+				diff *= diff;
+				g_camVel.z = -g_camSpeed - (diff * 70.0f);
+			}		
+		}
+
+		// Camera Angle
 		g_camAngle.x -= Clamp(dx*kSensitivity, -FLT_MAX, FLT_MAX);
 		if ((g_camAngle.x - 0) * (g_camAngle.x - 0) < cam_th)
 			g_camAngle.x = 0;
 		g_camAngle.y -= Clamp(dy*kSensitivity, -FLT_MAX, FLT_MAX);
 		if ((g_camAngle.y - 0) * (g_camAngle.y - 0) < cam_th)
 			g_camAngle.y = 0;
+
+		// Up/Down/Right/Left
+		g_camVel.x = x_speed;
+		g_camVel.y = y_speed;
 
 		scale_mtx.unlock();
 		// printf("g_scale = %f\n", g_sceneScale);
@@ -1392,34 +1421,14 @@ void UpdateEmitters()
 //FLAG:UPDATE_CAMERA
 void UpdateCamera()
 {
-	Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
-	Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
 
 	scale_mtx.lock();
-	if (g_sceneScale == 1.0f) {
-		g_camVel.z = 0;
-	} else {
-		if (g_sceneScale > 1.0f) {
-			float diff = (g_sceneScale - 1.0);
-			diff *= diff;
-			g_camVel.z =  diff * 70.0f +  g_camSpeed;
-		}
-			
-		else{
-			float diff = (1.0 - g_sceneScale);
-			diff *= diff;
-			g_camVel.z = -g_camSpeed - (diff * 70.0f);
-		}
-			
-	}
-	// else {
-	// 	// g_camVel.x = (g_sceneLastScale - g_sceneScale) / g_sceneLastScale * g_camSpeed;
-	// 	g_camVel.x = g_camSpeed;
-	// }
-	
-	g_sceneLastScale = g_sceneScale;
+	// Forward backword
+	Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
+	Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
 	scale_mtx.unlock();
 
+	// Camera Angle
 	g_camSmoothVel = Lerp(g_camSmoothVel, g_camVel, 0.1f);
 	g_camPos += (forward*g_camSmoothVel.z + right*g_camSmoothVel.x + Cross(right, forward)*g_camSmoothVel.y);
 }
@@ -3163,6 +3172,7 @@ int main(int argc, char* argv[])
 	g_scenes.push_back(new Buoyancy("Buoyancy"));
 	g_scenes.push_back(new RockPool("Rock Pool"));
 	g_scenes.push_back(new FluidBlock("Fluid Block"));
+
 	// g_scenes.push_back(new Speaker("Speaker", 0.15f));
 
 	// FLAG:RENGERING_OPTION

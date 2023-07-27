@@ -162,6 +162,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
             print("resending 1")
             self.frame_socket.send_string("1")
 
+        print("got scenes")
         extras = openrtist_pb2.Extras()
         extras.ParseFromString(reply)
         self.scene_list = dict()
@@ -206,7 +207,7 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
         ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
         self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
-
+        self.get_scenes()
 
 
         pass
@@ -270,7 +271,6 @@ class OpenrfluidEngine(cognitive_engine.Engine):
             self._resize_watermark()
             if self.phys_simulator != None:
                 self.reset_simulator()
-                self.get_scenes()
                 # self.phys_simulator.kill()
                 # while self.phys_simulator.poll() is None:
                 #     time.sleep(0.1)
