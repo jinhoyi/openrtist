@@ -18,7 +18,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -59,6 +61,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.view.PreviewView;
+import androidx.core.view.WindowCompat;
 
 //import android.hardware.SensorManager;
 
@@ -80,6 +83,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import edu.cmu.cs.gabriel.Const;
@@ -109,7 +113,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     // major components for streaming sensor data and receiving information
     String serverIP = null;
-    private String styleType = "?"; // "?" when style is not retrieved from the server, "none" if style is retrieved but not selected
+    private String styleType = "-1"; //
 
     private OpenrtistComm openrtistComm;
 
@@ -155,6 +159,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private AppMode currMode = AppMode.MAIN;
     private Handler iterationHandler;
     private Handler frameHandler;
+    private Handler autoplayHandler;
     private Handler fpsHandler;
     private TextView fpsLabel;
     private PreviewView preview;
@@ -170,8 +175,10 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private YuvToJPEGConverter yuvToJPEGConverter;
     private CameraCapture cameraCapture;
 
-    private final List<String> styleDescriptions = new ArrayList<>(Collections.singletonList("Choose Scene"));
-    private final List<String> styleIds = new ArrayList<>(Collections.singletonList("none"));
+    private final List<String> styleDescriptions = new ArrayList<>();
+    private final List<String> styleIds = new ArrayList<>();
+
+    private ArrayAdapter<String> sceneAdapter;
 
     public class Pair implements Comparable<Pair> {
         String key;
@@ -211,14 +218,29 @@ public class GabrielClientActivity extends AppCompatActivity implements
         }
     }
 
+    public ArrayAdapter<String> getSceneAdapter() {
+        return sceneAdapter;
+    }
+
+    public List<String> getSceneIDs() {
+        return styleIds;
+    }
+
+    public List<String> getSceneDescriptions() {
+        return styleDescriptions;
+    }
+
+    public void setSceneType(String sceneID) {
+        styleType = sceneID;
+    }
+
+
     public void addStyles(Set<Map.Entry<String, String>> entrySet) {
         for (Map.Entry<String, String> entry : entrySet) {
             Log.v(LOG_TAG, "style: " + entry.getKey() + ", desc: " + entry.getValue());
             styleDescriptions.add(entry.getValue());
             styleIds.add(entry.getKey());
         }
-        styleDescriptions.remove(0);
-        styleIds.remove(0);
 
         // Sort the list of Pairs
         sortPairedArray(styleIds, styleDescriptions);
@@ -242,6 +264,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     private boolean alignCenter = false;
     private boolean arView = false;
+    private boolean reset = false;
+    private boolean pause = false;
+    private boolean particle = false;
+    private boolean autoPlay = false;
+    private boolean landscapeMode = false;
+    private boolean info = false;
 
     public void setAlignCenter(boolean b){
         alignCenter = b;
@@ -257,6 +285,75 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 Toast.LENGTH_SHORT).show();
     }
 
+    public void setReset(boolean b){
+        reset = b;
+        Toast.makeText(this,
+                "setReset - Incomplete",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean getPause() {
+        return pause;
+    }
+    public void setPause(boolean b){
+        pause = !pause;
+    }
+
+    public boolean getParticle() {
+        return particle;
+    }
+    public void setParticle(boolean b){
+        particle = !particle;
+    }
+
+    public boolean getAutoPlay() {
+        return autoPlay;
+    }
+    public void setAutoPlay(boolean b){
+        autoPlay = !autoPlay;
+
+        if (autoPlay) {
+            setIMUSensor(false);
+
+        } else {
+            setIMUSensor(true);
+        }
+
+        Toast.makeText(this,
+                "setAutoPlay - Incomplete",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean getLandscapeMode() {
+        return landscapeMode;
+    }
+    public void setLandscapeMode(boolean b){
+        landscapeMode = !landscapeMode;
+        if (landscapeMode) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            int tmp = mScreenHeight;
+            mScreenHeight = mScreenWidth;
+            mScreenWidth = tmp;
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            int tmp = mScreenHeight;
+            mScreenHeight = mScreenWidth;
+            mScreenWidth = tmp;
+        }
+    }
+
+    public boolean getInfo() {
+        return info;
+    }
+    public void setInfo(boolean b){
+        info = !info;
+        if (info) {
+            fpsLabel.setVisibility(View.VISIBLE);
+        } else {
+            fpsLabel.setVisibility(View.INVISIBLE);
+        }
+    }
+
     public void setScaleFactor(float factor){
         sceneScaleFactor = factor;
     }
@@ -266,33 +363,34 @@ public class GabrielClientActivity extends AppCompatActivity implements
         sceneY = y;
     }
 
+    public void updateScreenSize() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        mScreenDensity = metrics.densityDpi;
+        mScreenHeight = metrics.heightPixels;
+        mScreenWidth = metrics.widthPixels;
+    }
+
+
+    public void enterFullscreen() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    public void exitFullscreen() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
     public void switchMode(AppMode mode) {
         currMode = mode;
-        switch(mode) {
-            case MAIN:
-                Toast.makeText(this,
-                        "MAIN!!",
-                        Toast.LENGTH_LONG).show();
-                modeList.get(mode).init();
-                return;
-            case FULLSCREEN:
-                Toast.makeText(this,
-                        "FULLSCREEN!!",
-                        Toast.LENGTH_LONG).show();
-                return;
-            case CAM:
-                Toast.makeText(this,
-                        "CAM!!",
-                        Toast.LENGTH_LONG).show();
-                modeList.get(mode).init();
-                return;
-            case MENU:
-                Toast.makeText(this,
-                        "MENU!!",
-                        Toast.LENGTH_LONG).show();
-                return;
-        }
-        return;
+        modeList.get(mode).init();
     }
 
     @Override
@@ -304,10 +402,16 @@ public class GabrielClientActivity extends AppCompatActivity implements
     public final void onSensorChanged(SensorEvent event) {
         // The light sensor returns a single value.
         // Many sensors return 3 values, one for each axis.
-        imu_x = event.values[0];
-        imu_y = event.values[1];
-        imu_z = event.values[2];
 
+        if (landscapeMode) {
+            imu_x = -event.values[1];
+            imu_y = event.values[0];
+            imu_z = event.values[2];
+        } else {
+            imu_x = event.values[0];
+            imu_y = event.values[1];
+            imu_z = event.values[2];
+        }
     }
 
     // local execution
@@ -381,7 +485,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         views.put(ViewID.ROTATE, viewRotate);
         views.put(ViewID.INFO, viewInfo);
         views.put(ViewID.HELP, viewHelp);
-        views.put(ViewID.IMAGE, imgView);
+        views.put(ViewID.MAIN, imgView);
 
 //        views.put(ViewID.ARROW_UP, findViewById(R.id.button_up));
 //        views.put(ViewID.ARROW_DOWN, findViewById(R.id.button_down));
@@ -405,6 +509,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //        AbstractModeManager mainMode = new MainMode(this, views);
         modeList.put(AppMode.MAIN, new MainMode(this, views));
         modeList.put(AppMode.CAM, new CamMode(this, views));
+        modeList.put(AppMode.MENU, new MenuMode(this, views));
+        modeList.put(AppMode.FULLSCREEN, new FullScreenMode(this, views));
         switchMode(AppMode.MAIN);
 
 
@@ -436,6 +542,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
         List<Sensor> gravSensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         mSensor = gravSensors.get(0);
 
+        sceneAdapter = new ArrayAdapter<>(
+                this, R.layout.mylist, styleDescriptions);
+//
         ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(
                 this, R.layout.mylist, styleDescriptions);
 
@@ -524,10 +633,13 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
 
                 // Spinner click listener
-                spinner.setAdapter(spinner_adapter);
-                spinner.setOnItemSelectedListener(this);
+//                spinner.setAdapter(spinner_adapter);
+//                spinner.setOnItemSelectedListener(this);
 
             }
+
+            autoplayHandler = new Handler();
+            autoplayHandler.postDelayed(styleIterator, 100);
 
             viewHelp.setVisibility(View.VISIBLE);
 //            viewHelp.setOnClickListener(new View.OnClickListener() {
@@ -557,42 +669,42 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //            });
         }
 
-        viewSceneList.setHapticFeedbackEnabled(true);
-        viewSceneList.setOnClickListener(new View.OnClickListener() {
+//        viewSceneList.setHapticFeedbackEnabled(true);
+//        viewSceneList.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View v) {
+////                builder.show();
+////            }
 //            @Override
 //            public void onClick(View v) {
-//                builder.show();
+//                // Create an ArrayAdapter
+//                ArrayAdapter<String> adapter = spinner_adapter;
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(GabrielClientActivity.this);
+//                builder.setTitle("Choose an option")
+//                        .setAdapter(adapter, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int position) {
+//                                if (styleIds.get(position).equals("none")) {
+//                                    if (!Const.STYLES_RETRIEVED) {
+//                                        styleType = "?";
+//                                    } else {
+//                                        styleType = "none";
+//                                    }
+//                                }
+//                                else {
+//                                    styleType = styleIds.get(position);
+//                                }
+//                            }
+//                        });
+//
+//                AlertDialog dialog = builder.create();
+//                dialog.show();
+////                viewSceneList.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
 //            }
-            @Override
-            public void onClick(View v) {
-                // Create an ArrayAdapter
-                ArrayAdapter<String> adapter = spinner_adapter;
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(GabrielClientActivity.this);
-                builder.setTitle("Choose an option")
-                        .setAdapter(adapter, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position) {
-                                if (styleIds.get(position).equals("none")) {
-                                    if (!Const.STYLES_RETRIEVED) {
-                                        styleType = "?";
-                                    } else {
-                                        styleType = "none";
-                                    }
-                                }
-                                else {
-                                    styleType = styleIds.get(position);
-                                }
-                            }
-                        });
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
-//                viewSceneList.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
-            }
-
-
-        });
+//
+//
+//        });
 
 
 //        viewSceneList.setOnTouchListener(new View.OnTouchListener() {
@@ -611,11 +723,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //        });
 
 
-        if (Const.SHOW_FPS) {
-            findViewById(R.id.fpsLabel).setVisibility(View.VISIBLE);
-            fpsHandler = new Handler();
-            fpsHandler.postDelayed(fpsCalculator, 1000);
-        }
+
+        fpsLabel.setVisibility(info ? View.VISIBLE : View.INVISIBLE);
+        fpsHandler = new Handler();
+        fpsHandler.postDelayed(fpsCalculator, 1000);
+
 
         accelLabel.setVisibility(View.INVISIBLE);
 
@@ -669,10 +781,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private final Runnable fpsCalculator = new Runnable() {
         @Override
         public void run() {
-            if (fpsLabel.getVisibility() == View.INVISIBLE) {
-                fpsLabel.setVisibility(View.VISIBLE);
-
-            }
             String msg= "FPS: " + framesProcessed;
             fpsLabel.setText( msg );
 
@@ -701,7 +809,14 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     //FLAG FOR LATER
 
-
+    private boolean directionX = true;
+//    private final Runnable gForceIterator = new Runnable() {
+//        @Override
+//        public void run() {
+//
+//        }
+//    }
+    
     private final Runnable styleIterator = new Runnable() {
         private int position = 1;
 
@@ -987,6 +1102,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private void initPerRun(String serverIP) {
         Log.v(LOG_TAG, "++initPerRun");
 
+        if (currMode == AppMode.FULLSCREEN)
+            currMode = AppMode.MAIN;
         switchMode(currMode);
 
         // don't connect to cloudlet if running locally
@@ -1059,15 +1176,16 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setDown(buttonDown.isPressed())
                     .build();
 
-            int scene = 0;
-            if (!(styleType.equals("?") || styleType.equals("none"))) {
-                scene = Integer.parseInt(styleType);
-            }
-            scene = scene + 1;
-            if (help) {
-                scene = -scene;
-                help = !help;
-            }
+            Extras.Setting settingValues = Extras.Setting.newBuilder()
+                    .setScene(Integer.parseInt(styleType))
+                    .setAlignCenter(alignCenter)
+                    .setArView(arView)
+                    .setReset(reset)
+                    .setPause(pause)
+                    .setParticle(particle)
+                    .setInfo(info)
+                    .build();
+
             sceneX = 0;
             sceneY = 0;
 //            sceneScaleFactor = 1.0f;
@@ -1077,8 +1195,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //                    .setImuValue(imuValue)
 //                    .build();
 
-            Extras extras = Extras.newBuilder().setDepthThreshold(scene)
-                    .setStyle(styleType)
+            Extras extras = Extras.newBuilder().setSettingValue(settingValues)
                     .setScreenValue(screenValue)
                     .setImuValue(imuValue)
                     .setTouchValue(touchValue)

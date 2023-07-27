@@ -260,12 +260,16 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         extras = cognitive_engine.unpack_extras(openrtist_pb2.Extras, input_frame)
         
         # Check if Scene info needs to be updated
-        if extras.style == "?":
+        if extras.setting_value.scene == -1:
             self.sendStyle = True
+
+        # print(extras.screen_value.width,  extras.screen_value.height)
+
 
         ratio = extras.screen_value.width / extras.screen_value.height
         # ratio = self.screen_h / self.screen_w
         if int(ratio * self.screen_h) != self.screen_w :
+            print(extras.screen_value.width,  extras.screen_value.height)
             self.screen_w = int(ratio * self.screen_h)
             print(f'-windowed={self.screen_w }x{self.screen_h}')
             self._resize_watermark()

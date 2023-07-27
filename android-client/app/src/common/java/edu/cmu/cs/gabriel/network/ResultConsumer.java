@@ -41,11 +41,6 @@ public class ResultConsumer implements Consumer<ResultWrapper> {
         ResultWrapper.Result result = resultWrapper.getResults(0);
         try {
             Extras extras = Extras.parseFrom(resultWrapper.getExtras().getValue());
-            if (Const.DISPLAY_REFERENCE && extras.hasStyleImage()) {
-                if (extras.getStyleImage().getValue().toByteArray().length > 0) {
-                    this.referenceViewUpdater.accept(extras.getStyleImage().getValue());
-                }
-            }
 
             if (!Const.STYLES_RETRIEVED && (extras.getStyleListCount() > 0)) {
                 Const.STYLES_RETRIEVED = true;

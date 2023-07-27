@@ -1,19 +1,14 @@
 package edu.cmu.cs.openrtist;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Build;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainMode extends AbstractModeManager {
@@ -38,7 +33,7 @@ public class MainMode extends AbstractModeManager {
                 put(ViewID.ROTATE, View.INVISIBLE);
                 put(ViewID.INFO, View.INVISIBLE);
                 put(ViewID.HELP, View.VISIBLE);
-                put(ViewID.IMAGE, View.VISIBLE);
+                put(ViewID.MAIN, View.VISIBLE);
             }});
     }
 
@@ -49,7 +44,7 @@ public class MainMode extends AbstractModeManager {
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     @Override
     protected View.OnTouchListener getOnTouchListener(ViewID key) {
-        if (key == ViewID.IMAGE) {
+        if (key == ViewID.MAIN) {
             return null;
         }
 
@@ -71,28 +66,25 @@ public class MainMode extends AbstractModeManager {
 
     @Override
     protected View.OnClickListener getOnClickListener(ViewID key) {
-        View.OnClickListener defaultListener = (view) -> {
-        };
-
 
         switch(key) {
             case FULL_SCREEN:
                 return (view -> {
-                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.FULLSCREEN);
+                    clientActivity.switchMode(GabrielClientActivity.AppMode.FULLSCREEN);
                 });
             case CAM_CONTROL:
                 return (view -> {
-                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.CAM);
+                    clientActivity.switchMode(GabrielClientActivity.AppMode.CAM);
                 });
 
             case MENU:
                 return (view -> {
-                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.MENU);
+                    clientActivity.switchMode(GabrielClientActivity.AppMode.MENU);
                 });
 
             case HELP:
                 return (view -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(gabrielClientActivity);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
                     builder.setTitle("HELPER")
                             .setMessage(R.string.help_info);
 
@@ -103,7 +95,4 @@ public class MainMode extends AbstractModeManager {
 
         return null;
     }
-
-
-
 }

@@ -36,14 +36,21 @@ message Extras {
         bool up = 3;
         bool down = 4;
     }
+    
+    message Setting {
+        int32 scene = 1;
+        bool align_center = 2;
+        bool ar_view = 3;
+        bool reset = 4;
+        bool pause = 5;
+        bool particle = 6;
+        bool info = 7;
+    }
 
-    string style = 1;
-    map<string, string> style_list = 2;
-    BytesValue style_image = 3;
-    int32 depth_threshold = 4;
-    BytesValue depth_map = 5;
-    IMUValue imu_value = 6;
-    ScreenValue screen_value = 7;
-    TouchInput touch_value = 8;
-    ArrowKey arrow_key = 9;
+    map<string, string> style_list = 1;
+    IMUValue imu_value = 2;
+    ScreenValue screen_value = 3;
+    TouchInput touch_value = 4;
+    ArrowKey arrow_key = 5;
+    Setting setting_value = 6;
 }

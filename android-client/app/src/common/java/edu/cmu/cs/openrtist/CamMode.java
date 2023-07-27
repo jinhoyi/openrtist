@@ -34,7 +34,7 @@ public class CamMode extends AbstractModeManager {
                 put(ViewID.ROTATE, View.INVISIBLE);
                 put(ViewID.INFO, View.INVISIBLE);
                 put(ViewID.HELP, View.VISIBLE);
-                put(ViewID.IMAGE, View.VISIBLE);
+                put(ViewID.MAIN, View.VISIBLE);
             }});
     }
 
@@ -49,8 +49,8 @@ public class CamMode extends AbstractModeManager {
     @Override
     protected View.OnTouchListener getOnTouchListener(ViewID key) {
 
-        if (key == ViewID.IMAGE) {
-            return new SceneScaleGestures(gabrielClientActivity, gabrielClientActivity);
+        if (key == ViewID.MAIN) {
+            return new SceneScaleGestures(clientActivity, clientActivity);
         }
 
         return (view, event) -> {
@@ -71,36 +71,34 @@ public class CamMode extends AbstractModeManager {
 
     @Override
     protected View.OnClickListener getOnClickListener(ViewID key) {
-        View.OnClickListener defaultListener = (view) -> {
-        };
 
         switch(key) {
             case FULL_SCREEN:
 
                 return (view -> {
                     ((ImageView)this.views.get(ViewID.CAM_CONTROL)).setImageResource(R.drawable.baseline_control_camera_24);
-                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.FULLSCREEN);
+                    clientActivity.switchMode(GabrielClientActivity.AppMode.FULLSCREEN);
                 });
             case CAM_CONTROL:
 
                 return (view -> {
                     ((ImageView)this.views.get(ViewID.CAM_CONTROL)).setImageResource(R.drawable.baseline_control_camera_24);
-                    gabrielClientActivity.switchMode(GabrielClientActivity.AppMode.MAIN);
+                    clientActivity.switchMode(GabrielClientActivity.AppMode.MAIN);
                 });
 
             case ALIGN_CENTER:
                 return (view -> {
-                    gabrielClientActivity.setAlignCenter(true);
+                    clientActivity.setAlignCenter(true);
                 });
 
             case AR_VIEW:
                 return (view -> {
-                    gabrielClientActivity.setARView(true);
+                    clientActivity.setARView(true);
                 });
 
             case HELP:
                 return (view -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(gabrielClientActivity);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
                     builder.setTitle("HELPER")
                             .setMessage(R.string.help_cam);
 

@@ -15,9 +15,9 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 extern PROTOBUF_INTERNAL_EXPORT_openrtist_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_ArrowKey_openrtist_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_openrtist_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_BytesValue_openrtist_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_openrtist_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_IMUValue_openrtist_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_openrtist_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_ScreenValue_openrtist_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_openrtist_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_Setting_openrtist_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_openrtist_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_StyleListEntry_DoNotUse_openrtist_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_openrtist_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_TouchInput_openrtist_2eproto;
 namespace openrtist {
@@ -41,6 +41,10 @@ class Extras_ArrowKeyDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Extras_ArrowKey> _instance;
 } _Extras_ArrowKey_default_instance_;
+class Extras_SettingDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Extras_Setting> _instance;
+} _Extras_Setting_default_instance_;
 class Extras_StyleListEntry_DoNotUseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Extras_StyleListEntry_DoNotUse> _instance;
@@ -64,11 +68,11 @@ static void InitDefaultsscc_info_Extras_openrtist_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<6> scc_info_Extras_openrtist_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 6, 0, InitDefaultsscc_info_Extras_openrtist_2eproto}, {
       &scc_info_Extras_StyleListEntry_DoNotUse_openrtist_2eproto.base,
-      &scc_info_Extras_BytesValue_openrtist_2eproto.base,
       &scc_info_Extras_IMUValue_openrtist_2eproto.base,
       &scc_info_Extras_ScreenValue_openrtist_2eproto.base,
       &scc_info_Extras_TouchInput_openrtist_2eproto.base,
-      &scc_info_Extras_ArrowKey_openrtist_2eproto.base,}};
+      &scc_info_Extras_ArrowKey_openrtist_2eproto.base,
+      &scc_info_Extras_Setting_openrtist_2eproto.base,}};
 
 static void InitDefaultsscc_info_Extras_ArrowKey_openrtist_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -126,6 +130,20 @@ static void InitDefaultsscc_info_Extras_ScreenValue_openrtist_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_ScreenValue_openrtist_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Extras_ScreenValue_openrtist_2eproto}, {}};
 
+static void InitDefaultsscc_info_Extras_Setting_openrtist_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::openrtist::_Extras_Setting_default_instance_;
+    new (ptr) ::openrtist::Extras_Setting();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::openrtist::Extras_Setting::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_Setting_openrtist_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Extras_Setting_openrtist_2eproto}, {}};
+
 static void InitDefaultsscc_info_Extras_StyleListEntry_DoNotUse_openrtist_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -153,7 +171,7 @@ static void InitDefaultsscc_info_Extras_TouchInput_openrtist_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Extras_TouchInput_openrtist_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Extras_TouchInput_openrtist_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_openrtist_2eproto[7];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_openrtist_2eproto[8];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_openrtist_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_openrtist_2eproto = nullptr;
 
@@ -196,6 +214,18 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_openrtist_2eproto::offsets[] P
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ArrowKey, right_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ArrowKey, up_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ArrowKey, down_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, scene_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, align_center_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, ar_view_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, reset_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, pause_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, particle_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_Setting, info_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_StyleListEntry_DoNotUse, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_StyleListEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -210,15 +240,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_openrtist_2eproto::offsets[] P
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::openrtist::Extras, style_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, style_list_),
-  PROTOBUF_FIELD_OFFSET(::openrtist::Extras, style_image_),
-  PROTOBUF_FIELD_OFFSET(::openrtist::Extras, depth_threshold_),
-  PROTOBUF_FIELD_OFFSET(::openrtist::Extras, depth_map_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, imu_value_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, screen_value_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, touch_value_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, arrow_key_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras, setting_value_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::openrtist::Extras_BytesValue)},
@@ -226,8 +253,9 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 14, -1, sizeof(::openrtist::Extras_TouchInput)},
   { 22, -1, sizeof(::openrtist::Extras_ScreenValue)},
   { 29, -1, sizeof(::openrtist::Extras_ArrowKey)},
-  { 38, 45, sizeof(::openrtist::Extras_StyleListEntry_DoNotUse)},
-  { 47, -1, sizeof(::openrtist::Extras)},
+  { 38, -1, sizeof(::openrtist::Extras_Setting)},
+  { 50, 57, sizeof(::openrtist::Extras_StyleListEntry_DoNotUse)},
+  { 59, -1, sizeof(::openrtist::Extras)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -236,48 +264,51 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::openrtist::_Extras_TouchInput_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::openrtist::_Extras_ScreenValue_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::openrtist::_Extras_ArrowKey_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::openrtist::_Extras_Setting_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::openrtist::_Extras_StyleListEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::openrtist::_Extras_default_instance_),
 };
 
 const char descriptor_table_protodef_openrtist_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017openrtist.proto\022\topenrtist\"\260\005\n\006Extras\022"
-  "\r\n\005style\030\001 \001(\t\0224\n\nstyle_list\030\002 \003(\0132 .ope"
-  "nrtist.Extras.StyleListEntry\0221\n\013style_im"
-  "age\030\003 \001(\0132\034.openrtist.Extras.BytesValue\022"
-  "\027\n\017depth_threshold\030\004 \001(\005\022/\n\tdepth_map\030\005 "
-  "\001(\0132\034.openrtist.Extras.BytesValue\022-\n\timu"
-  "_value\030\006 \001(\0132\032.openrtist.Extras.IMUValue"
-  "\0223\n\014screen_value\030\007 \001(\0132\035.openrtist.Extra"
-  "s.ScreenValue\0221\n\013touch_value\030\010 \001(\0132\034.ope"
-  "nrtist.Extras.TouchInput\022-\n\tarrow_key\030\t "
-  "\001(\0132\032.openrtist.Extras.ArrowKey\032\033\n\nBytes"
-  "Value\022\r\n\005value\030\001 \001(\014\032+\n\010IMUValue\022\t\n\001x\030\001 "
-  "\001(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001z\030\003 \001(\002\0321\n\nTouchInput\022"
-  "\r\n\005scale\030\001 \001(\002\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\032,\n\013"
-  "ScreenValue\022\016\n\006height\030\001 \001(\005\022\r\n\005width\030\002 \001"
-  "(\005\032A\n\010ArrowKey\022\014\n\004left\030\001 \001(\010\022\r\n\005right\030\002 "
-  "\001(\010\022\n\n\002up\030\003 \001(\010\022\014\n\004down\030\004 \001(\010\0320\n\016StyleLi"
-  "stEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B"
-  "\036\n\024edu.cmu.cs.openrtistB\006Protosb\006proto3"
+  "\n\017openrtist.proto\022\topenrtist\"\325\005\n\006Extras\022"
+  "4\n\nstyle_list\030\001 \003(\0132 .openrtist.Extras.S"
+  "tyleListEntry\022-\n\timu_value\030\002 \001(\0132\032.openr"
+  "tist.Extras.IMUValue\0223\n\014screen_value\030\003 \001"
+  "(\0132\035.openrtist.Extras.ScreenValue\0221\n\013tou"
+  "ch_value\030\004 \001(\0132\034.openrtist.Extras.TouchI"
+  "nput\022-\n\tarrow_key\030\005 \001(\0132\032.openrtist.Extr"
+  "as.ArrowKey\0220\n\rsetting_value\030\006 \001(\0132\031.ope"
+  "nrtist.Extras.Setting\032\033\n\nBytesValue\022\r\n\005v"
+  "alue\030\001 \001(\014\032+\n\010IMUValue\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002"
+  " \001(\002\022\t\n\001z\030\003 \001(\002\0321\n\nTouchInput\022\r\n\005scale\030\001"
+  " \001(\002\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\032,\n\013ScreenValu"
+  "e\022\016\n\006height\030\001 \001(\005\022\r\n\005width\030\002 \001(\005\032A\n\010Arro"
+  "wKey\022\014\n\004left\030\001 \001(\010\022\r\n\005right\030\002 \001(\010\022\n\n\002up\030"
+  "\003 \001(\010\022\014\n\004down\030\004 \001(\010\032}\n\007Setting\022\r\n\005scene\030"
+  "\001 \001(\005\022\024\n\014align_center\030\002 \001(\010\022\017\n\007ar_view\030\003"
+  " \001(\010\022\r\n\005reset\030\004 \001(\010\022\r\n\005pause\030\005 \001(\010\022\020\n\010pa"
+  "rticle\030\006 \001(\010\022\014\n\004info\030\007 \001(\010\0320\n\016StyleListE"
+  "ntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\036\n\024"
+  "edu.cmu.cs.openrtistB\006Protosb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_openrtist_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_openrtist_2eproto_sccs[7] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_openrtist_2eproto_sccs[8] = {
   &scc_info_Extras_openrtist_2eproto.base,
   &scc_info_Extras_ArrowKey_openrtist_2eproto.base,
   &scc_info_Extras_BytesValue_openrtist_2eproto.base,
   &scc_info_Extras_IMUValue_openrtist_2eproto.base,
   &scc_info_Extras_ScreenValue_openrtist_2eproto.base,
+  &scc_info_Extras_Setting_openrtist_2eproto.base,
   &scc_info_Extras_StyleListEntry_DoNotUse_openrtist_2eproto.base,
   &scc_info_Extras_TouchInput_openrtist_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_openrtist_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_openrtist_2eproto = {
-  false, false, descriptor_table_protodef_openrtist_2eproto, "openrtist.proto", 759,
-  &descriptor_table_openrtist_2eproto_once, descriptor_table_openrtist_2eproto_sccs, descriptor_table_openrtist_2eproto_deps, 7, 0,
+  false, false, descriptor_table_protodef_openrtist_2eproto, "openrtist.proto", 796,
+  &descriptor_table_openrtist_2eproto_once, descriptor_table_openrtist_2eproto_sccs, descriptor_table_openrtist_2eproto_deps, 8, 0,
   schemas, file_default_instances, TableStruct_openrtist_2eproto::offsets,
-  file_level_metadata_openrtist_2eproto, 7, file_level_enum_descriptors_openrtist_2eproto, file_level_service_descriptors_openrtist_2eproto,
+  file_level_metadata_openrtist_2eproto, 8, file_level_enum_descriptors_openrtist_2eproto, file_level_service_descriptors_openrtist_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -1486,6 +1517,340 @@ void Extras_ArrowKey::InternalSwap(Extras_ArrowKey* other) {
 
 // ===================================================================
 
+void Extras_Setting::InitAsDefaultInstance() {
+}
+class Extras_Setting::_Internal {
+ public:
+};
+
+Extras_Setting::Extras_Setting(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:openrtist.Extras.Setting)
+}
+Extras_Setting::Extras_Setting(const Extras_Setting& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&scene_, &from.scene_,
+    static_cast<size_t>(reinterpret_cast<char*>(&info_) -
+    reinterpret_cast<char*>(&scene_)) + sizeof(info_));
+  // @@protoc_insertion_point(copy_constructor:openrtist.Extras.Setting)
+}
+
+void Extras_Setting::SharedCtor() {
+  ::memset(&scene_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&info_) -
+      reinterpret_cast<char*>(&scene_)) + sizeof(info_));
+}
+
+Extras_Setting::~Extras_Setting() {
+  // @@protoc_insertion_point(destructor:openrtist.Extras.Setting)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Extras_Setting::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Extras_Setting::ArenaDtor(void* object) {
+  Extras_Setting* _this = reinterpret_cast< Extras_Setting* >(object);
+  (void)_this;
+}
+void Extras_Setting::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Extras_Setting::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Extras_Setting& Extras_Setting::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Extras_Setting_openrtist_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Extras_Setting::Clear() {
+// @@protoc_insertion_point(message_clear_start:openrtist.Extras.Setting)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&scene_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&info_) -
+      reinterpret_cast<char*>(&scene_)) + sizeof(info_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Extras_Setting::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 scene = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          scene_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool align_center = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          align_center_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool ar_view = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          ar_view_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool reset = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+          reset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool pause = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+          pause_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool particle = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+          particle_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool info = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+          info_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Extras_Setting::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:openrtist.Extras.Setting)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 scene = 1;
+  if (this->scene() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_scene(), target);
+  }
+
+  // bool align_center = 2;
+  if (this->align_center() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(2, this->_internal_align_center(), target);
+  }
+
+  // bool ar_view = 3;
+  if (this->ar_view() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(3, this->_internal_ar_view(), target);
+  }
+
+  // bool reset = 4;
+  if (this->reset() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(4, this->_internal_reset(), target);
+  }
+
+  // bool pause = 5;
+  if (this->pause() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(5, this->_internal_pause(), target);
+  }
+
+  // bool particle = 6;
+  if (this->particle() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(6, this->_internal_particle(), target);
+  }
+
+  // bool info = 7;
+  if (this->info() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(7, this->_internal_info(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:openrtist.Extras.Setting)
+  return target;
+}
+
+size_t Extras_Setting::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:openrtist.Extras.Setting)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int32 scene = 1;
+  if (this->scene() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_scene());
+  }
+
+  // bool align_center = 2;
+  if (this->align_center() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool ar_view = 3;
+  if (this->ar_view() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool reset = 4;
+  if (this->reset() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool pause = 5;
+  if (this->pause() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool particle = 6;
+  if (this->particle() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool info = 7;
+  if (this->info() != 0) {
+    total_size += 1 + 1;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Extras_Setting::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:openrtist.Extras.Setting)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Extras_Setting* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Extras_Setting>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:openrtist.Extras.Setting)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:openrtist.Extras.Setting)
+    MergeFrom(*source);
+  }
+}
+
+void Extras_Setting::MergeFrom(const Extras_Setting& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:openrtist.Extras.Setting)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.scene() != 0) {
+    _internal_set_scene(from._internal_scene());
+  }
+  if (from.align_center() != 0) {
+    _internal_set_align_center(from._internal_align_center());
+  }
+  if (from.ar_view() != 0) {
+    _internal_set_ar_view(from._internal_ar_view());
+  }
+  if (from.reset() != 0) {
+    _internal_set_reset(from._internal_reset());
+  }
+  if (from.pause() != 0) {
+    _internal_set_pause(from._internal_pause());
+  }
+  if (from.particle() != 0) {
+    _internal_set_particle(from._internal_particle());
+  }
+  if (from.info() != 0) {
+    _internal_set_info(from._internal_info());
+  }
+}
+
+void Extras_Setting::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:openrtist.Extras.Setting)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Extras_Setting::CopyFrom(const Extras_Setting& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:openrtist.Extras.Setting)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Extras_Setting::IsInitialized() const {
+  return true;
+}
+
+void Extras_Setting::InternalSwap(Extras_Setting* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Extras_Setting, info_)
+      + sizeof(Extras_Setting::info_)
+      - PROTOBUF_FIELD_OFFSET(Extras_Setting, scene_)>(
+          reinterpret_cast<char*>(&scene_),
+          reinterpret_cast<char*>(&other->scene_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Extras_Setting::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 Extras_StyleListEntry_DoNotUse::Extras_StyleListEntry_DoNotUse() {}
 Extras_StyleListEntry_DoNotUse::Extras_StyleListEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
     : SuperType(arena) {}
@@ -1504,10 +1869,6 @@ void Extras_StyleListEntry_DoNotUse::MergeFrom(
 // ===================================================================
 
 void Extras::InitAsDefaultInstance() {
-  ::openrtist::_Extras_default_instance_._instance.get_mutable()->style_image_ = const_cast< ::openrtist::Extras_BytesValue*>(
-      ::openrtist::Extras_BytesValue::internal_default_instance());
-  ::openrtist::_Extras_default_instance_._instance.get_mutable()->depth_map_ = const_cast< ::openrtist::Extras_BytesValue*>(
-      ::openrtist::Extras_BytesValue::internal_default_instance());
   ::openrtist::_Extras_default_instance_._instance.get_mutable()->imu_value_ = const_cast< ::openrtist::Extras_IMUValue*>(
       ::openrtist::Extras_IMUValue::internal_default_instance());
   ::openrtist::_Extras_default_instance_._instance.get_mutable()->screen_value_ = const_cast< ::openrtist::Extras_ScreenValue*>(
@@ -1516,25 +1877,18 @@ void Extras::InitAsDefaultInstance() {
       ::openrtist::Extras_TouchInput::internal_default_instance());
   ::openrtist::_Extras_default_instance_._instance.get_mutable()->arrow_key_ = const_cast< ::openrtist::Extras_ArrowKey*>(
       ::openrtist::Extras_ArrowKey::internal_default_instance());
+  ::openrtist::_Extras_default_instance_._instance.get_mutable()->setting_value_ = const_cast< ::openrtist::Extras_Setting*>(
+      ::openrtist::Extras_Setting::internal_default_instance());
 }
 class Extras::_Internal {
  public:
-  static const ::openrtist::Extras_BytesValue& style_image(const Extras* msg);
-  static const ::openrtist::Extras_BytesValue& depth_map(const Extras* msg);
   static const ::openrtist::Extras_IMUValue& imu_value(const Extras* msg);
   static const ::openrtist::Extras_ScreenValue& screen_value(const Extras* msg);
   static const ::openrtist::Extras_TouchInput& touch_value(const Extras* msg);
   static const ::openrtist::Extras_ArrowKey& arrow_key(const Extras* msg);
+  static const ::openrtist::Extras_Setting& setting_value(const Extras* msg);
 };
 
-const ::openrtist::Extras_BytesValue&
-Extras::_Internal::style_image(const Extras* msg) {
-  return *msg->style_image_;
-}
-const ::openrtist::Extras_BytesValue&
-Extras::_Internal::depth_map(const Extras* msg) {
-  return *msg->depth_map_;
-}
 const ::openrtist::Extras_IMUValue&
 Extras::_Internal::imu_value(const Extras* msg) {
   return *msg->imu_value_;
@@ -1551,6 +1905,10 @@ const ::openrtist::Extras_ArrowKey&
 Extras::_Internal::arrow_key(const Extras* msg) {
   return *msg->arrow_key_;
 }
+const ::openrtist::Extras_Setting&
+Extras::_Internal::setting_value(const Extras* msg) {
+  return *msg->setting_value_;
+}
 Extras::Extras(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
   style_list_(arena) {
@@ -1562,21 +1920,6 @@ Extras::Extras(const Extras& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   style_list_.MergeFrom(from.style_list_);
-  style_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_style().empty()) {
-    style_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_style(),
-      GetArena());
-  }
-  if (from._internal_has_style_image()) {
-    style_image_ = new ::openrtist::Extras_BytesValue(*from.style_image_);
-  } else {
-    style_image_ = nullptr;
-  }
-  if (from._internal_has_depth_map()) {
-    depth_map_ = new ::openrtist::Extras_BytesValue(*from.depth_map_);
-  } else {
-    depth_map_ = nullptr;
-  }
   if (from._internal_has_imu_value()) {
     imu_value_ = new ::openrtist::Extras_IMUValue(*from.imu_value_);
   } else {
@@ -1597,16 +1940,19 @@ Extras::Extras(const Extras& from)
   } else {
     arrow_key_ = nullptr;
   }
-  depth_threshold_ = from.depth_threshold_;
+  if (from._internal_has_setting_value()) {
+    setting_value_ = new ::openrtist::Extras_Setting(*from.setting_value_);
+  } else {
+    setting_value_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:openrtist.Extras)
 }
 
 void Extras::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Extras_openrtist_2eproto.base);
-  style_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&style_image_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&depth_threshold_) -
-      reinterpret_cast<char*>(&style_image_)) + sizeof(depth_threshold_));
+  ::memset(&imu_value_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&setting_value_) -
+      reinterpret_cast<char*>(&imu_value_)) + sizeof(setting_value_));
 }
 
 Extras::~Extras() {
@@ -1617,13 +1963,11 @@ Extras::~Extras() {
 
 void Extras::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  style_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete style_image_;
-  if (this != internal_default_instance()) delete depth_map_;
   if (this != internal_default_instance()) delete imu_value_;
   if (this != internal_default_instance()) delete screen_value_;
   if (this != internal_default_instance()) delete touch_value_;
   if (this != internal_default_instance()) delete arrow_key_;
+  if (this != internal_default_instance()) delete setting_value_;
 }
 
 void Extras::ArenaDtor(void* object) {
@@ -1648,15 +1992,6 @@ void Extras::Clear() {
   (void) cached_has_bits;
 
   style_list_.Clear();
-  style_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  if (GetArena() == nullptr && style_image_ != nullptr) {
-    delete style_image_;
-  }
-  style_image_ = nullptr;
-  if (GetArena() == nullptr && depth_map_ != nullptr) {
-    delete depth_map_;
-  }
-  depth_map_ = nullptr;
   if (GetArena() == nullptr && imu_value_ != nullptr) {
     delete imu_value_;
   }
@@ -1673,7 +2008,10 @@ void Extras::Clear() {
     delete arrow_key_;
   }
   arrow_key_ = nullptr;
-  depth_threshold_ = 0;
+  if (GetArena() == nullptr && setting_value_ != nullptr) {
+    delete setting_value_;
+  }
+  setting_value_ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1685,73 +2023,50 @@ const char* Extras::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // string style = 1;
+      // map<string, string> style_list = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          auto str = _internal_mutable_style();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "openrtist.Extras.style"));
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // map<string, string> style_list = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(&style_list_, ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
         } else goto handle_unusual;
         continue;
-      // .openrtist.Extras.BytesValue style_image = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_style_image(), ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // int32 depth_threshold = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-          depth_threshold_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // .openrtist.Extras.BytesValue depth_map = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-          ptr = ctx->ParseMessage(_internal_mutable_depth_map(), ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // .openrtist.Extras.IMUValue imu_value = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+      // .openrtist.Extras.IMUValue imu_value = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_imu_value(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .openrtist.Extras.ScreenValue screen_value = 7;
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+      // .openrtist.Extras.ScreenValue screen_value = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_screen_value(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .openrtist.Extras.TouchInput touch_value = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+      // .openrtist.Extras.TouchInput touch_value = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
           ptr = ctx->ParseMessage(_internal_mutable_touch_value(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .openrtist.Extras.ArrowKey arrow_key = 9;
-      case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+      // .openrtist.Extras.ArrowKey arrow_key = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_arrow_key(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .openrtist.Extras.Setting setting_value = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          ptr = ctx->ParseMessage(_internal_mutable_setting_value(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -1783,17 +2098,7 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string style = 1;
-  if (this->style().size() > 0) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_style().data(), static_cast<int>(this->_internal_style().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "openrtist.Extras.style");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_style(), target);
-  }
-
-  // map<string, string> style_list = 2;
+  // map<string, string> style_list = 1;
   if (!this->_internal_style_list().empty()) {
     typedef ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >::const_pointer
         ConstPtr;
@@ -1825,71 +2130,57 @@ failure:
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
       for (size_type i = 0; i < n; i++) {
-        target = Extras_StyleListEntry_DoNotUse::Funcs::InternalSerialize(2, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second, target, stream);
+        target = Extras_StyleListEntry_DoNotUse::Funcs::InternalSerialize(1, items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second, target, stream);
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
       for (::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >::const_iterator
           it = this->_internal_style_list().begin();
           it != this->_internal_style_list().end(); ++it) {
-        target = Extras_StyleListEntry_DoNotUse::Funcs::InternalSerialize(2, it->first, it->second, target, stream);
+        target = Extras_StyleListEntry_DoNotUse::Funcs::InternalSerialize(1, it->first, it->second, target, stream);
         Utf8Check::Check(&(*it));
       }
     }
   }
 
-  // .openrtist.Extras.BytesValue style_image = 3;
-  if (this->has_style_image()) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        3, _Internal::style_image(this), target, stream);
-  }
-
-  // int32 depth_threshold = 4;
-  if (this->depth_threshold() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(4, this->_internal_depth_threshold(), target);
-  }
-
-  // .openrtist.Extras.BytesValue depth_map = 5;
-  if (this->has_depth_map()) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        5, _Internal::depth_map(this), target, stream);
-  }
-
-  // .openrtist.Extras.IMUValue imu_value = 6;
+  // .openrtist.Extras.IMUValue imu_value = 2;
   if (this->has_imu_value()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        6, _Internal::imu_value(this), target, stream);
+        2, _Internal::imu_value(this), target, stream);
   }
 
-  // .openrtist.Extras.ScreenValue screen_value = 7;
+  // .openrtist.Extras.ScreenValue screen_value = 3;
   if (this->has_screen_value()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        7, _Internal::screen_value(this), target, stream);
+        3, _Internal::screen_value(this), target, stream);
   }
 
-  // .openrtist.Extras.TouchInput touch_value = 8;
+  // .openrtist.Extras.TouchInput touch_value = 4;
   if (this->has_touch_value()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        8, _Internal::touch_value(this), target, stream);
+        4, _Internal::touch_value(this), target, stream);
   }
 
-  // .openrtist.Extras.ArrowKey arrow_key = 9;
+  // .openrtist.Extras.ArrowKey arrow_key = 5;
   if (this->has_arrow_key()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        9, _Internal::arrow_key(this), target, stream);
+        5, _Internal::arrow_key(this), target, stream);
+  }
+
+  // .openrtist.Extras.Setting setting_value = 6;
+  if (this->has_setting_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        6, _Internal::setting_value(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1908,7 +2199,7 @@ size_t Extras::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // map<string, string> style_list = 2;
+  // map<string, string> style_list = 1;
   total_size += 1 *
       ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_style_list_size());
   for (::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >::const_iterator
@@ -1917,60 +2208,39 @@ size_t Extras::ByteSizeLong() const {
     total_size += Extras_StyleListEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
   }
 
-  // string style = 1;
-  if (this->style().size() > 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_style());
-  }
-
-  // .openrtist.Extras.BytesValue style_image = 3;
-  if (this->has_style_image()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *style_image_);
-  }
-
-  // .openrtist.Extras.BytesValue depth_map = 5;
-  if (this->has_depth_map()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *depth_map_);
-  }
-
-  // .openrtist.Extras.IMUValue imu_value = 6;
+  // .openrtist.Extras.IMUValue imu_value = 2;
   if (this->has_imu_value()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *imu_value_);
   }
 
-  // .openrtist.Extras.ScreenValue screen_value = 7;
+  // .openrtist.Extras.ScreenValue screen_value = 3;
   if (this->has_screen_value()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *screen_value_);
   }
 
-  // .openrtist.Extras.TouchInput touch_value = 8;
+  // .openrtist.Extras.TouchInput touch_value = 4;
   if (this->has_touch_value()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *touch_value_);
   }
 
-  // .openrtist.Extras.ArrowKey arrow_key = 9;
+  // .openrtist.Extras.ArrowKey arrow_key = 5;
   if (this->has_arrow_key()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *arrow_key_);
   }
 
-  // int32 depth_threshold = 4;
-  if (this->depth_threshold() != 0) {
+  // .openrtist.Extras.Setting setting_value = 6;
+  if (this->has_setting_value()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_depth_threshold());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *setting_value_);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -2005,15 +2275,6 @@ void Extras::MergeFrom(const Extras& from) {
   (void) cached_has_bits;
 
   style_list_.MergeFrom(from.style_list_);
-  if (from.style().size() > 0) {
-    _internal_set_style(from._internal_style());
-  }
-  if (from.has_style_image()) {
-    _internal_mutable_style_image()->::openrtist::Extras_BytesValue::MergeFrom(from._internal_style_image());
-  }
-  if (from.has_depth_map()) {
-    _internal_mutable_depth_map()->::openrtist::Extras_BytesValue::MergeFrom(from._internal_depth_map());
-  }
   if (from.has_imu_value()) {
     _internal_mutable_imu_value()->::openrtist::Extras_IMUValue::MergeFrom(from._internal_imu_value());
   }
@@ -2026,8 +2287,8 @@ void Extras::MergeFrom(const Extras& from) {
   if (from.has_arrow_key()) {
     _internal_mutable_arrow_key()->::openrtist::Extras_ArrowKey::MergeFrom(from._internal_arrow_key());
   }
-  if (from.depth_threshold() != 0) {
-    _internal_set_depth_threshold(from._internal_depth_threshold());
+  if (from.has_setting_value()) {
+    _internal_mutable_setting_value()->::openrtist::Extras_Setting::MergeFrom(from._internal_setting_value());
   }
 }
 
@@ -2053,13 +2314,12 @@ void Extras::InternalSwap(Extras* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   style_list_.Swap(&other->style_list_);
-  style_.Swap(&other->style_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Extras, depth_threshold_)
-      + sizeof(Extras::depth_threshold_)
-      - PROTOBUF_FIELD_OFFSET(Extras, style_image_)>(
-          reinterpret_cast<char*>(&style_image_),
-          reinterpret_cast<char*>(&other->style_image_));
+      PROTOBUF_FIELD_OFFSET(Extras, setting_value_)
+      + sizeof(Extras::setting_value_)
+      - PROTOBUF_FIELD_OFFSET(Extras, imu_value_)>(
+          reinterpret_cast<char*>(&imu_value_),
+          reinterpret_cast<char*>(&other->imu_value_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Extras::GetMetadata() const {
@@ -2084,6 +2344,9 @@ template<> PROTOBUF_NOINLINE ::openrtist::Extras_ScreenValue* Arena::CreateMaybe
 }
 template<> PROTOBUF_NOINLINE ::openrtist::Extras_ArrowKey* Arena::CreateMaybeMessage< ::openrtist::Extras_ArrowKey >(Arena* arena) {
   return Arena::CreateMessageInternal< ::openrtist::Extras_ArrowKey >(arena);
+}
+template<> PROTOBUF_NOINLINE ::openrtist::Extras_Setting* Arena::CreateMaybeMessage< ::openrtist::Extras_Setting >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::openrtist::Extras_Setting >(arena);
 }
 template<> PROTOBUF_NOINLINE ::openrtist::Extras_StyleListEntry_DoNotUse* Arena::CreateMaybeMessage< ::openrtist::Extras_StyleListEntry_DoNotUse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::openrtist::Extras_StyleListEntry_DoNotUse >(arena);

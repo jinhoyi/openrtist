@@ -1,20 +1,18 @@
 package edu.cmu.cs.openrtist;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
-import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractModeManager {
 
     protected Map<ViewID, View> views;
     protected Map<ViewID, Integer> visibility;
-    protected GabrielClientActivity gabrielClientActivity;
+    protected GabrielClientActivity clientActivity;
 
     public AbstractModeManager(GabrielClientActivity gabrielClientActivity, Map<ViewID, View> views, Map<ViewID, Integer> visibility) {
-        this.gabrielClientActivity = gabrielClientActivity;
+        this.clientActivity = gabrielClientActivity;
         this.views = views;
         this.visibility = visibility;
 
@@ -29,6 +27,7 @@ public abstract class AbstractModeManager {
             Integer view_visibility = visibility.get(key);
             View view = views.get(key);
             view.setVisibility(view_visibility);
+
             if (view_visibility == View.VISIBLE) {
                 view.setOnTouchListener(getOnTouchListener(key));
                 view.setOnClickListener(getOnClickListener(key));

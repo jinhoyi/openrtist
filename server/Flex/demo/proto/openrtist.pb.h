@@ -50,7 +50,7 @@ struct TableStruct_openrtist_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -73,6 +73,9 @@ extern Extras_IMUValueDefaultTypeInternal _Extras_IMUValue_default_instance_;
 class Extras_ScreenValue;
 class Extras_ScreenValueDefaultTypeInternal;
 extern Extras_ScreenValueDefaultTypeInternal _Extras_ScreenValue_default_instance_;
+class Extras_Setting;
+class Extras_SettingDefaultTypeInternal;
+extern Extras_SettingDefaultTypeInternal _Extras_Setting_default_instance_;
 class Extras_StyleListEntry_DoNotUse;
 class Extras_StyleListEntry_DoNotUseDefaultTypeInternal;
 extern Extras_StyleListEntry_DoNotUseDefaultTypeInternal _Extras_StyleListEntry_DoNotUse_default_instance_;
@@ -86,6 +89,7 @@ template<> ::openrtist::Extras_ArrowKey* Arena::CreateMaybeMessage<::openrtist::
 template<> ::openrtist::Extras_BytesValue* Arena::CreateMaybeMessage<::openrtist::Extras_BytesValue>(Arena*);
 template<> ::openrtist::Extras_IMUValue* Arena::CreateMaybeMessage<::openrtist::Extras_IMUValue>(Arena*);
 template<> ::openrtist::Extras_ScreenValue* Arena::CreateMaybeMessage<::openrtist::Extras_ScreenValue>(Arena*);
+template<> ::openrtist::Extras_Setting* Arena::CreateMaybeMessage<::openrtist::Extras_Setting>(Arena*);
 template<> ::openrtist::Extras_StyleListEntry_DoNotUse* Arena::CreateMaybeMessage<::openrtist::Extras_StyleListEntry_DoNotUse>(Arena*);
 template<> ::openrtist::Extras_TouchInput* Arena::CreateMaybeMessage<::openrtist::Extras_TouchInput>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -882,6 +886,209 @@ class Extras_ArrowKey PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class Extras_Setting PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:openrtist.Extras.Setting) */ {
+ public:
+  inline Extras_Setting() : Extras_Setting(nullptr) {};
+  virtual ~Extras_Setting();
+
+  Extras_Setting(const Extras_Setting& from);
+  Extras_Setting(Extras_Setting&& from) noexcept
+    : Extras_Setting() {
+    *this = ::std::move(from);
+  }
+
+  inline Extras_Setting& operator=(const Extras_Setting& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Extras_Setting& operator=(Extras_Setting&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Extras_Setting& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Extras_Setting* internal_default_instance() {
+    return reinterpret_cast<const Extras_Setting*>(
+               &_Extras_Setting_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(Extras_Setting& a, Extras_Setting& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Extras_Setting* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Extras_Setting* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Extras_Setting* New() const final {
+    return CreateMaybeMessage<Extras_Setting>(nullptr);
+  }
+
+  Extras_Setting* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Extras_Setting>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Extras_Setting& from);
+  void MergeFrom(const Extras_Setting& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Extras_Setting* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "openrtist.Extras.Setting";
+  }
+  protected:
+  explicit Extras_Setting(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_openrtist_2eproto);
+    return ::descriptor_table_openrtist_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSceneFieldNumber = 1,
+    kAlignCenterFieldNumber = 2,
+    kArViewFieldNumber = 3,
+    kResetFieldNumber = 4,
+    kPauseFieldNumber = 5,
+    kParticleFieldNumber = 6,
+    kInfoFieldNumber = 7,
+  };
+  // int32 scene = 1;
+  void clear_scene();
+  ::PROTOBUF_NAMESPACE_ID::int32 scene() const;
+  void set_scene(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_scene() const;
+  void _internal_set_scene(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // bool align_center = 2;
+  void clear_align_center();
+  bool align_center() const;
+  void set_align_center(bool value);
+  private:
+  bool _internal_align_center() const;
+  void _internal_set_align_center(bool value);
+  public:
+
+  // bool ar_view = 3;
+  void clear_ar_view();
+  bool ar_view() const;
+  void set_ar_view(bool value);
+  private:
+  bool _internal_ar_view() const;
+  void _internal_set_ar_view(bool value);
+  public:
+
+  // bool reset = 4;
+  void clear_reset();
+  bool reset() const;
+  void set_reset(bool value);
+  private:
+  bool _internal_reset() const;
+  void _internal_set_reset(bool value);
+  public:
+
+  // bool pause = 5;
+  void clear_pause();
+  bool pause() const;
+  void set_pause(bool value);
+  private:
+  bool _internal_pause() const;
+  void _internal_set_pause(bool value);
+  public:
+
+  // bool particle = 6;
+  void clear_particle();
+  bool particle() const;
+  void set_particle(bool value);
+  private:
+  bool _internal_particle() const;
+  void _internal_set_particle(bool value);
+  public:
+
+  // bool info = 7;
+  void clear_info();
+  bool info() const;
+  void set_info(bool value);
+  private:
+  bool _internal_info() const;
+  void _internal_set_info(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:openrtist.Extras.Setting)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 scene_;
+  bool align_center_;
+  bool ar_view_;
+  bool reset_;
+  bool pause_;
+  bool particle_;
+  bool info_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_openrtist_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Extras_StyleListEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<Extras_StyleListEntry_DoNotUse, 
     std::string, std::string,
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
@@ -908,7 +1115,7 @@ public:
   private:
   static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
     ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_openrtist_2eproto);
-    return ::descriptor_table_openrtist_2eproto.file_level_metadata[5];
+    return ::descriptor_table_openrtist_2eproto.file_level_metadata[6];
   }
 
   public:
@@ -958,7 +1165,7 @@ class Extras PROTOBUF_FINAL :
                &_Extras_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(Extras& a, Extras& b) {
     a.Swap(&b);
@@ -1031,21 +1238,19 @@ class Extras PROTOBUF_FINAL :
   typedef Extras_TouchInput TouchInput;
   typedef Extras_ScreenValue ScreenValue;
   typedef Extras_ArrowKey ArrowKey;
+  typedef Extras_Setting Setting;
 
   // accessors -------------------------------------------------------
 
   enum : int {
-    kStyleListFieldNumber = 2,
-    kStyleFieldNumber = 1,
-    kStyleImageFieldNumber = 3,
-    kDepthMapFieldNumber = 5,
-    kImuValueFieldNumber = 6,
-    kScreenValueFieldNumber = 7,
-    kTouchValueFieldNumber = 8,
-    kArrowKeyFieldNumber = 9,
-    kDepthThresholdFieldNumber = 4,
+    kStyleListFieldNumber = 1,
+    kImuValueFieldNumber = 2,
+    kScreenValueFieldNumber = 3,
+    kTouchValueFieldNumber = 4,
+    kArrowKeyFieldNumber = 5,
+    kSettingValueFieldNumber = 6,
   };
-  // map<string, string> style_list = 2;
+  // map<string, string> style_list = 1;
   int style_list_size() const;
   private:
   int _internal_style_list_size() const;
@@ -1062,68 +1267,7 @@ class Extras PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::Map< std::string, std::string >*
       mutable_style_list();
 
-  // string style = 1;
-  void clear_style();
-  const std::string& style() const;
-  void set_style(const std::string& value);
-  void set_style(std::string&& value);
-  void set_style(const char* value);
-  void set_style(const char* value, size_t size);
-  std::string* mutable_style();
-  std::string* release_style();
-  void set_allocated_style(std::string* style);
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  std::string* unsafe_arena_release_style();
-  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
-  "    string fields are deprecated and will be removed in a"
-  "    future release.")
-  void unsafe_arena_set_allocated_style(
-      std::string* style);
-  private:
-  const std::string& _internal_style() const;
-  void _internal_set_style(const std::string& value);
-  std::string* _internal_mutable_style();
-  public:
-
-  // .openrtist.Extras.BytesValue style_image = 3;
-  bool has_style_image() const;
-  private:
-  bool _internal_has_style_image() const;
-  public:
-  void clear_style_image();
-  const ::openrtist::Extras_BytesValue& style_image() const;
-  ::openrtist::Extras_BytesValue* release_style_image();
-  ::openrtist::Extras_BytesValue* mutable_style_image();
-  void set_allocated_style_image(::openrtist::Extras_BytesValue* style_image);
-  private:
-  const ::openrtist::Extras_BytesValue& _internal_style_image() const;
-  ::openrtist::Extras_BytesValue* _internal_mutable_style_image();
-  public:
-  void unsafe_arena_set_allocated_style_image(
-      ::openrtist::Extras_BytesValue* style_image);
-  ::openrtist::Extras_BytesValue* unsafe_arena_release_style_image();
-
-  // .openrtist.Extras.BytesValue depth_map = 5;
-  bool has_depth_map() const;
-  private:
-  bool _internal_has_depth_map() const;
-  public:
-  void clear_depth_map();
-  const ::openrtist::Extras_BytesValue& depth_map() const;
-  ::openrtist::Extras_BytesValue* release_depth_map();
-  ::openrtist::Extras_BytesValue* mutable_depth_map();
-  void set_allocated_depth_map(::openrtist::Extras_BytesValue* depth_map);
-  private:
-  const ::openrtist::Extras_BytesValue& _internal_depth_map() const;
-  ::openrtist::Extras_BytesValue* _internal_mutable_depth_map();
-  public:
-  void unsafe_arena_set_allocated_depth_map(
-      ::openrtist::Extras_BytesValue* depth_map);
-  ::openrtist::Extras_BytesValue* unsafe_arena_release_depth_map();
-
-  // .openrtist.Extras.IMUValue imu_value = 6;
+  // .openrtist.Extras.IMUValue imu_value = 2;
   bool has_imu_value() const;
   private:
   bool _internal_has_imu_value() const;
@@ -1141,7 +1285,7 @@ class Extras PROTOBUF_FINAL :
       ::openrtist::Extras_IMUValue* imu_value);
   ::openrtist::Extras_IMUValue* unsafe_arena_release_imu_value();
 
-  // .openrtist.Extras.ScreenValue screen_value = 7;
+  // .openrtist.Extras.ScreenValue screen_value = 3;
   bool has_screen_value() const;
   private:
   bool _internal_has_screen_value() const;
@@ -1159,7 +1303,7 @@ class Extras PROTOBUF_FINAL :
       ::openrtist::Extras_ScreenValue* screen_value);
   ::openrtist::Extras_ScreenValue* unsafe_arena_release_screen_value();
 
-  // .openrtist.Extras.TouchInput touch_value = 8;
+  // .openrtist.Extras.TouchInput touch_value = 4;
   bool has_touch_value() const;
   private:
   bool _internal_has_touch_value() const;
@@ -1177,7 +1321,7 @@ class Extras PROTOBUF_FINAL :
       ::openrtist::Extras_TouchInput* touch_value);
   ::openrtist::Extras_TouchInput* unsafe_arena_release_touch_value();
 
-  // .openrtist.Extras.ArrowKey arrow_key = 9;
+  // .openrtist.Extras.ArrowKey arrow_key = 5;
   bool has_arrow_key() const;
   private:
   bool _internal_has_arrow_key() const;
@@ -1195,14 +1339,23 @@ class Extras PROTOBUF_FINAL :
       ::openrtist::Extras_ArrowKey* arrow_key);
   ::openrtist::Extras_ArrowKey* unsafe_arena_release_arrow_key();
 
-  // int32 depth_threshold = 4;
-  void clear_depth_threshold();
-  ::PROTOBUF_NAMESPACE_ID::int32 depth_threshold() const;
-  void set_depth_threshold(::PROTOBUF_NAMESPACE_ID::int32 value);
+  // .openrtist.Extras.Setting setting_value = 6;
+  bool has_setting_value() const;
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_depth_threshold() const;
-  void _internal_set_depth_threshold(::PROTOBUF_NAMESPACE_ID::int32 value);
+  bool _internal_has_setting_value() const;
   public:
+  void clear_setting_value();
+  const ::openrtist::Extras_Setting& setting_value() const;
+  ::openrtist::Extras_Setting* release_setting_value();
+  ::openrtist::Extras_Setting* mutable_setting_value();
+  void set_allocated_setting_value(::openrtist::Extras_Setting* setting_value);
+  private:
+  const ::openrtist::Extras_Setting& _internal_setting_value() const;
+  ::openrtist::Extras_Setting* _internal_mutable_setting_value();
+  public:
+  void unsafe_arena_set_allocated_setting_value(
+      ::openrtist::Extras_Setting* setting_value);
+  ::openrtist::Extras_Setting* unsafe_arena_release_setting_value();
 
   // @@protoc_insertion_point(class_scope:openrtist.Extras)
  private:
@@ -1217,14 +1370,11 @@ class Extras PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_STRING,
       0 > style_list_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr style_;
-  ::openrtist::Extras_BytesValue* style_image_;
-  ::openrtist::Extras_BytesValue* depth_map_;
   ::openrtist::Extras_IMUValue* imu_value_;
   ::openrtist::Extras_ScreenValue* screen_value_;
   ::openrtist::Extras_TouchInput* touch_value_;
   ::openrtist::Extras_ArrowKey* arrow_key_;
-  ::PROTOBUF_NAMESPACE_ID::int32 depth_threshold_;
+  ::openrtist::Extras_Setting* setting_value_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_openrtist_2eproto;
 };
@@ -1578,92 +1728,155 @@ inline void Extras_ArrowKey::set_down(bool value) {
 
 // -------------------------------------------------------------------
 
+// Extras_Setting
+
+// int32 scene = 1;
+inline void Extras_Setting::clear_scene() {
+  scene_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_Setting::_internal_scene() const {
+  return scene_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_Setting::scene() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.Setting.scene)
+  return _internal_scene();
+}
+inline void Extras_Setting::_internal_set_scene(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  scene_ = value;
+}
+inline void Extras_Setting::set_scene(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_scene(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.Setting.scene)
+}
+
+// bool align_center = 2;
+inline void Extras_Setting::clear_align_center() {
+  align_center_ = false;
+}
+inline bool Extras_Setting::_internal_align_center() const {
+  return align_center_;
+}
+inline bool Extras_Setting::align_center() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.Setting.align_center)
+  return _internal_align_center();
+}
+inline void Extras_Setting::_internal_set_align_center(bool value) {
+  
+  align_center_ = value;
+}
+inline void Extras_Setting::set_align_center(bool value) {
+  _internal_set_align_center(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.Setting.align_center)
+}
+
+// bool ar_view = 3;
+inline void Extras_Setting::clear_ar_view() {
+  ar_view_ = false;
+}
+inline bool Extras_Setting::_internal_ar_view() const {
+  return ar_view_;
+}
+inline bool Extras_Setting::ar_view() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.Setting.ar_view)
+  return _internal_ar_view();
+}
+inline void Extras_Setting::_internal_set_ar_view(bool value) {
+  
+  ar_view_ = value;
+}
+inline void Extras_Setting::set_ar_view(bool value) {
+  _internal_set_ar_view(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.Setting.ar_view)
+}
+
+// bool reset = 4;
+inline void Extras_Setting::clear_reset() {
+  reset_ = false;
+}
+inline bool Extras_Setting::_internal_reset() const {
+  return reset_;
+}
+inline bool Extras_Setting::reset() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.Setting.reset)
+  return _internal_reset();
+}
+inline void Extras_Setting::_internal_set_reset(bool value) {
+  
+  reset_ = value;
+}
+inline void Extras_Setting::set_reset(bool value) {
+  _internal_set_reset(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.Setting.reset)
+}
+
+// bool pause = 5;
+inline void Extras_Setting::clear_pause() {
+  pause_ = false;
+}
+inline bool Extras_Setting::_internal_pause() const {
+  return pause_;
+}
+inline bool Extras_Setting::pause() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.Setting.pause)
+  return _internal_pause();
+}
+inline void Extras_Setting::_internal_set_pause(bool value) {
+  
+  pause_ = value;
+}
+inline void Extras_Setting::set_pause(bool value) {
+  _internal_set_pause(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.Setting.pause)
+}
+
+// bool particle = 6;
+inline void Extras_Setting::clear_particle() {
+  particle_ = false;
+}
+inline bool Extras_Setting::_internal_particle() const {
+  return particle_;
+}
+inline bool Extras_Setting::particle() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.Setting.particle)
+  return _internal_particle();
+}
+inline void Extras_Setting::_internal_set_particle(bool value) {
+  
+  particle_ = value;
+}
+inline void Extras_Setting::set_particle(bool value) {
+  _internal_set_particle(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.Setting.particle)
+}
+
+// bool info = 7;
+inline void Extras_Setting::clear_info() {
+  info_ = false;
+}
+inline bool Extras_Setting::_internal_info() const {
+  return info_;
+}
+inline bool Extras_Setting::info() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.Setting.info)
+  return _internal_info();
+}
+inline void Extras_Setting::_internal_set_info(bool value) {
+  
+  info_ = value;
+}
+inline void Extras_Setting::set_info(bool value) {
+  _internal_set_info(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.Setting.info)
+}
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // Extras
 
-// string style = 1;
-inline void Extras::clear_style() {
-  style_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline const std::string& Extras::style() const {
-  // @@protoc_insertion_point(field_get:openrtist.Extras.style)
-  return _internal_style();
-}
-inline void Extras::set_style(const std::string& value) {
-  _internal_set_style(value);
-  // @@protoc_insertion_point(field_set:openrtist.Extras.style)
-}
-inline std::string* Extras::mutable_style() {
-  // @@protoc_insertion_point(field_mutable:openrtist.Extras.style)
-  return _internal_mutable_style();
-}
-inline const std::string& Extras::_internal_style() const {
-  return style_.Get();
-}
-inline void Extras::_internal_set_style(const std::string& value) {
-  
-  style_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
-}
-inline void Extras::set_style(std::string&& value) {
-  
-  style_.Set(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:openrtist.Extras.style)
-}
-inline void Extras::set_style(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  style_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
-              GetArena());
-  // @@protoc_insertion_point(field_set_char:openrtist.Extras.style)
-}
-inline void Extras::set_style(const char* value,
-    size_t size) {
-  
-  style_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:openrtist.Extras.style)
-}
-inline std::string* Extras::_internal_mutable_style() {
-  
-  return style_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline std::string* Extras::release_style() {
-  // @@protoc_insertion_point(field_release:openrtist.Extras.style)
-  return style_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void Extras::set_allocated_style(std::string* style) {
-  if (style != nullptr) {
-    
-  } else {
-    
-  }
-  style_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), style,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.style)
-}
-inline std::string* Extras::unsafe_arena_release_style() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:openrtist.Extras.style)
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  
-  return style_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      GetArena());
-}
-inline void Extras::unsafe_arena_set_allocated_style(
-    std::string* style) {
-  GOOGLE_DCHECK(GetArena() != nullptr);
-  if (style != nullptr) {
-    
-  } else {
-    
-  }
-  style_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      style, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:openrtist.Extras.style)
-}
-
-// map<string, string> style_list = 2;
+// map<string, string> style_list = 1;
 inline int Extras::_internal_style_list_size() const {
   return style_list_.size();
 }
@@ -1692,189 +1905,7 @@ Extras::mutable_style_list() {
   return _internal_mutable_style_list();
 }
 
-// .openrtist.Extras.BytesValue style_image = 3;
-inline bool Extras::_internal_has_style_image() const {
-  return this != internal_default_instance() && style_image_ != nullptr;
-}
-inline bool Extras::has_style_image() const {
-  return _internal_has_style_image();
-}
-inline void Extras::clear_style_image() {
-  if (GetArena() == nullptr && style_image_ != nullptr) {
-    delete style_image_;
-  }
-  style_image_ = nullptr;
-}
-inline const ::openrtist::Extras_BytesValue& Extras::_internal_style_image() const {
-  const ::openrtist::Extras_BytesValue* p = style_image_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::openrtist::Extras_BytesValue*>(
-      &::openrtist::_Extras_BytesValue_default_instance_);
-}
-inline const ::openrtist::Extras_BytesValue& Extras::style_image() const {
-  // @@protoc_insertion_point(field_get:openrtist.Extras.style_image)
-  return _internal_style_image();
-}
-inline void Extras::unsafe_arena_set_allocated_style_image(
-    ::openrtist::Extras_BytesValue* style_image) {
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(style_image_);
-  }
-  style_image_ = style_image;
-  if (style_image) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:openrtist.Extras.style_image)
-}
-inline ::openrtist::Extras_BytesValue* Extras::release_style_image() {
-  auto temp = unsafe_arena_release_style_image();
-  if (GetArena() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-  return temp;
-}
-inline ::openrtist::Extras_BytesValue* Extras::unsafe_arena_release_style_image() {
-  // @@protoc_insertion_point(field_release:openrtist.Extras.style_image)
-  
-  ::openrtist::Extras_BytesValue* temp = style_image_;
-  style_image_ = nullptr;
-  return temp;
-}
-inline ::openrtist::Extras_BytesValue* Extras::_internal_mutable_style_image() {
-  
-  if (style_image_ == nullptr) {
-    auto* p = CreateMaybeMessage<::openrtist::Extras_BytesValue>(GetArena());
-    style_image_ = p;
-  }
-  return style_image_;
-}
-inline ::openrtist::Extras_BytesValue* Extras::mutable_style_image() {
-  // @@protoc_insertion_point(field_mutable:openrtist.Extras.style_image)
-  return _internal_mutable_style_image();
-}
-inline void Extras::set_allocated_style_image(::openrtist::Extras_BytesValue* style_image) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
-  if (message_arena == nullptr) {
-    delete style_image_;
-  }
-  if (style_image) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(style_image);
-    if (message_arena != submessage_arena) {
-      style_image = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, style_image, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  style_image_ = style_image;
-  // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.style_image)
-}
-
-// int32 depth_threshold = 4;
-inline void Extras::clear_depth_threshold() {
-  depth_threshold_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 Extras::_internal_depth_threshold() const {
-  return depth_threshold_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 Extras::depth_threshold() const {
-  // @@protoc_insertion_point(field_get:openrtist.Extras.depth_threshold)
-  return _internal_depth_threshold();
-}
-inline void Extras::_internal_set_depth_threshold(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  depth_threshold_ = value;
-}
-inline void Extras::set_depth_threshold(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_depth_threshold(value);
-  // @@protoc_insertion_point(field_set:openrtist.Extras.depth_threshold)
-}
-
-// .openrtist.Extras.BytesValue depth_map = 5;
-inline bool Extras::_internal_has_depth_map() const {
-  return this != internal_default_instance() && depth_map_ != nullptr;
-}
-inline bool Extras::has_depth_map() const {
-  return _internal_has_depth_map();
-}
-inline void Extras::clear_depth_map() {
-  if (GetArena() == nullptr && depth_map_ != nullptr) {
-    delete depth_map_;
-  }
-  depth_map_ = nullptr;
-}
-inline const ::openrtist::Extras_BytesValue& Extras::_internal_depth_map() const {
-  const ::openrtist::Extras_BytesValue* p = depth_map_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::openrtist::Extras_BytesValue*>(
-      &::openrtist::_Extras_BytesValue_default_instance_);
-}
-inline const ::openrtist::Extras_BytesValue& Extras::depth_map() const {
-  // @@protoc_insertion_point(field_get:openrtist.Extras.depth_map)
-  return _internal_depth_map();
-}
-inline void Extras::unsafe_arena_set_allocated_depth_map(
-    ::openrtist::Extras_BytesValue* depth_map) {
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(depth_map_);
-  }
-  depth_map_ = depth_map;
-  if (depth_map) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:openrtist.Extras.depth_map)
-}
-inline ::openrtist::Extras_BytesValue* Extras::release_depth_map() {
-  auto temp = unsafe_arena_release_depth_map();
-  if (GetArena() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-  return temp;
-}
-inline ::openrtist::Extras_BytesValue* Extras::unsafe_arena_release_depth_map() {
-  // @@protoc_insertion_point(field_release:openrtist.Extras.depth_map)
-  
-  ::openrtist::Extras_BytesValue* temp = depth_map_;
-  depth_map_ = nullptr;
-  return temp;
-}
-inline ::openrtist::Extras_BytesValue* Extras::_internal_mutable_depth_map() {
-  
-  if (depth_map_ == nullptr) {
-    auto* p = CreateMaybeMessage<::openrtist::Extras_BytesValue>(GetArena());
-    depth_map_ = p;
-  }
-  return depth_map_;
-}
-inline ::openrtist::Extras_BytesValue* Extras::mutable_depth_map() {
-  // @@protoc_insertion_point(field_mutable:openrtist.Extras.depth_map)
-  return _internal_mutable_depth_map();
-}
-inline void Extras::set_allocated_depth_map(::openrtist::Extras_BytesValue* depth_map) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
-  if (message_arena == nullptr) {
-    delete depth_map_;
-  }
-  if (depth_map) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(depth_map);
-    if (message_arena != submessage_arena) {
-      depth_map = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, depth_map, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  depth_map_ = depth_map;
-  // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.depth_map)
-}
-
-// .openrtist.Extras.IMUValue imu_value = 6;
+// .openrtist.Extras.IMUValue imu_value = 2;
 inline bool Extras::_internal_has_imu_value() const {
   return this != internal_default_instance() && imu_value_ != nullptr;
 }
@@ -1955,7 +1986,7 @@ inline void Extras::set_allocated_imu_value(::openrtist::Extras_IMUValue* imu_va
   // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.imu_value)
 }
 
-// .openrtist.Extras.ScreenValue screen_value = 7;
+// .openrtist.Extras.ScreenValue screen_value = 3;
 inline bool Extras::_internal_has_screen_value() const {
   return this != internal_default_instance() && screen_value_ != nullptr;
 }
@@ -2036,7 +2067,7 @@ inline void Extras::set_allocated_screen_value(::openrtist::Extras_ScreenValue* 
   // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.screen_value)
 }
 
-// .openrtist.Extras.TouchInput touch_value = 8;
+// .openrtist.Extras.TouchInput touch_value = 4;
 inline bool Extras::_internal_has_touch_value() const {
   return this != internal_default_instance() && touch_value_ != nullptr;
 }
@@ -2117,7 +2148,7 @@ inline void Extras::set_allocated_touch_value(::openrtist::Extras_TouchInput* to
   // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.touch_value)
 }
 
-// .openrtist.Extras.ArrowKey arrow_key = 9;
+// .openrtist.Extras.ArrowKey arrow_key = 5;
 inline bool Extras::_internal_has_arrow_key() const {
   return this != internal_default_instance() && arrow_key_ != nullptr;
 }
@@ -2198,9 +2229,92 @@ inline void Extras::set_allocated_arrow_key(::openrtist::Extras_ArrowKey* arrow_
   // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.arrow_key)
 }
 
+// .openrtist.Extras.Setting setting_value = 6;
+inline bool Extras::_internal_has_setting_value() const {
+  return this != internal_default_instance() && setting_value_ != nullptr;
+}
+inline bool Extras::has_setting_value() const {
+  return _internal_has_setting_value();
+}
+inline void Extras::clear_setting_value() {
+  if (GetArena() == nullptr && setting_value_ != nullptr) {
+    delete setting_value_;
+  }
+  setting_value_ = nullptr;
+}
+inline const ::openrtist::Extras_Setting& Extras::_internal_setting_value() const {
+  const ::openrtist::Extras_Setting* p = setting_value_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::openrtist::Extras_Setting*>(
+      &::openrtist::_Extras_Setting_default_instance_);
+}
+inline const ::openrtist::Extras_Setting& Extras::setting_value() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.setting_value)
+  return _internal_setting_value();
+}
+inline void Extras::unsafe_arena_set_allocated_setting_value(
+    ::openrtist::Extras_Setting* setting_value) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(setting_value_);
+  }
+  setting_value_ = setting_value;
+  if (setting_value) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:openrtist.Extras.setting_value)
+}
+inline ::openrtist::Extras_Setting* Extras::release_setting_value() {
+  auto temp = unsafe_arena_release_setting_value();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::openrtist::Extras_Setting* Extras::unsafe_arena_release_setting_value() {
+  // @@protoc_insertion_point(field_release:openrtist.Extras.setting_value)
+  
+  ::openrtist::Extras_Setting* temp = setting_value_;
+  setting_value_ = nullptr;
+  return temp;
+}
+inline ::openrtist::Extras_Setting* Extras::_internal_mutable_setting_value() {
+  
+  if (setting_value_ == nullptr) {
+    auto* p = CreateMaybeMessage<::openrtist::Extras_Setting>(GetArena());
+    setting_value_ = p;
+  }
+  return setting_value_;
+}
+inline ::openrtist::Extras_Setting* Extras::mutable_setting_value() {
+  // @@protoc_insertion_point(field_mutable:openrtist.Extras.setting_value)
+  return _internal_mutable_setting_value();
+}
+inline void Extras::set_allocated_setting_value(::openrtist::Extras_Setting* setting_value) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete setting_value_;
+  }
+  if (setting_value) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(setting_value);
+    if (message_arena != submessage_arena) {
+      setting_value = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, setting_value, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  setting_value_ = setting_value;
+  // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.setting_value)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

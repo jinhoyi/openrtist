@@ -762,6 +762,9 @@ void imu_thread() {
 	zmq::message_t pulled;
 
 	const float kSensitivity = DegToRad(0.1f);
+	bool particle = false;
+	bool pause = false;
+	bool help = false;
 
 	while(running) {
 		
@@ -785,6 +788,8 @@ void imu_thread() {
 
 		float x_speed = ((int)right_key - (int)left_key) * g_camSpeed / 3;
 		float y_speed = ((int)up_key - (int)down_key) * g_camSpeed / 3;
+
+		
 		
 		scale_mtx.lock();
 		// Forward backword
@@ -817,9 +822,29 @@ void imu_thread() {
 		g_camVel.y = y_speed;
 
 		scale_mtx.unlock();
-		// printf("g_scale = %f\n", g_sceneScale);
 		
-		g_newScene.store(extras.depth_threshold());
+		g_newScene.store(extras.setting_value().scene());
+
+		if (pause != extras.setting_value().pause()) {
+			pause = !pause;
+			g_pause = pause;
+		}
+
+		if (particle != extras.setting_value().particle()) {
+			particle = !particle;
+			if (particle) {
+				g_drawEllipsoids = false;
+				g_drawPoints = true;
+			} else {
+				g_drawEllipsoids = true;
+				g_drawPoints = false;
+			}
+		}
+
+		if (help != extras.setting_value().info()) {
+			help = !help;
+			g_showHelp = help;
+		}
 
 		g_params.gravity[0] = imu_x;
 		g_params.gravity[1] = imu_y;
@@ -2313,18 +2338,10 @@ void UpdateFrame()
 	int newScene = -1;
 	// bitmap_mtx.lock();
 	int input_scene = g_newScene.load();
-	if (input_scene < 0) {
-		g_showHelp = !g_showHelp;
-		input_scene = -input_scene;
-		g_newScene.store(input_scene);
-	}
-	// bitmap_mtx.unlock();
-
-	if (g_scene != input_scene - 1) {
-		newScene = input_scene - 1;
+	if (g_scene != input_scene) {
+		newScene = input_scene;
 	} 
 	
-
 	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
 	new_frame = true;
 
