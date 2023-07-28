@@ -440,6 +440,7 @@ float g_camFar;
 float g_sceneLastScale = 1.0f;
 float g_sceneScale = 1.0f;
 std::mutex scale_mtx; 
+std::mutex reset_mtx; 
 
 Vec3 g_lightPos;
 Vec3 g_lightDir;
@@ -606,6 +607,15 @@ std::mutex bitmap_mtx;
 zmq::context_t context(1);
 std::atomic_bool running(false);
 std::atomic_bool new_frame(false);
+std::atomic_bool flag_align(false);
+std::atomic_bool ack_align(false);
+std::atomic_bool flag_ar(false);
+std::atomic_bool ack_ar(false);
+std::atomic_bool flag_reset(false);
+std::atomic_bool ack_reset(false);
+
+std::vector<std::function<void(float,float,float,float,float,float)>> cameraViews;
+
 
 std::vector<unsigned char> g_jpegImage;
 
@@ -776,6 +786,7 @@ void imu_thread() {
 		imu_x = -extras.imu_value().x();
 		imu_y = -extras.imu_value().y();
 		imu_z = -extras.imu_value().z();
+		
 
 		float dx = extras.touch_value().x()*100;
 		float dy = extras.touch_value().y()*100;
@@ -789,8 +800,28 @@ void imu_thread() {
 		float x_speed = ((int)right_key - (int)left_key) * g_camSpeed / 3;
 		float y_speed = ((int)up_key - (int)down_key) * g_camSpeed / 3;
 
-		
-		
+		bool reset = extras.setting_value().reset();
+		bool alignCenter = extras.setting_value().align_center();
+		bool arView = extras.setting_value().ar_view();
+
+		if (reset == true) {
+			flag_reset = true;
+		} else if (!flag_reset) {
+			flag_reset = false;
+		}
+
+		if (alignCenter == true) {
+			flag_align = true;
+		} else if (!flag_align) {
+			flag_align = false;
+		}
+
+		if (arView == true) {
+			flag_ar = true;
+		} else if (!flag_ar) {
+			flag_ar = false;
+		}
+
 		scale_mtx.lock();
 		// Forward backword
 		if (sceneScale == 1.0f) {
@@ -799,13 +830,13 @@ void imu_thread() {
 			if (sceneScale > 1.0f) {
 				float diff = (sceneScale - 1.0);
 				diff *= diff;
-				g_camVel.z =  diff * 70.0f +  g_camSpeed;
+				g_camVel.z += diff * 5.0f +  g_camSpeed/50.0f;
 			}
 				
 			else{
 				float diff = (1.0 - sceneScale);
 				diff *= diff;
-				g_camVel.z = -g_camSpeed - (diff * 70.0f);
+				g_camVel.z += -g_camSpeed/50.0f - (diff * 5.0f);
 			}		
 		}
 
@@ -1443,19 +1474,94 @@ void UpdateEmitters()
 	}
 }
 
+void CameraFrontSky(float lowerX, float upperX, float lowerY, float upperY, float lowerZ, float upperZ) {
+	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
+	
+	float scene_w = (upperX - lowerX);
+	float cam_z = upperZ + (scene_w / g_screenWidth) * 1560.0f;
+	float cam_y = (scene_w / g_screenWidth) * 1500.0f * 0.6;
+
+	g_camPos = Vec3((lowerX + upperX)*0.5f, cam_y + upperY / 1.3, cam_z);
+	g_camAngle = Vec3(0.0f, -ATan2(cam_y , cam_z), 0.0f);
+}
+
+void CameraFrontSlent(float lowerX, float upperX, float lowerY, float upperY, float lowerZ, float upperZ) {
+	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
+	
+	float scene_w = (upperX - lowerX);
+	float cam_z = upperZ + (scene_w / g_screenWidth) * 1560.0f;
+	float cam_y = (scene_w / g_screenWidth) * 1630.0f * 0.2;
+
+	g_camPos = Vec3((lowerX + upperX)*0.5f, cam_y + (upperY / 2), cam_z);
+	g_camAngle = Vec3(0.0f, -ATan2(cam_y , cam_z), 0.0f);
+}
+
+void CameraFront(float lowerX, float upperX, float lowerY, float upperY, float lowerZ, float upperZ) {
+	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
+	
+	float scene_w = (upperX - lowerX);
+	float cam_z = upperZ + (scene_w / g_screenWidth) * 1600.0f;
+	float cam_y = (scene_w / g_screenWidth) * 1630.0f * 0.2;
+
+	g_camPos = Vec3((lowerX + upperX)*0.5f, (lowerY + upperY)*0.5f, cam_z);
+	g_camAngle = Vec3(0.0f, 0.0f, 0.0f);
+}
+
+void Camera3D(float lowerX, float upperX, float lowerY, float upperY, float lowerZ, float upperZ) {
+	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
+	
+	float scene_w = (upperX - lowerX);
+	float cam_z = upperZ + (scene_w / g_screenWidth) * 1250.0f;
+	float cam_y = (scene_w / g_screenWidth) * 1650.0f * 0.5;
+
+	float fromCenter = cam_z - ((upperZ + lowerZ) * 0.5);
+	float sqr = fromCenter * fromCenter;
+	float adjacent = sqrt(sqr + sqr);
+	float opposite = cam_y;
+
+	g_camPos = Vec3((lowerX + upperX) * 0.5 + cam_z, cam_y + (upperY / 1.7), (lowerZ + upperZ) * 0.5 + cam_z);
+	g_camAngle = Vec3(DegToRad(45), -ATan2(cam_y , adjacent), 0.0f);
+}
+
+int camViewIdx = 0;
+
 //FLAG:UPDATE_CAMERA
 void UpdateCamera()
 {
+	if (flag_ar) {
+		float upperX = ((Vec4&)g_params.planes[3]).w;
+		float lowerX = -((Vec4&)g_params.planes[2]).w;
+		float upperZ = ((Vec4&)g_params.planes[4]).w;
+		float lowerZ = -((Vec4&)g_params.planes[1]).w;
+		float upperY = ((Vec4&)g_params.planes[5]).w;
+		float lowerY = 0;
 
-	scale_mtx.lock();
-	// Forward backword
-	Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
-	Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
-	scale_mtx.unlock();
+		cameraViews[camViewIdx](lowerX, upperX, lowerY, upperY, lowerZ, upperZ);
+		camViewIdx = (camViewIdx + 1) % cameraViews.size();
+		
+		flag_ar = false;
+	} else if (flag_align) {
+		float upperX = ((Vec4&)g_params.planes[3]).w;
+		float lowerX = -((Vec4&)g_params.planes[2]).w;
+		float upperZ = ((Vec4&)g_params.planes[4]).w;
+		float lowerZ = -((Vec4&)g_params.planes[1]).w;
+		float upperY = ((Vec4&)g_params.planes[5]).w;
+		float lowerY = 0;
 
-	// Camera Angle
-	g_camSmoothVel = Lerp(g_camSmoothVel, g_camVel, 0.1f);
-	g_camPos += (forward*g_camSmoothVel.z + right*g_camSmoothVel.x + Cross(right, forward)*g_camSmoothVel.y);
+		CameraFront(lowerX, upperX, lowerY, upperY, lowerZ, upperZ);
+		flag_align = false;
+	
+	} else {
+		scale_mtx.lock();
+		// Forward backword
+		Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
+		Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
+		scale_mtx.unlock();
+
+		// Camera Angle
+		g_camSmoothVel = Lerp(g_camSmoothVel, g_camVel, 0.1f);
+		g_camPos += (forward*g_camSmoothVel.z + right*g_camSmoothVel.x + Cross(right, forward)*g_camSmoothVel.y);
+	}
 }
 
 void UpdateMouse()
@@ -2377,17 +2483,18 @@ void UpdateFrame()
 	}
 
 	double renderEndTime = GetSeconds();
-
+	
 	// if user requested a scene reset process it now
-	if (g_resetScene)
-	{
+
+	if (flag_reset || g_resetScene){
 		Reset();
+		flag_reset = false;
 		g_resetScene = false;
 	}
 
+
 	//-------------------------------------------------------------------
 	// Flex Update
-
 	double updateBeginTime = GetSeconds();
 
 	// send any particle updates to the solver
@@ -3189,6 +3296,11 @@ int main(int argc, char* argv[])
 	g_scenes.push_back(new Buoyancy("Buoyancy"));
 	g_scenes.push_back(new RockPool("Rock Pool"));
 	g_scenes.push_back(new FluidBlock("Fluid Block"));
+
+	cameraViews.push_back(CameraFrontSlent);
+	cameraViews.push_back(CameraFrontSky);
+	cameraViews.push_back(Camera3D);
+
 
 	// g_scenes.push_back(new Speaker("Speaker", 0.15f));
 
