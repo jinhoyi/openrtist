@@ -255,9 +255,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private float imu_y = 0;
     private float imu_z = 0;
 
-//    private ScaleGestureDetector SGD;
-//    private float scaleFactor = 1;
-//    private boolean inScale = false;
     private float sceneScaleFactor = 1.0f;
     private float sceneX = 0.0f;
     private float sceneY= 0.0f;
@@ -271,25 +268,16 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private boolean landscapeMode = false;
     private boolean info = false;
 
-    public void setAlignCenter(boolean b){
-        alignCenter = b;
-        Toast.makeText(this,
-                "setAlignCenter - Incomplete",
-                Toast.LENGTH_SHORT).show();
+    public void setAlignCenter(){
+        alignCenter = true;
     }
 
-    public void setARView(boolean b){
-        arView = b;
-        Toast.makeText(this,
-                "setARView - Incomplete",
-                Toast.LENGTH_SHORT).show();
+    public void setARView(){
+        arView = true;
     }
 
-    public void setReset(boolean b){
-        reset = b;
-        Toast.makeText(this,
-                "setReset - Incomplete",
-                Toast.LENGTH_SHORT).show();
+    public void setReset(){
+        reset = true;
     }
 
     public boolean getPause() {
@@ -314,14 +302,19 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
         if (autoPlay) {
             setIMUSensor(false);
+            autoplayHandler.postDelayed(gForceIterator, 100 );
+            Toast.makeText(this,
+                    "Autoplay On", Toast.LENGTH_SHORT).show();
 
         } else {
+            if(autoplayHandler != null) {
+                autoPlay = false;
+                autoplayHandler.removeCallbacks(gForceIterator);
+            }
             setIMUSensor(true);
+            Toast.makeText(this,
+                    "Autoplay Off", Toast.LENGTH_SHORT).show();
         }
-
-        Toast.makeText(this,
-                "setAutoPlay - Incomplete",
-                Toast.LENGTH_SHORT).show();
     }
 
     public boolean getLandscapeMode() {
@@ -421,9 +414,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private Handler localRunnerThreadHandler = null;
     private volatile boolean localRunnerBusy = false;
     private RenderScript rs = null;
-    private Bitmap bitmapCache;
-//    private SensorManager sensorManager = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -446,8 +436,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
         iconView = findViewById(R.id.style_image);
         fpsLabel = findViewById(R.id.fpsLabel);
         accelLabel = findViewById(R.id.accelLabel);
-
-//        imgView.setOnTouchListener(new SceneScaleGestures(this, this));
 
         buttonLeft = findViewById(R.id.button_left);
         buttonRight = findViewById(R.id.button_right);
@@ -513,30 +501,6 @@ public class GabrielClientActivity extends AppCompatActivity implements
         modeList.put(AppMode.FULLSCREEN, new FullScreenMode(this, views));
         switchMode(AppMode.MAIN);
 
-
-        String[] menuItems = {"Menu Item 1", "Menu Item 2"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose an option")
-                .setItems(menuItems, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // The 'which' argument contains the index position
-                        // of the selected item
-                        switch (which) {
-                            case 0: // Menu Item 1 selected
-                                // Your action here
-                                break;
-                            case 1: // Menu Item 2 selected
-                                // Your action here
-                                break;
-                        }
-
-                    }
-                });
-
-
-        ImageView imgRecord =  findViewById(R.id.imgRecord);
-//        ImageView screenshotButton = findViewById(R.id.imgSceneList);
-
         // Sensor Registration
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> gravSensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
@@ -544,185 +508,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
         sceneAdapter = new ArrayAdapter<>(
                 this, R.layout.mylist, styleDescriptions);
-//
-        ArrayAdapter<String> spinner_adapter = new ArrayAdapter<>(
-                this, R.layout.mylist, styleDescriptions);
 
-        if (Const.SHOW_RECORDER) {
-            imgRecord.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (capturingScreen) {
-                        imgRecord.setImageResource(R.drawable.ic_baseline_videocam_24px);
-                        stopRecording();
-                        MediaActionSound m = new MediaActionSound();
-                        m.play(MediaActionSound.STOP_VIDEO_RECORDING);
-                    } else {
-                        recordingInitiated = true;
-                        MediaActionSound m = new MediaActionSound();
-                        m.play(MediaActionSound.START_VIDEO_RECORDING);
+        autoplayHandler = new Handler();
+        if (autoPlay)
+            autoplayHandler.postDelayed(gForceIterator, 1000);
 
-                        imgRecord.setImageResource(R.drawable.ic_baseline_videocam_off_24px);
-                        initRecorder();
-                        shareScreen();
-                    }
-                    imgRecord.performHapticFeedback(
-                            android.view.HapticFeedbackConstants.LONG_PRESS);
-                }
-            });
-
-//            viewSceneList.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Bitmap b = Screenshot.takescreenshotOfRootView(imgView);
-//                    storeScreenshot(b,getOutputMediaFile(MEDIA_TYPE_IMAGE).getPath());
-//                    viewSceneList.performHapticFeedback(
-//                            android.view.HapticFeedbackConstants.LONG_PRESS);
-//                    }
-//            });
-        } else if (!Const.STEREO_ENABLED){
-            //this view doesn't exist when stereo is enabled (activity_stereo.xml)
-            imgRecord.setVisibility(View.GONE);
-            findViewById(R.id.imgSceneList).setVisibility(View.GONE);
-        }
-
-        if (Const.STEREO_ENABLED) {
-            if (Const.ITERATE_STYLES) {
-                // artificially start iteration since we don't display
-                // any buttons in stereo view
-                Const.ITERATION_STARTED = true;
-
-                iterationHandler = new Handler();
-                iterationHandler.postDelayed(styleIterator, 100);
-            }
-        } else {
-            Spinner spinner = findViewById(R.id.spinner);
-//            ImageView playPauseButton = findViewById(R.id.imgPlayPause);
-//            ImageView camButton = findViewById(R.id.imgHelp);
-
-            if (Const.ITERATE_STYLES) {
-                viewPlayPause.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!Const.ITERATION_STARTED) {
-                            Const.ITERATION_STARTED = true;
-                            viewPlayPause.setImageResource(R.drawable.ic_pause);
-
-                            Toast.makeText(
-                                    viewPlayPause.getContext(),
-                                    getString(R.string.iteration_started),
-                                    Toast.LENGTH_LONG).show();
-                        } else {
-                            Const.ITERATION_STARTED = false;
-                            viewPlayPause.setImageResource(R.drawable.ic_play);
-                            Toast.makeText(
-                                    viewPlayPause.getContext(),
-                                    getString(R.string.iteration_stopped),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                        viewPlayPause.performHapticFeedback(
-                                android.view.HapticFeedbackConstants.LONG_PRESS);
-                    }
-                });
-
-                spinner.setVisibility(View.GONE);
-                iterationHandler = new Handler();
-                iterationHandler.postDelayed(styleIterator, 100);
-            } else {
-                viewPlayPause.setVisibility(View.GONE);
-
-
-                // Spinner click listener
-//                spinner.setAdapter(spinner_adapter);
-//                spinner.setOnItemSelectedListener(this);
-
-            }
-
-            autoplayHandler = new Handler();
-            autoplayHandler.postDelayed(styleIterator, 100);
-
-            viewHelp.setVisibility(View.VISIBLE);
-//            viewHelp.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    viewHelp.performHapticFeedback(
-//                            android.view.HapticFeedbackConstants.LONG_PRESS);
-//                    if (Const.USING_FRONT_CAMERA) {
-//                        viewHelp.setImageResource(R.drawable.outline_info_24);
-//                        help = true;
-////                        cameraCapture = new CameraCapture(
-////                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
-////                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_BACK_CAMERA);
-//
-//                        Const.USING_FRONT_CAMERA = false;
-//                    } else {
-//                        viewHelp.setImageResource(R.drawable.baseline_close_24);
-//                        help = true;
-//
-////                        cameraCapture = new CameraCapture(
-////                                GabrielClientActivity.this, analyzer, Const.IMAGE_WIDTH,
-////                                Const.IMAGE_HEIGHT, preview, CameraSelector.DEFAULT_FRONT_CAMERA);
-//
-//                        Const.USING_FRONT_CAMERA = true;
-//                    }
-//                }
-//            });
-        }
-
-//        viewSceneList.setHapticFeedbackEnabled(true);
-//        viewSceneList.setOnClickListener(new View.OnClickListener() {
-////            @Override
-////            public void onClick(View v) {
-////                builder.show();
-////            }
-//            @Override
-//            public void onClick(View v) {
-//                // Create an ArrayAdapter
-//                ArrayAdapter<String> adapter = spinner_adapter;
-//
-//                AlertDialog.Builder builder = new AlertDialog.Builder(GabrielClientActivity.this);
-//                builder.setTitle("Choose an option")
-//                        .setAdapter(adapter, new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int position) {
-//                                if (styleIds.get(position).equals("none")) {
-//                                    if (!Const.STYLES_RETRIEVED) {
-//                                        styleType = "?";
-//                                    } else {
-//                                        styleType = "none";
-//                                    }
-//                                }
-//                                else {
-//                                    styleType = styleIds.get(position);
-//                                }
-//                            }
-//                        });
-//
-//                AlertDialog dialog = builder.create();
-//                dialog.show();
-////                viewSceneList.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
-//            }
-//
-//
-//        });
-
-
-//        viewSceneList.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
-
-
+        viewHelp.setVisibility(View.VISIBLE);
 
         fpsLabel.setVisibility(info ? View.VISIBLE : View.INVISIBLE);
         fpsHandler = new Handler();
@@ -737,19 +528,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
         mScreenHeight = metrics.heightPixels;
         mScreenWidth = metrics.widthPixels;
 
-
-
-        mMediaRecorder = new MediaRecorder();
-
         mProjectionManager = (MediaProjectionManager) getSystemService
                 (Context.MEDIA_PROJECTION_SERVICE);
-
-//        FrameUpdateThread frameUpdateThread = new FrameUpdateThread();
-//        frameUpdateThread.start();
-
-//        running = true;
+        
         frameHandler = new Handler();
-//        frameHandler.post(frameIterator);
+
     }
 
 
@@ -807,15 +590,23 @@ public class GabrielClientActivity extends AppCompatActivity implements
         }
     }
 
-    //FLAG FOR LATER
+    private final int[] xSequence = new int[] {0, 1, 0,-1, 0, 0, 0, 0 ,0, 0,-1, 0, 1, 0,-1, 0, 0, 1, 0, 0, 0, 0};
+    private final int[] ySequence = new int[] {1, 0,-1, 0, 1, 0,-1, 0, 0, 1, 0,-1, 0, 0, 0, 1, 0, 0,-1, 0, 0, 0};
+    private final int[] zSequence = new int[] {0, 0, 0, 0, 0, 1, 0,-1, 1, 0, 0, 0, 0,-1 ,0, 0, 1, 0, 0,-1, 0 ,0};
 
-    private boolean directionX = true;
-//    private final Runnable gForceIterator = new Runnable() {
-//        @Override
-//        public void run() {
-//
-//        }
-//    }
+    private int seqIdx = 0;
+    private final Runnable gForceIterator = new Runnable() {
+        @Override
+        public void run() {
+            if (autoPlay) {
+                imu_x = xSequence[seqIdx] * 9.8f;
+                imu_y = ySequence[seqIdx] * 9.8f;
+                imu_z = zSequence[seqIdx] * 9.8f;
+                seqIdx = (seqIdx + 1) % xSequence.length;
+                autoplayHandler.postDelayed(this, 2000 );
+            }
+        }
+    };
     
     private final Runnable styleIterator = new Runnable() {
         private int position = 1;
@@ -911,6 +702,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
             frameHandler.removeCallbacks(frameIterator);
         }
 
+        if(autoplayHandler != null) {
+            autoPlay = false;
+            autoplayHandler.removeCallbacks(gForceIterator);
+        }
+
         if(capturingScreen) {
             stopRecording();
         }
@@ -928,6 +724,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
         if(frameHandler != null) {
             running = false;
             frameHandler.removeCallbacks(frameIterator);
+        }
+
+        if(autoplayHandler != null) {
+            autoPlay = false;
+            autoplayHandler.removeCallbacks(gForceIterator);
         }
 
         if (capturingScreen) {
@@ -1152,6 +953,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     int counter = 0;
     private void sendIMUCloudlet() {
+        Log.v("SENDMIU", "Reset is " + reset);
         openrtistComm.sendSupplier(() -> {
             Extras.ScreenValue screenValue = Extras.ScreenValue.newBuilder()
                     .setHeight(mScreenHeight)
@@ -1186,8 +988,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setInfo(info)
                     .build();
 
-            sceneX = 0;
-            sceneY = 0;
+
 //            sceneScaleFactor = 1.0f;
 
 //            Extras extras = Extras.newBuilder().setStyle(styleType)
@@ -1207,6 +1008,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setExtras(GabrielClientActivity.pack(extras))
                     .build();
         });
+
+        reset = false;
+        arView = false;
+        alignCenter = false;
+        sceneX = 0;
+        sceneY = 0;
     }
 
 //    private void sendIMUCloudlet() {

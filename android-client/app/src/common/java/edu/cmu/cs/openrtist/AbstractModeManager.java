@@ -16,8 +16,8 @@ public abstract class AbstractModeManager {
         this.views = views;
         this.visibility = visibility;
 
-        Log.e("ModeManager", "Visibility Size = " + this.visibility.size());
-        Log.e("ModeManager", "ViewID Size = " + ViewID.SIZE.getValue());
+        Log.v("ModeManager", "Visibility Size = " + this.visibility.size());
+        Log.v("ModeManager", "ViewID Size = " + ViewID.SIZE.getValue());
 
         assert this.visibility.size() == ViewID.SIZE.getValue();
     }

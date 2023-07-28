@@ -41,7 +41,7 @@ public class CamMode extends AbstractModeManager {
     @Override
     public void init() {
         super.init();
-        ((ImageView)this.views.get(ViewID.CAM_CONTROL)).setImageResource(R.drawable.baseline_arrow_back_ios_new_24);
+        ((ImageView)this.views.get(ViewID.CAM_CONTROL)).setImageResource(R.drawable.baseline_keyboard_arrow_left_24);
 
     }
 
@@ -88,12 +88,12 @@ public class CamMode extends AbstractModeManager {
 
             case ALIGN_CENTER:
                 return (view -> {
-                    clientActivity.setAlignCenter(true);
+                    clientActivity.setAlignCenter();
                 });
 
             case AR_VIEW:
                 return (view -> {
-                    clientActivity.setARView(true);
+                    clientActivity.setARView();
                 });
 
             case HELP:

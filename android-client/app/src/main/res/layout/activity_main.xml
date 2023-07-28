@@ -216,29 +216,13 @@
             android:visibility="visible"
             app:tint="@drawable/touch_selector" />
 
-        <ImageView
-            android:id="@+id/imgReset"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_above="@id/imgSceneList"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/button_margin"
-            android:layout_marginTop="@dimen/layer_margin"
-            android:layout_marginBottom="@dimen/layer_margin"
-            android:elevation="16dp"
-            android:focusable="false"
-            android:hapticFeedbackEnabled="true"
-            android:scaleX="@dimen/icon_scale"
-            android:scaleY="@dimen/icon_scale"
-            android:src="@drawable/outline_replay_24"
-            android:visibility="visible"
-            app:tint="@drawable/touch_selector" />
+
 
         <ImageView
             android:id="@+id/imgRotate"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
-            android:layout_above="@id/imgReset"
+            android:layout_above="@id/imgSceneList"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginTop="@dimen/layer_margin"
@@ -272,28 +256,10 @@
             app:tint="@drawable/touch_selector" />
 
         <ImageView
-            android:id="@+id/imgParticle"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_above="@id/imgPlayPause"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/button_margin"
-            android:layout_marginTop="@dimen/layer_margin"
-            android:layout_marginBottom="@dimen/layer_margin"
-            android:elevation="16dp"
-            android:focusable="false"
-            android:hapticFeedbackEnabled="true"
-            android:scaleX="@dimen/icon_scale"
-            android:scaleY="@dimen/icon_scale"
-            android:src="@drawable/outline_blur_on_24"
-            android:visibility="visible"
-            app:tint="@drawable/touch_selector" />
-
-        <ImageView
             android:id="@+id/imgAutoPlay"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
-            android:layout_above="@id/imgParticle"
+            android:layout_above="@id/imgPlayPause"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginTop="@dimen/layer_margin"
@@ -307,13 +273,48 @@
             android:visibility="visible"
             app:tint="@drawable/touch_selector" />
 
+        <ImageView
+            android:id="@+id/imgReset"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgAutoPlay"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginTop="@dimen/layer_margin"
+            android:layout_marginBottom="@dimen/layer_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:scaleX="@dimen/icon_scale"
+            android:scaleY="@dimen/icon_scale"
+            android:src="@drawable/outline_replay_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
+
+        <ImageView
+            android:id="@+id/imgParticle"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_above="@id/imgReset"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginTop="@dimen/layer_margin"
+            android:layout_marginBottom="@dimen/layer_margin"
+            android:elevation="16dp"
+            android:focusable="false"
+            android:hapticFeedbackEnabled="true"
+            android:scaleX="@dimen/icon_scale"
+            android:scaleY="@dimen/icon_scale"
+            android:src="@drawable/outline_blur_on_24"
+            android:visibility="visible"
+            app:tint="@drawable/touch_selector" />
 
 
         <ImageView
             android:id="@+id/imgInfo"
             android:layout_width="@dimen/button_size"
             android:layout_height="@dimen/button_size"
-            android:layout_above="@id/imgAutoPlay"
+            android:layout_above="@id/imgParticle"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginTop="@dimen/layer_margin"

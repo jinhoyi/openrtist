@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" translatable="false">OpenRTiST</string>
-    <string name="title_activity_main" translatable="false">OpenRTiST</string>
-    <string name="subtitle" translatable="false">Real-Time Style Transfer</string>
+    <string name="app_name" translatable="false">OpenFluid</string>
+    <string name="title_activity_main" translatable="false">OpenFluid</string>
+    <string name="subtitle" translatable="false">Real-Time Fluid Simulation</string>
 
     <!-- activity_serverlist.xml -->
     <string name="options_heading">Options</string>
@@ -18,7 +18,7 @@
     <string name="address_subheading">Address</string>
     <string name="name_hint">Server Name</string>
     <string name="address_hint" translatable="false">10.0.0.2[:9099]</string>
-    <string name="backend_instructions">OpenRTiST requires a backend server to connect to. The cmu-demo-server can be used to test. You can setup your own backend server by following the instructions at https://github.com/cmusatyalab/openrtist to launch the cmusatyalab/openrtist Docker container.</string>
+    <string name="backend_instructions">OpenFluid requires a backend server to connect to. The cmu-demo-server can be used to test. You can setup your own backend server by following the instructions at https://github.com/cmusatyalab/openrtist to launch the cmusatyalab/openrtist Docker container.</string>
     <string name="error_empty">Name and address are required.</string>
     <string name="error_invalidURI">Server address is an invalid URI.</string>
     <string name="error_exists">A server by that name already exists.</string>
@@ -54,7 +54,7 @@
     <string name="about_menu">About&#8230;</string>
     <string name="settings_menu">Settings&#8230;</string>
     <string name="tokenSize">Gabriel Token Size</string>
-    <string name="about_title" translatable="false">OpenRTiST: Real-Time Style Transfer</string>
+    <string name="about_title" translatable="false">OpenFluid: Real-Time Fluid Simulation</string>
     <string name="about_message" translatable="false">version: %s\nCopyright &#169; 2017-2020\nCarnegie Mellon University\nThis is a developing project.\n\nAll source code and documentation are under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.html)</string>
     <string name="pref_header_ui">UI</string>
     <string name="token_limit_summary">Controls how many frames can be in flight to Gabriel server</string>

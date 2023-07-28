@@ -70,6 +70,10 @@
                 android:name="com.google.android.glass.VoiceTrigger"
                 android:resource="@xml/gabriel_start" />
         </activity>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

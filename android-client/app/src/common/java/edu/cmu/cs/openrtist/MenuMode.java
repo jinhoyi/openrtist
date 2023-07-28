@@ -1,14 +1,18 @@
 package edu.cmu.cs.openrtist;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.res.ResourcesCompat;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -51,7 +55,7 @@ public class MenuMode extends AbstractModeManager {
         ((ImageView)this.views.get(ViewID.AUTO_PLAY)).setImageResource(
                 clientActivity.getAutoPlay() ? R.drawable.autostop_fill0xml : R.drawable.autoplay_fill0);
         this.views.get(ViewID.ROTATE).setRotation(
-                clientActivity.getLandscapeMode() ? 45.0f : -45.0f);
+                clientActivity.getLandscapeMode() ? 55.0f : -35.0f);
         this.views.get(ViewID.ROTATE).setRotationX(
                 clientActivity.getLandscapeMode() ? 180.0f : 0.0f);
         ((ImageView)this.views.get(ViewID.INFO)).setImageResource(
@@ -112,11 +116,16 @@ public class MenuMode extends AbstractModeManager {
                     List<String> styleIds = clientActivity.getSceneIDs();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
-                    builder.setTitle("Choose a Scene")
+                    builder.setIcon(R.drawable.outline_landscape_24).setTitle(" ")
                             .setAdapter(adapter, (dialog, position) -> clientActivity.setSceneType(styleIds.get(position)));
 
                     AlertDialog dialog = builder.create();
                     dialog.show();
+
+                    ImageView imageView = dialog.findViewById(android.R.id.icon);
+                    if (imageView != null)
+                        imageView.setColorFilter(Color.WHITE);
+
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
                     clientActivity.switchMode(GabrielClientActivity.AppMode.MAIN);
                     ((ImageView)this.views.get(ViewID.MENU)).setImageResource(R.drawable.baseline_menu_24);
@@ -129,7 +138,7 @@ public class MenuMode extends AbstractModeManager {
 
             case RESET:
                 return (view -> {
-                    clientActivity.setReset(true);
+                    clientActivity.setReset();
                     this.init();
                 });
 
