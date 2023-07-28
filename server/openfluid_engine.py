@@ -220,29 +220,45 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         # self.imu_socket.setsockopt(zmq.SNDHWM , 1)
         # self.imu_socket.bind(self.zmq_imu_address)
     
-    # def get_frame(self):
-    #     # Async Request of new rendered frame to the Simulation Engine
-    #     raw_msg = self.frame_socket.recv()
-    #     input_frame = gabriel_pb2.InputFrame()
-    #     input_frame.ParseFromString(raw_msg)
-    #     return input_frame.payloads[0]
     def get_frame(self):
         # Async Request of new rendered frame to the Simulation Engine
-        # print("sending 0")
         self.frame_socket.send_string("0")
-        # print("asking for frame")
-        raw_msg = self.frame_socket.recv()
-        # except:
-        #     return None
+        reply = None
+        while True:
+            if (self.frame_socket.poll(self.REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
+                reply = self.frame_socket.recv()
+                break
+            
+            print("No response from server")
+            self.reset_simulator()
 
-        # print("done")
-        if raw_msg == None:
+            self.frame_socket.send_string("0")
+        if reply == None:
             return None
 
         input_frame = gabriel_pb2.InputFrame()
-        input_frame.ParseFromString(raw_msg)
+        input_frame.ParseFromString(reply)
 
         return input_frame.payloads[0]
+
+
+    # def get_frame(self):
+    #     # Async Request of new rendered frame to the Simulation Engine
+    #     # print("sending 0")
+    #     self.frame_socket.send_string("0")
+    #     # print("asking for frame")
+    #     raw_msg = self.frame_socket.recv()
+    #     # except:
+    #     #     return None
+
+    #     # print("done")
+    #     if raw_msg == None:
+    #         return None
+
+    #     input_frame = gabriel_pb2.InputFrame()
+    #     input_frame.ParseFromString(raw_msg)
+
+    #     return input_frame.payloads[0]
     
     def send_imu(self, extras):
         #Async Reply to the IMU_data request from the Simulation Engine
