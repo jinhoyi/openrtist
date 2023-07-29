@@ -268,33 +268,33 @@ void InitRender(const RenderInitOptions& options)
 	SDL_Window* window = options.window;
 	int msaaSamples = options.numMsaaSamples;
 
-	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	// Originally initialize GL context with SDL window for Device with monitors
+	/*
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-	// //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
-	// // Turn on double buffering with a 24bit Z buffer.
-	// SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	// SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	// Turn on double buffering with a 24bit Z buffer.
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	// SDL_GL_CreateContext(window);
+	SDL_GL_CreateContext(window);
 
-	// This makes our buffer swap syncronized with the monitor's vertical refresh
-	// SDL_GL_SetSwapInterval(1);
+	This makes our buffer swap syncronized with the monitor's vertical refresh
+	SDL_GL_SetSwapInterval(1);
 
-	// if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
-	// {
-	// 	printf("Could not initialize GL extensions\n");
-	// }
+	if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
+	{
+		printf("Could not initialize GL extensions\n");
+	}
 
-
-	// imguiRenderGLInit(GetFilePathByPlatform("Flex/data/DroidSans.ttf").c_str());
+	imguiRenderGLInit(GetFilePathByPlatform("Flex/data/DroidSans.ttf").c_str());
+	*/
 
 	g_msaaSamples = msaaSamples;
-	g_window = window;
-
-	
+	g_window = window;	// null
 }
 
 void DestroyRender()
@@ -324,12 +324,12 @@ void EndFrame()
 	{
 		// blit the msaa buffer to the window
 		glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, g_msaaFbo));
-		glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fbo));
+		// switched from glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0)); --> drawing to default monitor Frame Buffer
+		glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fbo)); 
 		glVerify(glBlitFramebuffer(0, 0, g_screenWidth, g_screenHeight, 0, 0, g_screenWidth, g_screenHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
 	}
 	// render help to back buffer
-	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
-	// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, g_msaaFbo));
+	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo)); // switched from 0 to custrom fbo
 	glVerify(glClear(GL_DEPTH_BUFFER_BIT));
 }
 
@@ -442,16 +442,15 @@ void ReshapeRender(int width, int height, bool minimized)
 
 	if (!gladLoadGLLoader((GLADloadproc)eglGetProcAddress)) {
 		printf("Failed to initialize GLAD\n");
-		return -1;
+		return;
 	}
 
 	imguiRenderGLInit(GetFilePathByPlatform("Flex/data/DroidSans.ttf").c_str());
 
 	if (g_msaaSamples)
-	// if (1 == 1)
 	{	
 		glVerify(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
-		// glVerify(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		//--> switched from glVerify(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 		if (g_msaaFbo)
 		{
@@ -533,7 +532,7 @@ void ReshapeRender(int width, int height, bool minimized)
 		if (status == GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS){
 			printf("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS\n");
 		}
-		return -1;
+		return;
 	}
 
 	printf("created FBO\n");	
@@ -578,7 +577,7 @@ Vec3 GetScreenCoord(Vec3& pos) {
 
 void ReadFrame(int* backbuffer, int width, int height)
 {
-	glVerify(glReadBuffer(GL_COLOR_ATTACHMENT0));
+	glVerify(glReadBuffer(GL_COLOR_ATTACHMENT0)); // Originally from GL_BACK
 	glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, backbuffer);
 }
 

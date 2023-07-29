@@ -2486,12 +2486,7 @@ void UpdateFrame()
 
 	EndFrame();
 
-	int newScene = -1;
-	// bitmap_mtx.lock();
-	int input_scene = g_newScene.load();
-	if (g_scene != input_scene) {
-		newScene = input_scene;
-	} 
+
 	
 	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
 	new_frame = true;
@@ -2537,7 +2532,6 @@ void UpdateFrame()
 		flag_reset = false;
 		g_resetScene = false;
 	}
-
 
 	//-------------------------------------------------------------------
 	// Flex Update
@@ -2636,6 +2630,13 @@ void UpdateFrame()
 	g_renderTime = (g_renderTime == 0.0f) ? newRenderTime : Lerp(g_renderTime, newRenderTime, timerSmoothing);
 	g_waitTime = (g_waitTime == 0.0f) ? newWaitTime : Lerp(g_waitTime, newWaitTime, timerSmoothing);
 	g_simLatency = (g_simLatency == 0.0f) ? newSimLatency : Lerp(g_simLatency, newSimLatency, timerSmoothing);
+
+	// Update scene Based on Client input
+	int newScene = -1;
+	int input_scene = g_newScene.load();
+	if (g_scene != input_scene) {
+		newScene = input_scene;
+	} 
 
 	if (g_benchmark) newScene = BenchmarkUpdate();
 
@@ -3090,6 +3091,7 @@ void ControllerDeviceUpdate()
 	}
 }
 
+// Originally Used for Device with monitor (and GUI)
 void SDLInit(const char* title)
 {
 	// if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)	// Initialize SDL's Video subsystem and game controllers
@@ -3106,15 +3108,13 @@ void SDLInit(const char* title)
 // 		// For Sharing Context
 // 		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
-// 		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
+// 		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS;
 // 	}
 // #endif
 
 	// g_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 	// 	g_screenWidth, g_screenHeight, flags);
 	
-	// // g_window  = SDL_CreateWindow(title, 0, 0, 1, 1, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
-
 	// g_windowId = SDL_GetWindowID(g_window);
 }
 
@@ -3134,9 +3134,12 @@ void SDLMainLoop()
 
 		while (!quit)
 		{
-			//FLAG:UPDATE_FRAME
+			//FLAG:UPDATE_FRAME : do new render + 1 time step of simulation.
 			UpdateFrame();
-					
+
+			// Originally for User Input from the mouse/keyboard in the GUI.	
+			
+			/*
 			while (SDL_PollEvent(&e))
 			{
 				switch (e.type)
@@ -3192,9 +3195,9 @@ void SDLMainLoop()
 					break;
 				}
 			}
+			*/
 		}
-
-
+		
 	}
 #if ENABLE_AFTERMATH_SUPPORT
 	__except (true)
@@ -3311,32 +3314,20 @@ int main(int argc, char* argv[])
 	}
 
 	// FLAG:SCENE_SETUP
-
 	// opening scene
-	// g_scenes.push_back(new DamBreak2("DamBreak2  7cm", 0.07f));
-	
-	// g_scenes.push_back(new DamBreak2("DamBreak2  15cm", 0.15f));
-	
-	
 	g_scenes.push_back(new DamBreak("DamBreak LowRes", 0.1f));
 	g_scenes.push_back(new DamBreak("DamBreak MedRes", 0.07f));
 	g_scenes.push_back(new DamBreak("DamBreak HighRes", 0.05f));
-	
-
-	// g_scenes.push_back(new PotPourri("Pot Pourri"));
 
 	// viscous fluids
 	g_scenes.push_back(new DamBreak2("Viscosity Low", 0.1f));
 	g_scenes.push_back(new ViscosityBox("Viscosity Med", 1.5f));
 	g_scenes.push_back(new ViscosityBox("Viscosity High", 3.0f));
-	// g_scenes.push_back(new Viscosity("Viscosity High", 5.0f, 0.12f));
 	g_scenes.push_back(new Viscosity("Rose Syrup", 1.5f));
-	// g_scenes.push_back(new Viscosity("Viscosity Med", 3.0f));
 
 	g_scenes.push_back(new SurfaceTension("Surface Tension Low", 0.0f));
 	g_scenes.push_back(new SurfaceTension("Surface Tension Med", 10.0f));
 	g_scenes.push_back(new SurfaceTension("Surface Tension High", 20.0f));
-
 	
 	// coupling scenes
 	g_scenes.push_back(new Buoyancy("Buoyancy"));
@@ -3347,10 +3338,7 @@ int main(int argc, char* argv[])
 	cameraViews.push_back(CameraFrontSky);
 	cameraViews.push_back(Camera3D);
 
-
-	// g_scenes.push_back(new Speaker("Speaker", 0.15f));
-
-	// FLAG:RENGERING_OPTION
+	// FLAG:RENDERING_OPTION
 	// init graphics
 	RenderInitOptions options;
 
