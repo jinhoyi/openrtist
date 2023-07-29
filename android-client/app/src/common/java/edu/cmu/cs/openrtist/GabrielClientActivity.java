@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -32,6 +33,7 @@ import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -39,6 +41,9 @@ import android.os.HandlerThread;
 import android.renderscript.RenderScript;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -100,6 +105,8 @@ import edu.cmu.cs.openrtist.Protos.Extras;
 public class GabrielClientActivity extends AppCompatActivity implements
         AdapterView.OnItemSelectedListener, SensorEventListener {
 
+
+
     public enum AppMode {
         MAIN, MENU, CAM, FULLSCREEN
     }
@@ -119,6 +126,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     private MediaController mediaController = null;
     private int mScreenDensity;
+    private float pxToDp;
     private int mScreenHeight = 640;
     private int mScreenWidth = 480;
 
@@ -258,6 +266,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private float sceneScaleFactor = 1.0f;
     private float sceneX = 0.0f;
     private float sceneY= 0.0f;
+    private float sceneXX = 0.0f;
+    private float sceneYY= 0.0f;
 
     private boolean alignCenter = false;
     private boolean arView = false;
@@ -352,8 +362,13 @@ public class GabrielClientActivity extends AppCompatActivity implements
     }
 
     public void setXY(float x, float y){
-        sceneX = x;
-        sceneY = y;
+        sceneX += x;
+        sceneY += y;
+    }
+
+    public void setXXYY(float x, float y){
+        sceneXX += x;
+        sceneYY += y;
     }
 
     public void updateScreenSize() {
@@ -385,6 +400,33 @@ public class GabrielClientActivity extends AppCompatActivity implements
         currMode = mode;
         modeList.get(mode).init();
     }
+
+    private boolean doubleTouch = false;
+    public boolean isDoubleTouch() {
+        return doubleTouch;
+    }
+    public void setDoubleTouch(boolean b) {
+        doubleTouch = b;
+    }
+
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        int action = event.getActionMasked();
+//
+//        switch (action) {
+//            case MotionEvent.ACTION_POINTER_DOWN:
+//                // When a second pointer is down, it's either a two-finger scroll or a pinch-to-zoom gesture
+//                if (event.getPointerCount() >= 2) {
+//                    doubleTouch = true;
+//                }
+//                break;
+//            case MotionEvent.ACTION_POINTER_UP:
+//                // When a pointer goes up, switch back to single-touch scroll
+//                doubleTouch = false;
+//                break;
+//        }
+//        return super.onTouchEvent(event);
+//    }
 
     @Override
     public final void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -524,7 +566,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        mScreenDensity = metrics.densityDpi;
+        mScreenDensity = getResources().getDisplayMetrics().densityDpi;
+        pxToDp = 160.0f/mScreenDensity;
         mScreenHeight = metrics.heightPixels;
         mScreenWidth = metrics.widthPixels;
 
@@ -532,6 +575,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 (Context.MEDIA_PROJECTION_SERVICE);
         
         frameHandler = new Handler();
+
 
     }
 
@@ -965,11 +1009,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setY(imu_y)
                     .setZ(imu_z)
                     .build();
-            Extras.TouchInput touchValue = Extras.TouchInput.newBuilder()
-                    .setX(sceneX / mScreenDensity)
-                    .setY(sceneY / mScreenDensity)
-                    .setScale(sceneScaleFactor)
-                    .build();
+
 
             Extras.ArrowKey arrowKey = Extras.ArrowKey.newBuilder()
                     .setLeft(buttonLeft.isPressed())
@@ -995,6 +1035,13 @@ public class GabrielClientActivity extends AppCompatActivity implements
 //                    .setScreenValue(screenValue)
 //                    .setImuValue(imuValue)
 //                    .build();
+
+            Extras.TouchInput touchValue = Extras.TouchInput.newBuilder()
+                    .setX( sceneX * pxToDp)
+                    .setY( sceneY * pxToDp)
+                    .setScale(sceneScaleFactor)
+                    .setDoubleTouch(doubleTouch)
+                    .build();
 
             Extras extras = Extras.newBuilder().setSettingValue(settingValues)
                     .setScreenValue(screenValue)

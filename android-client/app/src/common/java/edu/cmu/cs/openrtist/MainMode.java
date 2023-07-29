@@ -2,13 +2,16 @@ package edu.cmu.cs.openrtist;
 
 import android.app.AlertDialog;
 import android.os.Build;
+import android.util.Pair;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainMode extends AbstractModeManager {
@@ -83,12 +86,23 @@ public class MainMode extends AbstractModeManager {
                 });
 
             case HELP:
-                return (view -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
-                    builder.setTitle("HELPER")
-                            .setMessage(R.string.help_info);
+                List<Pair<Integer, String>> items = new ArrayList<>();
+                items.add(new Pair<>(R.drawable.outline_help_outline_24,
+                        clientActivity.getString(R.string.help_info)));
+                items.add(new Pair<>(R.drawable.baseline_menu_24,
+                        clientActivity.getString(R.string.help_menu)));
+                items.add(new Pair<>(R.drawable.baseline_control_camera_24,
+                        clientActivity.getString(R.string.help_cam_mode)));
+                items.add(new Pair<>(R.drawable.baseline_fullscreen_24,
+                        clientActivity.getString(R.string.help_fullscreen)));
 
-                    AlertDialog dialog = builder.create();
+                CustomListAdapter adapter = new CustomListAdapter(clientActivity, items);
+                AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
+                builder.setTitle("Help")
+                        .setAdapter(adapter, (dialog, which) -> {});
+                AlertDialog dialog = builder.create();
+
+                return (view -> {
                     dialog.show();
                 });
         }

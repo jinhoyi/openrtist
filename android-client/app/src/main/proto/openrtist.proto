@@ -23,6 +23,7 @@ message Extras {
         float scale = 1;
         float x = 2;
         float y = 3;
+        bool doubleTouch = 4;
     }
 
     message ScreenValue {

@@ -9,7 +9,7 @@ public abstract class AbstractModeManager {
 
     protected Map<ViewID, View> views;
     protected Map<ViewID, Integer> visibility;
-    protected GabrielClientActivity clientActivity;
+    protected static GabrielClientActivity clientActivity;
 
     public AbstractModeManager(GabrielClientActivity gabrielClientActivity, Map<ViewID, View> views, Map<ViewID, Integer> visibility) {
         this.clientActivity = gabrielClientActivity;

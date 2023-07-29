@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.util.Pair;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -169,12 +171,29 @@ public class MenuMode extends AbstractModeManager {
 
 
             case HELP:
-                return (view -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
-                    builder.setTitle("HELPER")
-                            .setMessage(R.string.help_cam);
+                List<Pair<Integer, String>> items = new ArrayList<>();
+                items.add(new Pair<>(R.drawable.outline_info_24,
+                        clientActivity.getString(R.string.help_menu_info)));
+                items.add(new Pair<>(R.drawable.outline_blur_on_24,
+                        clientActivity.getString(R.string.help_menu_particle)));
+                items.add(new Pair<>(R.drawable.outline_replay_24,
+                        clientActivity.getString(R.string.help_reset)));
+                items.add(new Pair<>(R.drawable.autoplay_fill0,
+                        clientActivity.getString(R.string.help_auto_play)));
+                items.add(new Pair<>(R.drawable.outline_pause_24,
+                        clientActivity.getString(R.string.help_pause)));
+                items.add(new Pair<>(R.drawable.outline_screen_rotation_24,
+                        clientActivity.getString(R.string.help_rotation)));
+                items.add(new Pair<>(R.drawable.outline_landscape_24,
+                        clientActivity.getString(R.string.help_scene)));
 
-                    AlertDialog dialog = builder.create();
+                CustomListAdapter adapter = new CustomListAdapter(clientActivity, items);
+                AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
+                builder.setTitle("Menus")
+                        .setAdapter(adapter, (dialog, which) -> {});
+                AlertDialog dialog = builder.create();
+
+                return (view -> {
                     dialog.show();
                 });
         }

@@ -1,15 +1,21 @@
 package edu.cmu.cs.openrtist;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.util.Pair;
 import android.view.HapticFeedbackConstants;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class CamMode extends AbstractModeManager {
@@ -97,12 +103,29 @@ public class CamMode extends AbstractModeManager {
                 });
 
             case HELP:
-                return (view -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
-                    builder.setTitle("HELPER")
-                            .setMessage(R.string.help_cam);
+                List<Pair<Integer, String>> items = new ArrayList<>();
+                items.add(new Pair<>(R.drawable.pinch_fill0_wght400_grad0_opsz48,
+                        clientActivity.getString(R.string.help_cma_pinch_zoom)));
+                items.add(new Pair<>(R.drawable.drag_pan_fill0_wght400_grad0_opsz48__1_,
+                        clientActivity.getString(R.string.help_cma_drag_pan)));
+                items.add(new Pair<>(R.drawable._60_fill0_wght400_grad0_opsz48,
+                        clientActivity.getString(R.string.help_cam_360)));
+                items.add(new Pair<>(R.drawable._60_fill0_wght400_grad0_opsz48,
+                        clientActivity.getString(R.string.help_cam_360_2)));
+                items.add(new Pair<>(R.drawable.baseline_horizontal_distribute_24,
+                        clientActivity.getString(R.string.help_cam_center)));
+                items.add(new Pair<>(R.drawable.baseline_view_in_ar_24,
+                        clientActivity.getString(R.string.help_cam_ar)));
+                items.add(new Pair<>(R.drawable.baseline_keyboard_arrow_left_24,
+                        clientActivity.getString(R.string.help_cam_back)));
 
-                    AlertDialog dialog = builder.create();
+                CustomListAdapter adapter = new CustomListAdapter(clientActivity, items);
+                AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
+                builder.setTitle("Camera Controls")
+                        .setAdapter(adapter, (dialog, which) -> {});
+                AlertDialog dialog = builder.create();
+
+                return (view -> {
                     dialog.show();
                 });
         }

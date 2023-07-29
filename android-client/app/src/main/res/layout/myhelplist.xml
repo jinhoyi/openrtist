@@ -13,7 +13,7 @@
         android:layout_height="@dimen/icon_size"
         android:layout_gravity="center"
         android:src="@drawable/ic_launch"
-        android:tint="@color/card_background" />
+        app:tint="@color/card_background" />
 
     <TextView
         android:id="@+id/item_description2"

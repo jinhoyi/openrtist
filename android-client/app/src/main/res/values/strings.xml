@@ -116,7 +116,31 @@
         <item>4</item>
     </string-array>
 
-    <string name="help_info">This is some helpful information</string>
     <string name="help_cam">This is some helpful information for controlling cam</string>
+<!--    <string name="help_menu">This is some helpful information for controlling cam</string>-->
+
+    <string name="help_cma_pinch_zoom">Use pinch gestures to zoom in or out, moving the camera forwards or backwards.</string>
+    <string name="help_cma_drag_pan">Drag across the screen with one finger to move the camera up, down, left, or right.</string>
+    <string name="help_cam_360">Use the four arrow keys on the screen to adjust the camera angle.</string>
+    <string name="help_cam_360_2">Alternatively, drag across the screen with two fingers to rotate the camera.</string>
+    <string name="help_cam_center">Tap to re-center the camera.</string>
+    <string name="help_cam_ar">Tap to move the camera to predefined positions.</string>
+    <string name="help_cam_back">Tap to return to the main layout.</string>
+
+    <string name="help_info">Press \'Help\' in each layout for more specific guidance.</string>
+    <string name="help_menu">Tap to open a list of additional options.</string>
+    <string name="help_cam_mode">Tap to begin adjusting the camera position.</string>
+    <string name="help_fullscreen">Tap to switch to fullscreen mode. Tap again to exit this mode.</string>
+
+    <string name="help_menu_info">Tap to access the simulation benchmarks.</string>
+    <string name="help_menu_particle">Tap to switch between particle and fluid rendering modes.</string>
+    <string name="help_reset">Tap to reset the simulation.</string>
+    <string name="help_auto_play">Tap to toggle the auto-play mode. Note, no IMU sensor data will be collected in this mode.</string>
+    <string name="help_pause">Tap to pause or resume the simulation.</string>
+    <string name="help_scene">Tap to select from different scenes.</string>
+    <string name="help_rotation">Tap to switch between landscape and portrait screen modes.</string>
+
+
+
 
 </resources>
