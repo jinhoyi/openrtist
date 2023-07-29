@@ -525,6 +525,7 @@ class Extras_TouchInput PROTOBUF_FINAL :
     kScaleFieldNumber = 1,
     kXFieldNumber = 2,
     kYFieldNumber = 3,
+    kDoubleTouchFieldNumber = 4,
   };
   // float scale = 1;
   void clear_scale();
@@ -553,6 +554,15 @@ class Extras_TouchInput PROTOBUF_FINAL :
   void _internal_set_y(float value);
   public:
 
+  // bool doubleTouch = 4;
+  void clear_doubletouch();
+  bool doubletouch() const;
+  void set_doubletouch(bool value);
+  private:
+  bool _internal_doubletouch() const;
+  void _internal_set_doubletouch(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:openrtist.Extras.TouchInput)
  private:
   class _Internal;
@@ -563,6 +573,7 @@ class Extras_TouchInput PROTOBUF_FINAL :
   float scale_;
   float x_;
   float y_;
+  bool doubletouch_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_openrtist_2eproto;
 };
@@ -1596,6 +1607,26 @@ inline void Extras_TouchInput::_internal_set_y(float value) {
 inline void Extras_TouchInput::set_y(float value) {
   _internal_set_y(value);
   // @@protoc_insertion_point(field_set:openrtist.Extras.TouchInput.y)
+}
+
+// bool doubleTouch = 4;
+inline void Extras_TouchInput::clear_doubletouch() {
+  doubletouch_ = false;
+}
+inline bool Extras_TouchInput::_internal_doubletouch() const {
+  return doubletouch_;
+}
+inline bool Extras_TouchInput::doubletouch() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.TouchInput.doubleTouch)
+  return _internal_doubletouch();
+}
+inline void Extras_TouchInput::_internal_set_doubletouch(bool value) {
+  
+  doubletouch_ = value;
+}
+inline void Extras_TouchInput::set_doubletouch(bool value) {
+  _internal_set_doubletouch(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.TouchInput.doubleTouch)
 }
 
 // -------------------------------------------------------------------

@@ -198,6 +198,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_openrtist_2eproto::offsets[] P
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_TouchInput, scale_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_TouchInput, x_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_TouchInput, y_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_TouchInput, doubletouch_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ScreenValue, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -251,11 +252,11 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 0, -1, sizeof(::openrtist::Extras_BytesValue)},
   { 6, -1, sizeof(::openrtist::Extras_IMUValue)},
   { 14, -1, sizeof(::openrtist::Extras_TouchInput)},
-  { 22, -1, sizeof(::openrtist::Extras_ScreenValue)},
-  { 29, -1, sizeof(::openrtist::Extras_ArrowKey)},
-  { 38, -1, sizeof(::openrtist::Extras_Setting)},
-  { 50, 57, sizeof(::openrtist::Extras_StyleListEntry_DoNotUse)},
-  { 59, -1, sizeof(::openrtist::Extras)},
+  { 23, -1, sizeof(::openrtist::Extras_ScreenValue)},
+  { 30, -1, sizeof(::openrtist::Extras_ArrowKey)},
+  { 39, -1, sizeof(::openrtist::Extras_Setting)},
+  { 51, 58, sizeof(::openrtist::Extras_StyleListEntry_DoNotUse)},
+  { 60, -1, sizeof(::openrtist::Extras)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -270,7 +271,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_openrtist_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017openrtist.proto\022\topenrtist\"\325\005\n\006Extras\022"
+  "\n\017openrtist.proto\022\topenrtist\"\352\005\n\006Extras\022"
   "4\n\nstyle_list\030\001 \003(\0132 .openrtist.Extras.S"
   "tyleListEntry\022-\n\timu_value\030\002 \001(\0132\032.openr"
   "tist.Extras.IMUValue\0223\n\014screen_value\030\003 \001"
@@ -280,16 +281,17 @@ const char descriptor_table_protodef_openrtist_2eproto[] PROTOBUF_SECTION_VARIAB
   "as.ArrowKey\0220\n\rsetting_value\030\006 \001(\0132\031.ope"
   "nrtist.Extras.Setting\032\033\n\nBytesValue\022\r\n\005v"
   "alue\030\001 \001(\014\032+\n\010IMUValue\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002"
-  " \001(\002\022\t\n\001z\030\003 \001(\002\0321\n\nTouchInput\022\r\n\005scale\030\001"
-  " \001(\002\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\032,\n\013ScreenValu"
-  "e\022\016\n\006height\030\001 \001(\005\022\r\n\005width\030\002 \001(\005\032A\n\010Arro"
-  "wKey\022\014\n\004left\030\001 \001(\010\022\r\n\005right\030\002 \001(\010\022\n\n\002up\030"
-  "\003 \001(\010\022\014\n\004down\030\004 \001(\010\032}\n\007Setting\022\r\n\005scene\030"
-  "\001 \001(\005\022\024\n\014align_center\030\002 \001(\010\022\017\n\007ar_view\030\003"
-  " \001(\010\022\r\n\005reset\030\004 \001(\010\022\r\n\005pause\030\005 \001(\010\022\020\n\010pa"
-  "rticle\030\006 \001(\010\022\014\n\004info\030\007 \001(\010\0320\n\016StyleListE"
-  "ntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\036\n\024"
-  "edu.cmu.cs.openrtistB\006Protosb\006proto3"
+  " \001(\002\022\t\n\001z\030\003 \001(\002\032F\n\nTouchInput\022\r\n\005scale\030\001"
+  " \001(\002\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\022\023\n\013doubleTouc"
+  "h\030\004 \001(\010\032,\n\013ScreenValue\022\016\n\006height\030\001 \001(\005\022\r"
+  "\n\005width\030\002 \001(\005\032A\n\010ArrowKey\022\014\n\004left\030\001 \001(\010\022"
+  "\r\n\005right\030\002 \001(\010\022\n\n\002up\030\003 \001(\010\022\014\n\004down\030\004 \001(\010"
+  "\032}\n\007Setting\022\r\n\005scene\030\001 \001(\005\022\024\n\014align_cent"
+  "er\030\002 \001(\010\022\017\n\007ar_view\030\003 \001(\010\022\r\n\005reset\030\004 \001(\010"
+  "\022\r\n\005pause\030\005 \001(\010\022\020\n\010particle\030\006 \001(\010\022\014\n\004inf"
+  "o\030\007 \001(\010\0320\n\016StyleListEntry\022\013\n\003key\030\001 \001(\t\022\r"
+  "\n\005value\030\002 \001(\t:\0028\001B\036\n\024edu.cmu.cs.openrtis"
+  "tB\006Protosb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_openrtist_2eproto_deps[1] = {
 };
@@ -305,7 +307,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ope
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_openrtist_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_openrtist_2eproto = {
-  false, false, descriptor_table_protodef_openrtist_2eproto, "openrtist.proto", 796,
+  false, false, descriptor_table_protodef_openrtist_2eproto, "openrtist.proto", 817,
   &descriptor_table_openrtist_2eproto_once, descriptor_table_openrtist_2eproto_sccs, descriptor_table_openrtist_2eproto_deps, 8, 0,
   schemas, file_default_instances, TableStruct_openrtist_2eproto::offsets,
   file_level_metadata_openrtist_2eproto, 8, file_level_enum_descriptors_openrtist_2eproto, file_level_service_descriptors_openrtist_2eproto,
@@ -785,15 +787,15 @@ Extras_TouchInput::Extras_TouchInput(const Extras_TouchInput& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&scale_, &from.scale_,
-    static_cast<size_t>(reinterpret_cast<char*>(&y_) -
-    reinterpret_cast<char*>(&scale_)) + sizeof(y_));
+    static_cast<size_t>(reinterpret_cast<char*>(&doubletouch_) -
+    reinterpret_cast<char*>(&scale_)) + sizeof(doubletouch_));
   // @@protoc_insertion_point(copy_constructor:openrtist.Extras.TouchInput)
 }
 
 void Extras_TouchInput::SharedCtor() {
   ::memset(&scale_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&y_) -
-      reinterpret_cast<char*>(&scale_)) + sizeof(y_));
+      reinterpret_cast<char*>(&doubletouch_) -
+      reinterpret_cast<char*>(&scale_)) + sizeof(doubletouch_));
 }
 
 Extras_TouchInput::~Extras_TouchInput() {
@@ -828,8 +830,8 @@ void Extras_TouchInput::Clear() {
   (void) cached_has_bits;
 
   ::memset(&scale_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&y_) -
-      reinterpret_cast<char*>(&scale_)) + sizeof(y_));
+      reinterpret_cast<char*>(&doubletouch_) -
+      reinterpret_cast<char*>(&scale_)) + sizeof(doubletouch_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -860,6 +862,13 @@ const char* Extras_TouchInput::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29)) {
           y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // bool doubleTouch = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+          doubletouch_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -908,6 +917,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(3, this->_internal_y(), target);
   }
 
+  // bool doubleTouch = 4;
+  if (this->doubletouch() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(4, this->_internal_doubletouch(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -937,6 +952,11 @@ size_t Extras_TouchInput::ByteSizeLong() const {
   // float y = 3;
   if (!(this->y() <= 0 && this->y() >= 0)) {
     total_size += 1 + 4;
+  }
+
+  // bool doubleTouch = 4;
+  if (this->doubletouch() != 0) {
+    total_size += 1 + 1;
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -979,6 +999,9 @@ void Extras_TouchInput::MergeFrom(const Extras_TouchInput& from) {
   if (!(from.y() <= 0 && from.y() >= 0)) {
     _internal_set_y(from._internal_y());
   }
+  if (from.doubletouch() != 0) {
+    _internal_set_doubletouch(from._internal_doubletouch());
+  }
 }
 
 void Extras_TouchInput::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -1003,8 +1026,8 @@ void Extras_TouchInput::InternalSwap(Extras_TouchInput* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Extras_TouchInput, y_)
-      + sizeof(Extras_TouchInput::y_)
+      PROTOBUF_FIELD_OFFSET(Extras_TouchInput, doubletouch_)
+      + sizeof(Extras_TouchInput::doubletouch_)
       - PROTOBUF_FIELD_OFFSET(Extras_TouchInput, scale_)>(
           reinterpret_cast<char*>(&scale_),
           reinterpret_cast<char*>(&other->scale_));
