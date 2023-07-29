@@ -607,6 +607,7 @@ std::mutex bitmap_mtx;
 zmq::context_t context(1);
 std::atomic_bool running(false);
 std::atomic_bool new_frame(false);
+std::atomic_bool new_frame_sensors(false);
 std::atomic_bool flag_align(false);
 std::atomic_bool ack_align(false);
 std::atomic_bool flag_ar(false);
@@ -752,7 +753,7 @@ void video_thread2(){
 	receiver.close();
 }
 
-float cam_th = DegToRad(0.005f);
+float cam_th = DegToRad(0.001f);
 void imu_thread() {
 	
 	// zmq::socket_t imu_socket(context, zmq::socket_type::req);
@@ -771,10 +772,14 @@ void imu_thread() {
 	openrtist::Extras extras;
 	zmq::message_t pulled;
 
+	// const float kSensitivity = DegToRad(0.4f);
 	const float kSensitivity = DegToRad(0.1f);
+	const float scrollSensitivity = 0.1;
 	bool particle = false;
 	bool pause = false;
 	bool help = false;
+	float x_speed = 0;
+	float y_speed = 0;
 
 	while(running) {
 		
@@ -783,27 +788,21 @@ void imu_thread() {
 		std::string serialized_extra(static_cast<char*>(pulled.data()), pulled.size());
 
 		extras.ParseFromString(serialized_extra);
-		imu_x = -extras.imu_value().x();
-		imu_y = -extras.imu_value().y();
-		imu_z = -extras.imu_value().z();
 		
-
-		float dx = extras.touch_value().x()*100;
-		float dy = extras.touch_value().y()*100;
-
 		float sceneScale = extras.touch_value().scale();
+		float sceneX = extras.touch_value().x();
+		float sceneY = extras.touch_value().y();
 		bool left_key = extras.arrow_key().left();
 		bool right_key = extras.arrow_key().right();
 		bool up_key = extras.arrow_key().up();
 		bool down_key = extras.arrow_key().down();
-
-		float x_speed = ((int)right_key - (int)left_key) * g_camSpeed / 3;
-		float y_speed = ((int)up_key - (int)down_key) * g_camSpeed / 3;
-
 		bool reset = extras.setting_value().reset();
 		bool alignCenter = extras.setting_value().align_center();
 		bool arView = extras.setting_value().ar_view();
 
+		
+
+		// Click Actions
 		if (reset == true) {
 			flag_reset = true;
 		} else if (!flag_reset) {
@@ -822,40 +821,10 @@ void imu_thread() {
 			flag_ar = false;
 		}
 
-		scale_mtx.lock();
-		// Forward backword
-		if (sceneScale == 1.0f) {
-			g_camVel.z = 0;
-		} else {
-			if (sceneScale > 1.0f) {
-				float diff = (sceneScale - 1.0);
-				diff *= diff;
-				g_camVel.z += diff * 5.0f +  g_camSpeed/50.0f;
-			}
-				
-			else{
-				float diff = (1.0 - sceneScale);
-				diff *= diff;
-				g_camVel.z += -g_camSpeed/50.0f - (diff * 5.0f);
-			}		
-		}
-
-		// Camera Angle
-		g_camAngle.x -= Clamp(dx*kSensitivity, -FLT_MAX, FLT_MAX);
-		if ((g_camAngle.x - 0) * (g_camAngle.x - 0) < cam_th)
-			g_camAngle.x = 0;
-		g_camAngle.y -= Clamp(dy*kSensitivity, -FLT_MAX, FLT_MAX);
-		if ((g_camAngle.y - 0) * (g_camAngle.y - 0) < cam_th)
-			g_camAngle.y = 0;
-
-		// Up/Down/Right/Left
-		g_camVel.x = x_speed;
-		g_camVel.y = y_speed;
-
-		scale_mtx.unlock();
-		
+		// Scene value
 		g_newScene.store(extras.setting_value().scene());
 
+		// Toggle Settings
 		if (pause != extras.setting_value().pause()) {
 			pause = !pause;
 			g_pause = pause;
@@ -876,6 +845,81 @@ void imu_thread() {
 			help = !help;
 			g_showHelp = help;
 		}
+
+		// IMU Values
+		imu_x = -extras.imu_value().x();
+		imu_y = -extras.imu_value().y();
+		imu_z = -extras.imu_value().z();
+
+
+		// Camera Movements
+		// float dx = extras.touch_value().x()*100;
+		// float dy = extras.touch_value().y()*100;
+
+		// float x_speed = ((int)right_key - (int)left_key) * g_camSpeed / 3;
+		// float y_speed = ((int)up_key - (int)down_key) * g_camSpeed / 3;
+
+		// float dx = ((int)right_key - (int)left_key);
+		// float dy = ((int)down_key - (int)up_key);
+
+		bool doubleTouch = extras.touch_value().doubletouch();
+		
+
+		// float x_speed = extras.touch_value().x()*g_camSpeed * scrollSensitivity;
+		// float y_speed = -extras.touch_value().y()*g_camSpeed * scrollSensitivity;
+
+		scale_mtx.lock();
+
+		float dx = 0;
+		float dy = 0;
+		if (new_frame_sensors.load()) {
+			x_speed = 0;
+			y_speed = 0;
+		}
+
+
+		// printf("dx: %f, %f\n", extras.touch_value().x(), extras.touch_value().y());
+		// printf("Scale: %f\n\n", sceneScale);
+
+		if (doubleTouch) {
+			dx = extras.touch_value().x()*0.8;
+			dy = extras.touch_value().y()*0.8;
+		} else {
+			x_speed += extras.touch_value().x()*g_camSpeed * scrollSensitivity;
+			y_speed += -extras.touch_value().y()*g_camSpeed * scrollSensitivity;
+			dx = ((int)right_key - (int)left_key) * 3 * (new_frame_sensors);
+			dy = ((int)down_key - (int)up_key) * 3 * (new_frame_sensors);
+		}
+
+		// Forward backword
+		if (sceneScale == 1.0f) {
+			g_camVel.z = 0;
+		} else {
+			if (sceneScale > 1.0f) {
+				float diff = (sceneScale - 1.0);
+				diff *= diff;
+				g_camVel.z += diff * 5.0f +  g_camSpeed/50.0f;
+			}
+				
+			else{
+				float diff = (1.0 - sceneScale);
+				diff *= diff;
+				g_camVel.z += -g_camSpeed/50.0f - (diff * 5.0f);
+			}		
+		}
+
+		// Camera Angle
+		g_camAngle.x -= Clamp(dx*kSensitivity, -FLT_MAX, FLT_MAX);
+		g_camAngle.y -= Clamp(dy*kSensitivity, -FLT_MAX, FLT_MAX);
+
+		new_frame_sensors = false;
+
+		// Up/Down/Right/Left
+		g_camVel.x = x_speed;
+		g_camVel.y = y_speed;
+		scale_mtx.unlock();		
+		
+
 
 		g_params.gravity[0] = imu_x;
 		g_params.gravity[1] = imu_y;
@@ -1556,6 +1600,7 @@ void UpdateCamera()
 		// Forward backword
 		Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
 		Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
+		new_frame_sensors = true;
 		scale_mtx.unlock();
 
 		// Camera Angle
@@ -2450,6 +2495,7 @@ void UpdateFrame()
 	
 	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
 	new_frame = true;
+	
 
 	// If user has disabled async compute, ensure that no compute can overlap 
 	// graphics by placing a sync between them	
