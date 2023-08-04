@@ -129,6 +129,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private float pxToDp;
     private int mScreenHeight = 640;
     private int mScreenWidth = 480;
+    private float mScreenRatio = 1.0f;
+    private int heightResolution = 1080; // replace with Const later
 
     private MediaProjectionManager mProjectionManager;
     private MediaProjection mMediaProjection;
@@ -337,11 +339,15 @@ public class GabrielClientActivity extends AppCompatActivity implements
             int tmp = mScreenHeight;
             mScreenHeight = mScreenWidth;
             mScreenWidth = tmp;
+            mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);
+            heightResolution = (int) (1080.0f / mScreenRatio + 0.5f);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             int tmp = mScreenHeight;
             mScreenHeight = mScreenWidth;
             mScreenWidth = tmp;
+            mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);
+            heightResolution = 1080;
         }
     }
 
@@ -375,8 +381,10 @@ public class GabrielClientActivity extends AppCompatActivity implements
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mScreenDensity = metrics.densityDpi;
+        pxToDp = 160.0f/mScreenDensity;
         mScreenHeight = metrics.heightPixels;
         mScreenWidth = metrics.widthPixels;
+        mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);;
     }
 
 
@@ -563,13 +571,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
 
         accelLabel.setVisibility(View.INVISIBLE);
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        mScreenDensity = getResources().getDisplayMetrics().densityDpi;
-        pxToDp = 160.0f/mScreenDensity;
-        mScreenHeight = metrics.heightPixels;
-        mScreenWidth = metrics.widthPixels;
+        updateScreenSize();
 
         mProjectionManager = (MediaProjectionManager) getSystemService
                 (Context.MEDIA_PROJECTION_SERVICE);
@@ -1000,8 +1002,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
         Log.v("SENDMIU", "Reset is " + reset);
         openrtistComm.sendSupplier(() -> {
             Extras.ScreenValue screenValue = Extras.ScreenValue.newBuilder()
-                    .setHeight(mScreenHeight)
-                    .setWidth(mScreenWidth)
+                    .setHeight(heightResolution)
+                    .setRatio(mScreenRatio)
                     .build();
 //            counter++;
             Extras.IMUValue imuValue = Extras.IMUValue.newBuilder()
