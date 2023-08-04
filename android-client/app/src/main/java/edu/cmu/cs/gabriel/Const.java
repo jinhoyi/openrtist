@@ -24,9 +24,9 @@ public class Const {
     public static boolean DISPLAY_REFERENCE = false;
     public static boolean ITERATE_STYLES = false;
     public static boolean ITERATION_STARTED = false;
-    public static int ITERATE_INTERVAL = 2;
+    public static int ITERATE_INTERVAL = 2000;
     public static boolean SHOW_RECORDER = true;
-    public static boolean SHOW_FPS = true;
+    public static boolean VSYNC = true;
 
     // high level sensor control (on/off)
     public static boolean SENSOR_VIDEO = true;
@@ -38,7 +38,8 @@ public class Const {
     // image size and frame rate
     public static int CAPTURE_FPS = 120;
 
-    // options: 320x180, 640x360, 1280x720, 1920x1080
+    // options: 240p, 360p, 480p, 720p, 1080p, 1440p, 2160p
+    public static int IMAGE_RES =  480;
     public static int IMAGE_WIDTH = 320;
     public static int IMAGE_HEIGHT = 240;
 
@@ -57,58 +58,58 @@ public class Const {
         Integer i = null;
         //update Const values so that new settings take effect
         switch(key) {
-            case "general_recording":
-                Const.SHOW_RECORDER = sharedPreferences.getBoolean(key, false);
-                break;
-            case "general_show_fps":
-                b = sharedPreferences.getBoolean(key, false);
-                Const.SHOW_FPS = b;
+//            case "general_recording":
+//                Const.SHOW_RECORDER = sharedPreferences.getBoolean(key, false);
+//                break;
+            case "general_vsync":
+                b = sharedPreferences.getBoolean(key, true);
+                Const.VSYNC = b;
                 break;
             case "experimental_resolution":
-                i = new Integer(sharedPreferences.getString(key, "1"));
-                if(i == 1) {
-                    Const.IMAGE_HEIGHT = 240;
-                    Const.IMAGE_WIDTH = 320;
-                } else if(i == 2) {
-                    Const.IMAGE_HEIGHT = 480;
-                    Const.IMAGE_WIDTH = 640;
-                } else if (i == 3) {
-                    Const.IMAGE_HEIGHT = 720;
-                    Const.IMAGE_WIDTH = 1280;
-                } else {
-                    Const.IMAGE_HEIGHT = 240;
-                    Const.IMAGE_WIDTH = 320;
-                }
+                i = new Integer(sharedPreferences.getString(key, "480"));
+//                if(i == 1) {
+//                    Const.IMAGE_HEIGHT = 240;
+//                    Const.IMAGE_WIDTH = 320;
+//                } else if(i == 2) {
+//                    Const.IMAGE_HEIGHT = 480;
+//                    Const.IMAGE_WIDTH = 640;
+//                } else if (i == 3) {
+//                    Const.IMAGE_HEIGHT = 720;
+//                    Const.IMAGE_WIDTH = 1280;
+//                } else {
+//                    Const.IMAGE_HEIGHT = 240;
+//                    Const.IMAGE_WIDTH = 320;
+//                }
+                Const.IMAGE_RES = i;
                 break;
             case "experimental_token_limit":
-                Const.TOKEN_LIMIT = sharedPreferences.getString(key, "2");
+                Const.TOKEN_LIMIT = sharedPreferences.getString(key, "None");
                 break;
-            case "general_stereoscopic":
-                b = sharedPreferences.getBoolean(key, false);
-                Const.STEREO_ENABLED = b;
-                if(b) {
-                    Const.SHOW_FPS = false;
-                    Const.SHOW_RECORDER = false;
-                    Const.DISPLAY_REFERENCE = false;
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean("general_show_reference", false);
-                    editor.putBoolean("general_front_camera", false);
-                    editor.putBoolean("general_recording", false);
-                    editor.putBoolean("general_show_fps", false);
-                    editor.putString("general_iterate_delay", "2");
-                    editor.commit();
-
-                }
-                break;
-            case "general_show_reference":
-                b = sharedPreferences.getBoolean(key, true);
-                Const.DISPLAY_REFERENCE = b;
-                break;
+//            case "general_stereoscopic":
+//                b = sharedPreferences.getBoolean(key, false);
+//                Const.STEREO_ENABLED = b;
+//                if(b) {
+//                    Const.SHOW_FPS = false;
+//                    Const.SHOW_RECORDER = false;
+//                    Const.DISPLAY_REFERENCE = false;
+//                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                    editor.putBoolean("general_show_reference", false);
+//                    editor.putBoolean("general_front_camera", false);
+//                    editor.putBoolean("general_recording", false);
+//                    editor.putBoolean("general_show_fps", false);
+//                    editor.putString("general_iterate_delay", "2");
+//                    editor.commit();
+//
+//                }
+//                break;
+//            case "general_show_reference":
+//                b = sharedPreferences.getBoolean(key, true);
+//                Const.DISPLAY_REFERENCE = b;
+//                break;
 
             case "general_iterate_delay":
-                i = new Integer(sharedPreferences.getString(key, "0"));
-                Const.ITERATE_STYLES = (i != 0);
-                Const.ITERATE_INTERVAL = i * 5;
+                i = new Integer(sharedPreferences.getString(key, "2"));
+                Const.ITERATE_INTERVAL = i * 1000;
                 break;
 
         }

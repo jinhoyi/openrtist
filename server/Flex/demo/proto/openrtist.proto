@@ -28,7 +28,7 @@ message Extras {
 
     message ScreenValue {
         float ratio = 1;
-        int32 height = 2;
+        int32 resolution = 2;
     }
 
     message ArrowKey {
@@ -54,4 +54,6 @@ message Extras {
     TouchInput touch_value = 4;
     ArrowKey arrow_key = 5;
     Setting setting_value = 6;
+    bool latency_token = 7;
+    int32 fps = 8;
 }

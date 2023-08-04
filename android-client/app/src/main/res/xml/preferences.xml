@@ -8,7 +8,7 @@
         app:title="@string/pref_header_general">
 
         <ListPreference
-            app:defaultValue="1"
+            app:defaultValue="480"
             app:entries="@array/pref_resolution_titles"
             app:entryValues="@array/pref_resolution_values"
             app:key="experimental_resolution"
@@ -36,24 +36,24 @@
         app:key="ui_category"
         app:title="@string/pref_header_ui">
 
-        <SwitchPreferenceCompat
-            app:defaultValue="true"
-            app:key="general_recording"
-            app:title="@string/pref_title_recording" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:defaultValue="true"-->
+<!--            app:key="general_recording"-->
+<!--            app:title="@string/pref_title_recording" />-->
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            android:key="general_show_fps"
+            android:key="general_vsync"
             android:title="@string/show_fps"  />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="general_stereoscopic"
-            android:title="@string/stereo_option" />
+<!--        <SwitchPreference-->
+<!--            android:defaultValue="false"-->
+<!--            android:key="general_stereoscopic"-->
+<!--            android:title="@string/stereo_option" />-->
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="general_show_reference"
-            android:title="@string/reference_option" />
+<!--        <SwitchPreference-->
+<!--            android:defaultValue="false"-->
+<!--            android:key="general_show_reference"-->
+<!--            android:title="@string/reference_option" />-->
 
         <ListPreference
             android:entries="@array/pref_interval_list_titles"

@@ -100,6 +100,8 @@ int GetKeyFromGameControllerButton(SDL_GameControllerButton button)
 #define XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE 8689
 #define XINPUT_GAMEPAD_TRIGGER_THRESHOLD    30
 
+#define VSYNC_INTERVAL 1.0f/120.0f
+
 int deadzones[3] = { XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, XINPUT_GAMEPAD_TRIGGER_THRESHOLD };
 
 inline float joyAxisFilter(int value, int stick)
@@ -120,6 +122,8 @@ using namespace std;
 //FLAG:SCREEN_SIZE
 // int g_screenWidth = 1280;
 // int g_screenHeight = 720;
+int g_relativeW = 480;
+
 int g_screenWidth = 480;
 int g_screenHeight = 640;
 int g_msaaSamples = 8;
@@ -439,8 +443,6 @@ float g_camFar;
 
 float g_sceneLastScale = 1.0f;
 float g_sceneScale = 1.0f;
-std::mutex scale_mtx; 
-std::mutex reset_mtx; 
 
 Vec3 g_lightPos;
 Vec3 g_lightDir;
@@ -499,7 +501,7 @@ bool g_diffuseShadow;
 float g_diffuseInscatter;
 float g_diffuseOutscatter;
 
-float g_dt = 1.0f / 120.0f;	// the time delta used for simulation
+float g_dt = VSYNC_INTERVAL;	// the time delta used for simulation
 float g_realdt;				// the real world time delta between updates
 
 float g_waitTime;		// the CPU time spent waiting for the GPU
@@ -598,12 +600,15 @@ StopWatch g_frameClock;
 
 inline void vSync() {
 	g_frameClock.stop();
-	// sleep(g_dt - g_frameClock.lap - 0.0003f);
-	sleep(g_dt - g_frameClock.lap);
+	sleep(g_dt - g_frameClock.lap - 0.0002f);
+	// sleep(g_dt - g_frameClock.lap);
 	g_frameClock.start();
 }
 
 std::mutex bitmap_mtx; 
+std::mutex scale_mtx; 
+std::mutex latency_mtx; 
+
 zmq::context_t context(1);
 std::atomic_bool running(false);
 std::atomic_bool new_frame(false);
@@ -614,12 +619,13 @@ std::atomic_bool flag_ar(false);
 std::atomic_bool ack_ar(false);
 std::atomic_bool flag_reset(false);
 std::atomic_bool ack_reset(false);
+std::atomic_bool latency_request(false);
+std::atomic_bool latency_feedback(false);
+std::atomic_bool latency_return(false);
 
 std::vector<std::function<void(float,float,float,float,float,float)>> cameraViews;
 
-
 std::vector<unsigned char> g_jpegImage;
-
 
 std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int height, int quality) {
     struct jpeg_compress_struct cinfo;
@@ -682,7 +688,7 @@ std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int h
 TgaImage g_framebuffer;
 std::vector<unsigned char> g_jpegData;
 
-void video_thread() {
+void video_compressor() {
 	int *bitmap = (int*)g_framebuffer.m_data;
 
 	while(running) {
@@ -690,7 +696,7 @@ void video_thread() {
 			new_frame = false;
 			std::vector<unsigned char> data = compressJpeg((uint32_t *)bitmap, g_screenWidth, g_screenHeight, 67);
 			bitmap_mtx.lock();
-			g_jpegData = data;
+				g_jpegData = data;
 			bitmap_mtx.unlock();
 		}
 	}
@@ -729,8 +735,19 @@ void send_image(zmq::socket_t& socket) {
 		extras.SerializeToString(&serialized_msg);
 	} else {
 		bitmap_mtx.lock();
-		frame.add_payloads((char*)g_jpegData.data(), g_jpegData.size());
+			frame.add_payloads((char*)g_jpegData.data(), g_jpegData.size());
 		bitmap_mtx.unlock();
+		
+		if (latency_return) {
+			extras.set_latency_token(true);
+			latency_return = false;
+		}
+		extras.set_fps((int) (1.0f/g_realdt + 0.5));
+		// std::cout << (int) (1.0f/g_realdt + 0.5) << std::endl;
+
+		google::protobuf::Any any;
+		any.PackFrom(extras);
+		*frame.mutable_extras() = any;
 
 		frame.SerializeToString(&serialized_msg);
 	}
@@ -740,23 +757,23 @@ void send_image(zmq::socket_t& socket) {
     socket.send(message, zmq::send_flags::none);
 }
 
-void video_thread2(){
-	zmq::socket_t receiver(context, zmq::socket_type::rep);
-	receiver.bind("tcp://*:5559");
+void video_sender(){
+	zmq::socket_t video_socket(context, zmq::socket_type::rep);
+	video_socket.bind("tcp://*:5559");
 	printf("binded for video Thread\n");
-	send_image(receiver);
+	send_image(video_socket);
 
 	while(running) {
 		if (g_jpegData.size() != 0)
-			send_image(receiver);
+			send_image(video_socket);
 	}
-	receiver.close();
+	video_socket.close();
 }
 
-float cam_th = DegToRad(0.001f);
-void imu_thread() {
+void imu_receiver() {
 	
-	// zmq::socket_t imu_socket(context, zmq::socket_type::req);
+	openrtist::Extras extras;
+	zmq::message_t pulled;
 	zmq::socket_t imu_socket(context, zmq::socket_type::pull);
 	int hwm = 1;
 	imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
@@ -769,10 +786,6 @@ void imu_thread() {
 	imu_y = 0;
 	imu_z = -si_g;
 
-	openrtist::Extras extras;
-	zmq::message_t pulled;
-
-	// const float kSensitivity = DegToRad(0.4f);
 	const float kSensitivity = DegToRad(0.1f);
 	const float scrollSensitivity = 0.1;
 	bool particle = false;
@@ -798,27 +811,24 @@ void imu_thread() {
 		bool reset = extras.setting_value().reset();
 		bool alignCenter = extras.setting_value().align_center();
 		bool arView = extras.setting_value().ar_view();
-
+		
+		bool latency_token = extras.latency_token();
 		
 
 		// Click Actions
 		if (reset == true) {
 			flag_reset = true;
-		} else if (!flag_reset) {
-			flag_reset = false;
-		}
+		} 
 
 		if (alignCenter == true) {
 			flag_align = true;
-		} else if (!flag_align) {
-			flag_align = false;
-		}
+		} 
 
 		if (arView == true) {
 			flag_ar = true;
-		} else if (!flag_ar) {
-			flag_ar = false;
-		}
+		} 
+
+		
 
 		// Scene value
 		g_newScene.store(extras.setting_value().scene());
@@ -866,56 +876,60 @@ void imu_thread() {
 
 		// float x_speed = extras.touch_value().x()*g_camSpeed * scrollSensitivity;
 		// float y_speed = -extras.touch_value().y()*g_camSpeed * scrollSensitivity;
+		latency_mtx.lock();
+			if (latency_token == true) {
+				latency_request = true;
+			} 
+		latency_mtx.unlock();
 
 		scale_mtx.lock();
-
-		float dx = 0;
-		float dy = 0;
-		if (new_frame_sensors.load()) {
-			x_speed = 0;
-			y_speed = 0;
-		}
-
-
-		// printf("dx: %f, %f\n", extras.touch_value().x(), extras.touch_value().y());
-		// printf("Scale: %f\n\n", sceneScale);
-
-		if (doubleTouch) {
-			dx = extras.touch_value().x()*0.8;
-			dy = extras.touch_value().y()*0.8;
-		} else {
-			x_speed += extras.touch_value().x()*g_camSpeed * scrollSensitivity;
-			y_speed += -extras.touch_value().y()*g_camSpeed * scrollSensitivity;
-			dx = ((int)right_key - (int)left_key) * 3 * (new_frame_sensors);
-			dy = ((int)down_key - (int)up_key) * 3 * (new_frame_sensors);
-		}
-
-		// Forward backword
-		if (sceneScale == 1.0f) {
-			g_camVel.z = 0;
-		} else {
-			if (sceneScale > 1.0f) {
-				float diff = (sceneScale - 1.0);
-				diff *= diff;
-				g_camVel.z += diff * 5.0f +  g_camSpeed/50.0f;
+			float dx = 0;
+			float dy = 0;
+			if (new_frame_sensors.load()) {
+				x_speed = 0;
+				y_speed = 0;
 			}
-				
-			else{
-				float diff = (1.0 - sceneScale);
-				diff *= diff;
-				g_camVel.z += -g_camSpeed/50.0f - (diff * 5.0f);
-			}		
-		}
 
-		// Camera Angle
-		g_camAngle.x -= Clamp(dx*kSensitivity, -FLT_MAX, FLT_MAX);
-		g_camAngle.y -= Clamp(dy*kSensitivity, -FLT_MAX, FLT_MAX);
 
-		new_frame_sensors = false;
+			// printf("dx: %f, %f\n", extras.touch_value().x(), extras.touch_value().y());
+			// printf("Scale: %f\n\n", sceneScale);
 
-		// Up/Down/Right/Left
-		g_camVel.x = x_speed;
-		g_camVel.y = y_speed;
+			if (doubleTouch) {
+				dx = extras.touch_value().x()*0.8;
+				dy = extras.touch_value().y()*0.8;
+			} else {
+				x_speed += extras.touch_value().x()*g_camSpeed * scrollSensitivity;
+				y_speed += -extras.touch_value().y()*g_camSpeed * scrollSensitivity;
+				dx = ((int)right_key - (int)left_key) * 3 * (new_frame_sensors);
+				dy = ((int)down_key - (int)up_key) * 3 * (new_frame_sensors);
+			}
+
+			// Forward backword
+			if (sceneScale == 1.0f) {
+				g_camVel.z = 0;
+			} else {
+				if (sceneScale > 1.0f) {
+					float diff = (sceneScale - 1.0);
+					diff *= diff;
+					g_camVel.z += diff * 5.0f +  g_camSpeed/50.0f;
+				}
+					
+				else{
+					float diff = (1.0 - sceneScale);
+					diff *= diff;
+					g_camVel.z += -g_camSpeed/50.0f - (diff * 5.0f);
+				}		
+			}
+
+			// Camera Angle
+			g_camAngle.x -= Clamp(dx*kSensitivity, -FLT_MAX, FLT_MAX);
+			g_camAngle.y -= Clamp(dy*kSensitivity, -FLT_MAX, FLT_MAX);
+
+			new_frame_sensors = false;
+
+			// Up/Down/Right/Left
+			g_camVel.x = x_speed;
+			g_camVel.y = y_speed;
 		scale_mtx.unlock();		
 		
 
@@ -1020,7 +1034,7 @@ void Init(int scene, bool centerCamera = true)
 	g_frame = 0;
 	g_pause = false;
 
-	g_dt = 1.0f / 60.0f;
+	g_dt = VSYNC_INTERVAL;
 	g_waveTime = 0.0f;
 	g_windTime = 0.0f;
 	g_windStrength = 1.0f;
@@ -1254,7 +1268,7 @@ void Init(int scene, bool centerCamera = true)
 		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 		// g_camAngle = Vec3(0.0f, -DegToRad(5.0f), 0.0f);
 		float scene_w = (g_sceneUpper.x - g_sceneLower.x);
-		float cam_z = g_sceneUpper.z + (scene_w / g_screenWidth) * 1500.0f;
+		float cam_z = g_sceneUpper.z + (scene_w / g_relativeW) * 1500.0f;
 
 		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, (g_sceneLower.y + g_sceneUpper.y)*0.5f, cam_z);
 		g_camAngle = Vec3(0.0f, 0.0f, 0.0f);
@@ -1521,10 +1535,10 @@ void CameraFrontSky(float lowerX, float upperX, float lowerY, float upperY, floa
 	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 	
 	float scene_w = (upperX - lowerX);
-	float cam_z = upperZ + (scene_w / g_screenWidth) * 1560.0f;
-	float cam_y = (scene_w / g_screenWidth) * 1500.0f * 0.6;
+	float cam_z = upperZ + (scene_w / g_relativeW) * 1560.0f;
+	float cam_y = (scene_w / g_relativeW) * 1500.0f * 0.6;
 
-	g_camPos = Vec3((lowerX + upperX)*0.5f, cam_y + upperY / 1.3, cam_z);
+	g_camPos = Vec3((lowerX + upperX)*0.5f, cam_y + upperY / 1.5, cam_z);
 	g_camAngle = Vec3(0.0f, -ATan2(cam_y , cam_z), 0.0f);
 }
 
@@ -1532,8 +1546,8 @@ void CameraFrontSlent(float lowerX, float upperX, float lowerY, float upperY, fl
 	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 	
 	float scene_w = (upperX - lowerX);
-	float cam_z = upperZ + (scene_w / g_screenWidth) * 1560.0f;
-	float cam_y = (scene_w / g_screenWidth) * 1630.0f * 0.2;
+	float cam_z = upperZ + (scene_w / g_relativeW) * 1560.0f;
+	float cam_y = (scene_w / g_relativeW) * 1630.0f * 0.2;
 
 	g_camPos = Vec3((lowerX + upperX)*0.5f, cam_y + (upperY / 2), cam_z);
 	g_camAngle = Vec3(0.0f, -ATan2(cam_y , cam_z), 0.0f);
@@ -1543,8 +1557,8 @@ void CameraFront(float lowerX, float upperX, float lowerY, float upperY, float l
 	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 	
 	float scene_w = (upperX - lowerX);
-	float cam_z = upperZ + (scene_w / g_screenWidth) * 1600.0f;
-	float cam_y = (scene_w / g_screenWidth) * 1630.0f * 0.2;
+	float cam_z = upperZ + (scene_w / g_relativeW) * 1600.0f;
+	float cam_y = (scene_w / g_relativeW) * 1630.0f * 0.2;
 
 	g_camPos = Vec3((lowerX + upperX)*0.5f, (lowerY + upperY)*0.5f, cam_z);
 	g_camAngle = Vec3(0.0f, 0.0f, 0.0f);
@@ -1554,8 +1568,8 @@ void Camera3D(float lowerX, float upperX, float lowerY, float upperY, float lowe
 	// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 	
 	float scene_w = (upperX - lowerX);
-	float cam_z = upperZ + (scene_w / g_screenWidth) * 1250.0f;
-	float cam_y = (scene_w / g_screenWidth) * 1650.0f * 0.5;
+	float cam_z = upperZ + (scene_w / g_relativeW) * 1250.0f;
+	float cam_y = (scene_w / g_relativeW) * 1650.0f * 0.5;
 
 	float fromCenter = cam_z - ((upperZ + lowerZ) * 0.5);
 	float sqr = fromCenter * fromCenter;
@@ -1596,10 +1610,10 @@ void UpdateCamera()
 	
 	} else {
 		scale_mtx.lock();
-		// Forward backword
-		Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
-		Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
-		new_frame_sensors = true;
+			// Forward backword
+			Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
+			Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
+			new_frame_sensors = true;
 		scale_mtx.unlock();
 
 		// Camera Angle
@@ -2257,85 +2271,86 @@ int DoUI()
 		int uiHeight = g_screenHeight - uiOffset - uiBorder * 3;
 		int uiLeft = uiBorder;
 
-		if (g_tweakPanel)
-			imguiBeginScrollArea("Scene", uiLeft, g_screenHeight - uiBorder - uiOffset, uiWidth, uiOffset, &g_levelScroll);
-		else
-			imguiBeginScrollArea("Scene", uiLeft, uiBorder, uiWidth, g_screenHeight - uiBorder - uiBorder, &g_levelScroll);
+		// if (g_tweakPanel)
+		// 	imguiBeginScrollArea("Scene", uiLeft, g_screenHeight - uiBorder - uiOffset, uiWidth, uiOffset, &g_levelScroll);
+		// else
+		// 	imguiBeginScrollArea("Scene", uiLeft, uiBorder, uiWidth, g_screenHeight - uiBorder - uiBorder, &g_levelScroll);
 
-		for (int i = 0; i < int(g_scenes.size()); ++i)
-		{
-			unsigned int color = g_scene == i ? imguiRGBA(255, 151, 61, 255) : imguiRGBA(255, 255, 255, 200);
-			if (imguiItem(g_scenes[i]->GetName(), true, color)) // , i == g_selectedScene))
-			{
-				newScene = i;
-			}
-		}
+		// for (int i = 0; i < int(g_scenes.size()); ++i)
+		// {
+		// 	unsigned int color = g_scene == i ? imguiRGBA(255, 151, 61, 255) : imguiRGBA(255, 255, 255, 200);
+		// 	if (imguiItem(g_scenes[i]->GetName(), true, color)) // , i == g_selectedScene))
+		// 	{
+		// 		newScene = i;
+		// 	}
+		// }
 
-		imguiEndScrollArea();
+		// imguiEndScrollArea();
 
 		if (g_tweakPanel)
 		{
 			static int scroll = 0;
 
-			imguiBeginScrollArea("Options", uiLeft, g_screenHeight - uiBorder - uiHeight - uiOffset - uiBorder, uiWidth, uiHeight, &scroll);
-			imguiSeparatorLine();
+			// imguiBeginScrollArea("Options", uiLeft, g_screenHeight - uiBorder - uiHeight - uiOffset - uiBorder, uiWidth, uiHeight, &scroll);
+			imguiBeginScrollArea("Infos", uiLeft, 6 * uiBorder, uiWidth, g_screenHeight - 12 * uiBorder, &g_levelScroll);
+			// imguiSeparatorLine();
 
-			// global options
-			imguiLabel("Global");
-			if (imguiCheck("Emit particles", g_emit))
-				g_emit = !g_emit;
+			// // global options
+			// imguiLabel("Global");
+			// if (imguiCheck("Emit particles", g_emit))
+			// 	g_emit = !g_emit;
 
-			if (imguiCheck("Pause", g_pause))
-				g_pause = !g_pause;
+			// if (imguiCheck("Pause", g_pause))
+			// 	g_pause = !g_pause;
 
-			imguiSeparatorLine();
+			// imguiSeparatorLine();
 
-			if (imguiCheck("Wireframe", g_wireframe))
-				g_wireframe = !g_wireframe;
+			// if (imguiCheck("Wireframe", g_wireframe))
+			// 	g_wireframe = !g_wireframe;
 
-			if (imguiCheck("Draw Points", g_drawPoints))
-				g_drawPoints = !g_drawPoints;
+			// if (imguiCheck("Draw Points", g_drawPoints))
+			// 	g_drawPoints = !g_drawPoints;
 
-			if (imguiCheck("Draw Fluid", g_drawEllipsoids))
-				g_drawEllipsoids = !g_drawEllipsoids;
+			// if (imguiCheck("Draw Fluid", g_drawEllipsoids))
+			// 	g_drawEllipsoids = !g_drawEllipsoids;
 
-			if (imguiCheck("Draw Mesh", g_drawMesh))
-			{
-				g_drawMesh = !g_drawMesh;
-				g_drawRopes = !g_drawRopes;
-			}
+			// if (imguiCheck("Draw Mesh", g_drawMesh))
+			// {
+			// 	g_drawMesh = !g_drawMesh;
+			// 	g_drawRopes = !g_drawRopes;
+			// }
 
-			if (imguiCheck("Draw Basis", g_drawBases))
-				g_drawBases = !g_drawBases;
+			// if (imguiCheck("Draw Basis", g_drawBases))
+			// 	g_drawBases = !g_drawBases;
 
-			if (imguiCheck("Draw Springs", bool(g_drawSprings != 0)))
-				g_drawSprings = (g_drawSprings) ? 0 : 1;
+			// if (imguiCheck("Draw Springs", bool(g_drawSprings != 0)))
+			// 	g_drawSprings = (g_drawSprings) ? 0 : 1;
 
-			if (imguiCheck("Draw Contacts", g_drawContacts))
-				g_drawContacts = !g_drawContacts;
+			// if (imguiCheck("Draw Contacts", g_drawContacts))
+			// 	g_drawContacts = !g_drawContacts;
 
-			imguiSeparatorLine();
+			// imguiSeparatorLine();
 
-			// scene options
-			g_scenes[g_scene]->DoGui();
+			// // scene options
+			// g_scenes[g_scene]->DoGui();
 
-		if (imguiButton("Reset Scene"))
-			g_resetScene = true;
+			// if (imguiButton("Reset Scene"))
+			// 	g_resetScene = true;
 
-			imguiSeparatorLine();
+			// imguiSeparatorLine();
 
-			float n = float(g_numSubsteps);
-			if (imguiSlider("Num Substeps", &n, 1, 10, 1))
-				g_numSubsteps = int(n);
+			// float n = float(g_numSubsteps);
+			// if (imguiSlider("Num Substeps", &n, 1, 10, 1))
+			// 	g_numSubsteps = int(n);
 
-			n = float(g_params.numIterations);
-			if (imguiSlider("Num Iterations", &n, 1, 20, 1))
-				g_params.numIterations = int(n);
+			// n = float(g_params.numIterations);
+			// if (imguiSlider("Num Iterations", &n, 1, 20, 1))
+			// 	g_params.numIterations = int(n);
 
-			imguiSeparatorLine();
+			// imguiSeparatorLine();
 			imguiSlider("Gravity X", &g_params.gravity[0], -15.0f, 15.0f, 0.5f);
-			imguiSlider("Gravity Y", &g_params.gravity[1], -50.0f, 50.0f, 1.0f);
-			imguiSlider("Gravity Z", &g_params.gravity[2], -50.0f, 50.0f, 1.0f);
+			imguiSlider("Gravity Y", &g_params.gravity[1], -15.0f, 15.0f, 0.5f);
+			imguiSlider("Gravity Z", &g_params.gravity[2], -15.0f, 15.0f, 0.5f);
 
 			imguiSeparatorLine();
 			imguiSlider("Radius", &g_params.radius, 0.01f, 0.5f, 0.01f);
@@ -2343,26 +2358,26 @@ int DoUI()
 			imguiSlider("Fluid Radius", &g_params.fluidRestDistance, 0.0f, 0.5f, 0.001f);
 
 			// common params
-			imguiSeparatorLine();
-			imguiSlider("Dynamic Friction", &g_params.dynamicFriction, 0.0f, 1.0f, 0.01f);
-			imguiSlider("Static Friction", &g_params.staticFriction, 0.0f, 1.0f, 0.01f);
-			imguiSlider("Particle Friction", &g_params.particleFriction, 0.0f, 1.0f, 0.01f);
-			imguiSlider("Restitution", &g_params.restitution, 0.0f, 1.0f, 0.01f);
-			imguiSlider("SleepThreshold", &g_params.sleepThreshold, 0.0f, 1.0f, 0.01f);
-			imguiSlider("Shock Propagation", &g_params.shockPropagation, 0.0f, 10.0f, 0.01f);
-			imguiSlider("Damping", &g_params.damping, 0.0f, 10.0f, 0.01f);
-			imguiSlider("Dissipation", &g_params.dissipation, 0.0f, 0.01f, 0.0001f);
-			imguiSlider("SOR", &g_params.relaxationFactor, 0.0f, 5.0f, 0.01f);
+			// imguiSeparatorLine();
+			// imguiSlider("Dynamic Friction", &g_params.dynamicFriction, 0.0f, 1.0f, 0.01f);
+			// imguiSlider("Static Friction", &g_params.staticFriction, 0.0f, 1.0f, 0.01f);
+			// imguiSlider("Particle Friction", &g_params.particleFriction, 0.0f, 1.0f, 0.01f);
+			// imguiSlider("Restitution", &g_params.restitution, 0.0f, 1.0f, 0.01f);
+			// imguiSlider("SleepThreshold", &g_params.sleepThreshold, 0.0f, 1.0f, 0.01f);
+			// imguiSlider("Shock Propagation", &g_params.shockPropagation, 0.0f, 10.0f, 0.01f);
+			// imguiSlider("Damping", &g_params.damping, 0.0f, 10.0f, 0.01f);
+			// imguiSlider("Dissipation", &g_params.dissipation, 0.0f, 0.01f, 0.0001f);
+			// imguiSlider("SOR", &g_params.relaxationFactor, 0.0f, 5.0f, 0.01f);
 
 			imguiSlider("Collision Distance", &g_params.collisionDistance, 0.0f, 0.5f, 0.001f);
 			imguiSlider("Collision Margin", &g_params.shapeCollisionMargin, 0.0f, 5.0f, 0.01f);
 
 			// cloth params
 			imguiSeparatorLine();
-			imguiSlider("Wind", &g_windStrength, -1.0f, 1.0f, 0.01f);
-			imguiSlider("Drag", &g_params.drag, 0.0f, 1.0f, 0.01f);
-			imguiSlider("Lift", &g_params.lift, 0.0f, 1.0f, 0.01f);
-			imguiSeparatorLine();
+			// imguiSlider("Wind", &g_windStrength, -1.0f, 1.0f, 0.01f);
+			// imguiSlider("Drag", &g_params.drag, 0.0f, 1.0f, 0.01f);
+			// imguiSlider("Lift", &g_params.lift, 0.0f, 1.0f, 0.01f);
+			// imguiSeparatorLine();
 
 			// fluid params
 			imguiSlider("Adhesion", &g_params.adhesion, 0.0f, 10.0f, 0.01f);
@@ -2379,19 +2394,19 @@ int DoUI()
 			imguiSlider("Smoothing", &g_params.smoothing, 0.0f, 1.0f, 0.01f);
 
 			// diffuse params
-			imguiSeparatorLine();
-			imguiSlider("Diffuse Threshold", &g_params.diffuseThreshold, 0.0f, 1000.0f, 1.0f);
-			imguiSlider("Diffuse Buoyancy", &g_params.diffuseBuoyancy, 0.0f, 2.0f, 0.01f);
-			imguiSlider("Diffuse Drag", &g_params.diffuseDrag, 0.0f, 2.0f, 0.01f);
-			imguiSlider("Diffuse Scale", &g_diffuseScale, 0.0f, 1.5f, 0.01f);
-			imguiSlider("Diffuse Alpha", &g_diffuseColor.w, 0.0f, 3.0f, 0.01f);
-			imguiSlider("Diffuse Inscatter", &g_diffuseInscatter, 0.0f, 2.0f, 0.01f);
-			imguiSlider("Diffuse Outscatter", &g_diffuseOutscatter, 0.0f, 2.0f, 0.01f);
-			imguiSlider("Diffuse Motion Blur", &g_diffuseMotionScale, 0.0f, 5.0f, 0.1f);
+			// imguiSeparatorLine();
+			// imguiSlider("Diffuse Threshold", &g_params.diffuseThreshold, 0.0f, 1000.0f, 1.0f);
+			// imguiSlider("Diffuse Buoyancy", &g_params.diffuseBuoyancy, 0.0f, 2.0f, 0.01f);
+			// imguiSlider("Diffuse Drag", &g_params.diffuseDrag, 0.0f, 2.0f, 0.01f);
+			// imguiSlider("Diffuse Scale", &g_diffuseScale, 0.0f, 1.5f, 0.01f);
+			// imguiSlider("Diffuse Alpha", &g_diffuseColor.w, 0.0f, 3.0f, 0.01f);
+			// imguiSlider("Diffuse Inscatter", &g_diffuseInscatter, 0.0f, 2.0f, 0.01f);
+			// imguiSlider("Diffuse Outscatter", &g_diffuseOutscatter, 0.0f, 2.0f, 0.01f);
+			// imguiSlider("Diffuse Motion Blur", &g_diffuseMotionScale, 0.0f, 5.0f, 0.1f);
 
-			n = float(g_params.diffuseBallistic);
-			if (imguiSlider("Diffuse Ballistic", &n, 1, 40, 1))
-				g_params.diffuseBallistic = int(n);
+			// float n = float(g_params.diffuseBallistic);
+			// if (imguiSlider("Diffuse Ballistic", &n, 1, 40, 1))
+			// 	g_params.diffuseBallistic = int(n);
 
 			imguiEndScrollArea();
 		}
@@ -2416,9 +2431,7 @@ void UpdateFrame()
 
 	g_realdt = float(frameBeginTime - lastTime);
 	
-	//FLAG:SYNC
-	// Synchronize real-frame to 60fps
-	// vSync();
+
 
 	// printf("g_realdt = %f\n", g_realdt);
 	lastTime = frameBeginTime;
@@ -2471,7 +2484,7 @@ void UpdateFrame()
 			NvFlexGetTimers(g_solver, &g_timers);
 		}
 	}
-
+	
 	StartFrame(Vec4(g_clearColor, 1.0f));
 
 	// main scene render
@@ -2484,6 +2497,8 @@ void UpdateFrame()
 	DoUI();
 
 	EndFrame();
+		
+
 
 
 	
@@ -2532,6 +2547,8 @@ void UpdateFrame()
 		g_resetScene = false;
 	}
 
+	
+
 	//-------------------------------------------------------------------
 	// Flex Update
 	double updateBeginTime = GetSeconds();
@@ -2571,6 +2588,22 @@ void UpdateFrame()
 		g_frame++;
 		g_step = false;
 	}
+
+	//FLAG:SYNC
+	// Synchronize real-frame to 120fps
+	if (g_vsync) vSync();
+
+	// Acknowledge that user input is queued
+	latency_mtx.lock();
+		if (latency_feedback) {
+			latency_feedback = false;
+			latency_return = true;
+		}
+		if (latency_request) {
+			latency_request = false;
+			latency_feedback = true;
+		}
+	latency_mtx.unlock();
 
 	// read back base particle data
 	// Note that flexGet calls don't wait for the GPU, they just queue a GPU copy 
@@ -2641,7 +2674,7 @@ void UpdateFrame()
 
 	// flush out the last frame before freeing up resources in the event of a scene change
 	// this is necessary for d3d12
-	PresentFrame(g_vsync);
+	// PresentFrame(g_vsync);
 
 	// if gui or benchmark requested a scene change process it now
 	if (newScene != -1)
@@ -3273,7 +3306,7 @@ int main(int argc, char* argv[])
 			g_screenWidth = w;
 			g_screenHeight = h;
 			g_fullscreen = false;
-			printf("SIZING %d x %d\n", g_screenWidth, g_screenHeight);
+			printf("Rendering Size %d x %d\n", g_screenWidth, g_screenHeight);
 		}
 		else if (strstr(argv[i], "-windowed"))
 		{
@@ -3284,6 +3317,13 @@ int main(int argc, char* argv[])
 
 		if (sscanf(argv[i], "-vsync=%d", &d))
 			g_vsync = d != 0;
+
+		if (g_vsync) {
+			printf("VSYNC On\n");
+
+		} else {
+			printf("VSYNC Off");
+		}
 
 		if (sscanf(argv[i], "-multiplier=%d", &d) == 1)
 		{
@@ -3312,11 +3352,15 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	g_relativeW = (int)((float) g_screenWidth / (float) g_screenHeight * 1200 + 0.5);
+
 	// FLAG:SCENE_SETUP
 	// opening scene
 	g_scenes.push_back(new DamBreak("DamBreak LowRes", 0.1f));
 	g_scenes.push_back(new DamBreak("DamBreak MedRes", 0.07f));
 	g_scenes.push_back(new DamBreak("DamBreak HighRes", 0.05f));
+	g_scenes.push_back(new DamBreak3("DamBreak Full LowRes", 0.1f));
+	g_scenes.push_back(new DamBreak3("DamBreak Full MedRes", 0.1f));
 
 	// viscous fluids
 	g_scenes.push_back(new DamBreak2("Viscosity Low", 0.1f));
@@ -3514,9 +3558,9 @@ int main(int argc, char* argv[])
 
 	running = true;
 
-	thread video_socket(video_thread);
-	thread video_socket2(video_thread2);
-	thread imu_socket(imu_thread);
+	thread video_compressor_thread(video_compressor);
+	thread video_sender_thread(video_sender);
+	thread imu_receiver_thread(imu_receiver);
 
 	//FLAG:MAIN_CALLING_MAIN_GUI_LOOP
 	SDLMainLoop();
@@ -3539,9 +3583,9 @@ int main(int argc, char* argv[])
 	SDL_Quit();
 
 
-	video_socket2.join();
-	video_socket.join();
-	imu_socket.join();
+	video_compressor_thread.join();
+	video_sender_thread.join();
+	imu_receiver_thread.join();
 
 	context.close();
 

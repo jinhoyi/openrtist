@@ -118,6 +118,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private static final int MEDIA_TYPE_IMAGE = 1;
     private static final int MEDIA_TYPE_VIDEO = 2;
 
+    private static final int LATENCY_TIMEOUT = 3000; //ms
+
     // major components for streaming sensor data and receiving information
     String serverIP = null;
     private String styleType = "-1"; //
@@ -130,7 +132,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private int mScreenHeight = 640;
     private int mScreenWidth = 480;
     private float mScreenRatio = 1.0f;
-    private int heightResolution = 1080; // replace with Const later
+    private int mResolution = Const.IMAGE_RES; // replace with Const later
 
     private MediaProjectionManager mProjectionManager;
     private MediaProjection mMediaProjection;
@@ -141,6 +143,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private String mOutputPath = null;
 
     private boolean help = false;
+
+    private boolean getLatency = true;
 
     // views
     private ImageView imgView;
@@ -181,6 +185,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private boolean cleared = false;
 
     private int framesProcessed = 0;
+    private int serverFPS = 0;
+
     private YuvToNV21Converter yuvToNV21Converter;
     private YuvToJPEGConverter yuvToJPEGConverter;
     private CameraCapture cameraCapture;
@@ -339,15 +345,18 @@ public class GabrielClientActivity extends AppCompatActivity implements
             int tmp = mScreenHeight;
             mScreenHeight = mScreenWidth;
             mScreenWidth = tmp;
-            mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);
-            heightResolution = (int) (1080.0f / mScreenRatio + 0.5f);
+//            mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);
+            mScreenRatio = (float)((double)mScreenHeight / (double)mScreenWidth);
+            mResolution = (int) ((float) Const.IMAGE_RES / mScreenRatio + 0.5f);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             int tmp = mScreenHeight;
             mScreenHeight = mScreenWidth;
             mScreenWidth = tmp;
-            mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);
-            heightResolution = 1080;
+//            mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);
+            mScreenRatio = (float)((double)mScreenHeight / (double)mScreenWidth);
+            mResolution = Const.IMAGE_RES;
+
         }
     }
 
@@ -357,9 +366,12 @@ public class GabrielClientActivity extends AppCompatActivity implements
     public void setInfo(boolean b){
         info = !info;
         if (info) {
+            getLatency = true;
+            latencyStartTime = System.currentTimeMillis();
             fpsLabel.setVisibility(View.VISIBLE);
         } else {
             fpsLabel.setVisibility(View.INVISIBLE);
+            getLatency = false;
         }
     }
 
@@ -384,7 +396,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
         pxToDp = 160.0f/mScreenDensity;
         mScreenHeight = metrics.heightPixels;
         mScreenWidth = metrics.widthPixels;
-        mScreenRatio = (float)((double)mScreenWidth / (double)mScreenHeight);;
+        mScreenRatio = (float)((double)mScreenHeight/ (double)mScreenWidth );
+        mResolution = Const.IMAGE_RES;
     }
 
 
@@ -465,6 +478,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
     private volatile boolean localRunnerBusy = false;
     private RenderScript rs = null;
 
+    private long latencyStartTime;
+    private long latencyMeasure = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOG_TAG, "++onCreate");
@@ -472,11 +488,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
         Const.STYLES_RETRIEVED = false;
         Const.ITERATION_STARTED = false;
 
-        if (Const.STEREO_ENABLED) {
-            setContentView(R.layout.activity_stereo);
-        } else {
-            setContentView(R.layout.activity_main);
-        }
+//        if (Const.STEREO_ENABLED) {
+//            setContentView(R.layout.activity_stereo);
+//        } else {
+        setContentView(R.layout.activity_main);
+//        }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 + WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
@@ -607,11 +623,50 @@ public class GabrielClientActivity extends AppCompatActivity implements
         // Log.e("FRAME!!!!", "Frame is  " + framesProcessed);
     }
 
+    private int avgServerFPS = 0;
+    private int fpsCount;
+
+    public void updateServerFPS(int fps) {
+        fpsCount++;
+        serverFPS += fps;
+        avgServerFPS = (int) ((float) serverFPS / (float) fpsCount + 0.5);
+
+        if (fpsCount >= 120){
+            fpsCount = 0;
+            serverFPS = 0;
+        }
+    }
+
+    private double avgLatency = 0.0;
+    private long latencyCount = 0;
+
+    public void updateLatency() {
+        latencyCount++;
+        long endTime = System.currentTimeMillis();
+        latencyMeasure += (endTime - latencyStartTime);
+        avgLatency = (double) latencyMeasure / (double) latencyCount;
+        getLatency = true;
+        latencyStartTime = endTime;
+
+        if (latencyCount >= 100){
+            latencyCount = 0;
+            latencyMeasure = 0;
+        }
+    }
+
     private final Runnable fpsCalculator = new Runnable() {
         @Override
         public void run() {
-            String msg= "FPS: " + framesProcessed;
+            String msg = "FPS-Gabrial: " + framesProcessed;
+            msg += "\nFPS-Simulation: " + avgServerFPS;
+            msg += " \nLatency: " + String.format("%.2f", avgLatency) + "ms";
             fpsLabel.setText( msg );
+
+            if ((System.currentTimeMillis() - latencyStartTime > LATENCY_TIMEOUT) && info) {
+                getLatency = true;
+                latencyStartTime = System.currentTimeMillis();
+            }
+
 
             framesProcessed = 0;
             fpsHandler.postDelayed(this, 1000);
@@ -649,7 +704,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
                 imu_y = ySequence[seqIdx] * 9.8f;
                 imu_z = zSequence[seqIdx] * 9.8f;
                 seqIdx = (seqIdx + 1) % xSequence.length;
-                autoplayHandler.postDelayed(this, 2000 );
+                autoplayHandler.postDelayed(this, Const.ITERATE_INTERVAL );
             }
         }
     };
@@ -970,11 +1025,11 @@ public class GabrielClientActivity extends AppCompatActivity implements
         if (serverIP == null) return;
 
         this.setupComm();
-        if (Const.STEREO_ENABLED) {
-            preview = findViewById(R.id.camera_preview1);
-        } else {
-            preview = findViewById(R.id.camera_preview);
-        }
+//        if (Const.STEREO_ENABLED) {
+//            preview = findViewById(R.id.camera_preview1);
+//        } else {
+//            preview = findViewById(R.id.camera_preview);
+//        }
 
 
         yuvToNV21Converter = new YuvToNV21Converter();
@@ -999,10 +1054,9 @@ public class GabrielClientActivity extends AppCompatActivity implements
 
     int counter = 0;
     private void sendIMUCloudlet() {
-        Log.v("SENDMIU", "Reset is " + reset);
         openrtistComm.sendSupplier(() -> {
             Extras.ScreenValue screenValue = Extras.ScreenValue.newBuilder()
-                    .setHeight(heightResolution)
+                    .setResolution(mResolution)
                     .setRatio(mScreenRatio)
                     .build();
 //            counter++;
@@ -1050,6 +1104,8 @@ public class GabrielClientActivity extends AppCompatActivity implements
                     .setImuValue(imuValue)
                     .setTouchValue(touchValue)
                     .setArrowKey(arrowKey)
+                    .setLatencyToken(getLatency)
+                    .setFps(Const.VSYNC ? 1 : 0)
                     .build();
             return InputFrame.newBuilder()
                     .setPayloadType(PayloadType.IMAGE)
@@ -1063,6 +1119,7 @@ public class GabrielClientActivity extends AppCompatActivity implements
         alignCenter = false;
         sceneX = 0;
         sceneY = 0;
+        getLatency = false;
     }
 
 //    private void sendIMUCloudlet() {

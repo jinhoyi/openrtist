@@ -46,6 +46,12 @@ public class ResultConsumer implements Consumer<ResultWrapper> {
                 Const.STYLES_RETRIEVED = true;
                 this.gabrielClientActivity.addStyles(new TreeMap<String, String>(extras.getStyleListMap()).entrySet());
             }
+
+            if (extras.getLatencyToken()) {
+                this.gabrielClientActivity.updateLatency();
+            }
+
+            this.gabrielClientActivity.updateServerFPS(extras.getFps());
         }  catch (InvalidProtocolBufferException e) {
             Log.e(TAG, "Protobuf Error", e);
         }

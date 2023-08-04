@@ -693,7 +693,7 @@ class Extras_ScreenValue PROTOBUF_FINAL :
 
   enum : int {
     kRatioFieldNumber = 1,
-    kHeightFieldNumber = 2,
+    kResolutionFieldNumber = 2,
   };
   // float ratio = 1;
   void clear_ratio();
@@ -704,13 +704,13 @@ class Extras_ScreenValue PROTOBUF_FINAL :
   void _internal_set_ratio(float value);
   public:
 
-  // int32 height = 2;
-  void clear_height();
-  ::PROTOBUF_NAMESPACE_ID::int32 height() const;
-  void set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
+  // int32 resolution = 2;
+  void clear_resolution();
+  ::PROTOBUF_NAMESPACE_ID::int32 resolution() const;
+  void set_resolution(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_height() const;
-  void _internal_set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_resolution() const;
+  void _internal_set_resolution(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:openrtist.Extras.ScreenValue)
@@ -721,7 +721,7 @@ class Extras_ScreenValue PROTOBUF_FINAL :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   float ratio_;
-  ::PROTOBUF_NAMESPACE_ID::int32 height_;
+  ::PROTOBUF_NAMESPACE_ID::int32 resolution_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_openrtist_2eproto;
 };
@@ -1260,6 +1260,8 @@ class Extras PROTOBUF_FINAL :
     kTouchValueFieldNumber = 4,
     kArrowKeyFieldNumber = 5,
     kSettingValueFieldNumber = 6,
+    kLatencyTokenFieldNumber = 7,
+    kFpsFieldNumber = 8,
   };
   // map<string, string> style_list = 1;
   int style_list_size() const;
@@ -1368,6 +1370,24 @@ class Extras PROTOBUF_FINAL :
       ::openrtist::Extras_Setting* setting_value);
   ::openrtist::Extras_Setting* unsafe_arena_release_setting_value();
 
+  // bool latency_token = 7;
+  void clear_latency_token();
+  bool latency_token() const;
+  void set_latency_token(bool value);
+  private:
+  bool _internal_latency_token() const;
+  void _internal_set_latency_token(bool value);
+  public:
+
+  // int32 fps = 8;
+  void clear_fps();
+  ::PROTOBUF_NAMESPACE_ID::int32 fps() const;
+  void set_fps(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_fps() const;
+  void _internal_set_fps(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:openrtist.Extras)
  private:
   class _Internal;
@@ -1386,6 +1406,8 @@ class Extras PROTOBUF_FINAL :
   ::openrtist::Extras_TouchInput* touch_value_;
   ::openrtist::Extras_ArrowKey* arrow_key_;
   ::openrtist::Extras_Setting* setting_value_;
+  bool latency_token_;
+  ::PROTOBUF_NAMESPACE_ID::int32 fps_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_openrtist_2eproto;
 };
@@ -1653,24 +1675,24 @@ inline void Extras_ScreenValue::set_ratio(float value) {
   // @@protoc_insertion_point(field_set:openrtist.Extras.ScreenValue.ratio)
 }
 
-// int32 height = 2;
-inline void Extras_ScreenValue::clear_height() {
-  height_ = 0;
+// int32 resolution = 2;
+inline void Extras_ScreenValue::clear_resolution() {
+  resolution_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_ScreenValue::_internal_height() const {
-  return height_;
+inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_ScreenValue::_internal_resolution() const {
+  return resolution_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_ScreenValue::height() const {
-  // @@protoc_insertion_point(field_get:openrtist.Extras.ScreenValue.height)
-  return _internal_height();
+inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_ScreenValue::resolution() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.ScreenValue.resolution)
+  return _internal_resolution();
 }
-inline void Extras_ScreenValue::_internal_set_height(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void Extras_ScreenValue::_internal_set_resolution(::PROTOBUF_NAMESPACE_ID::int32 value) {
   
-  height_ = value;
+  resolution_ = value;
 }
-inline void Extras_ScreenValue::set_height(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_height(value);
-  // @@protoc_insertion_point(field_set:openrtist.Extras.ScreenValue.height)
+inline void Extras_ScreenValue::set_resolution(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_resolution(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.ScreenValue.resolution)
 }
 
 // -------------------------------------------------------------------
@@ -2339,6 +2361,46 @@ inline void Extras::set_allocated_setting_value(::openrtist::Extras_Setting* set
   }
   setting_value_ = setting_value;
   // @@protoc_insertion_point(field_set_allocated:openrtist.Extras.setting_value)
+}
+
+// bool latency_token = 7;
+inline void Extras::clear_latency_token() {
+  latency_token_ = false;
+}
+inline bool Extras::_internal_latency_token() const {
+  return latency_token_;
+}
+inline bool Extras::latency_token() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.latency_token)
+  return _internal_latency_token();
+}
+inline void Extras::_internal_set_latency_token(bool value) {
+  
+  latency_token_ = value;
+}
+inline void Extras::set_latency_token(bool value) {
+  _internal_set_latency_token(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.latency_token)
+}
+
+// int32 fps = 8;
+inline void Extras::clear_fps() {
+  fps_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Extras::_internal_fps() const {
+  return fps_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Extras::fps() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.fps)
+  return _internal_fps();
+}
+inline void Extras::_internal_set_fps(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  fps_ = value;
+}
+inline void Extras::set_fps(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_fps(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.fps)
 }
 
 #ifdef __GNUC__

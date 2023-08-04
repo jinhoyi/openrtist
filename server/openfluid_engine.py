@@ -55,7 +55,6 @@ import http.client, urllib.request, urllib.parse, urllib.error, base64
 
 class OpenfluidEngine(cognitive_engine.Engine):
     SOURCE_NAME = "openfluid"
-    SHAKE_STYLE = "going_to_work"
     REQUEST_TIMEOUT = 3000
     
     instances = []
@@ -75,7 +74,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
     monitor_stop = False
 
-    def __init__(self, compression_params, args_engine = None):
+    def __init__(self, compression_params, args_engine = None, timeout = 30):
         OpenfluidEngine.instances.append(self)
         self.lock = threading.RLock()
         if args_engine == None:
@@ -103,7 +102,9 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.screen_w = 480
         # self.screen_h = 1080
         self.screen_h = 640
-        self.screen_ratio = self.screen_w / self.screen_h
+        # self.screen_ratio = self.screen_w / self.screen_h
+        self.screen_ratio = self.screen_h / self.screen_w
+        self.vsync = 0
 
         # Pointer to the Physics Simulation Engine Process
         self.phys_simulator = None
@@ -113,13 +114,15 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.sendStyle = True
         self.client_event = threading.Event()        
 
-        # Initialize simulation engine
+        # Initialize simulation engine and Client activity monitor
         self.start_sim()
         self.monitor_stop = False
         self.last_user_call = time.time()
-        self.activity_monitor = threading.Thread(target = self.time_monitor, args=(10, ))
+        self.activity_monitor = threading.Thread(target = self.client_activity_monitor, args=(timeout, ))
         self.activity_monitor.start()
-        # multiprocessing.Process(target = self.test_monitor).start()
+
+        self.latency_return = False
+        self.server_fps = 0
 
         logger.info("FINISHED INITIALISATION")
         
@@ -135,15 +138,9 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.terminate_sim()
         print("terminatd backend")
 
-
-    # def test_monitor(self):
-    #     while True:
-    #         if self.phys_simulator == None:
-    #             print("HI")
-
         
     # Turn off the simulation engine when no client is detected. 
-    def time_monitor(self, timeout=30):
+    def client_activity_monitor(self, timeout=30):
         while not self.monitor_stop:
             if self.client_event.wait(timeout = timeout):
                 self.client_event.clear()
@@ -188,7 +185,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 while self.phys_simulator.poll() is None:
                     time.sleep(0.1)
                 self.phys_simulator = None
-                # self.screen_h = 0
 
         # if self.frame_socket != None:
         #     self.frame_socket.setsockopt(zmq.LINGER, 0)
@@ -209,7 +205,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
 
         with self.lock:
-            ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
+            ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsync={self.vsync} -windowed={self.screen_w }x{self.screen_h}']
             
             print("New Simulator starting...")
             self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
@@ -238,6 +234,17 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
         input_frame = gabriel_pb2.InputFrame()
         input_frame.ParseFromString(reply)
+        
+        try:
+            extras = cognitive_engine.unpack_extras(openrtist_pb2.Extras, input_frame)
+            if (extras.latency_token == True):
+                self.latency_return = True
+            else:
+                self.latency_return = False
+            self.server_fps = extras.fps
+        except:
+            print("Exception")
+            self.latency_return = False
 
         return input_frame.payloads[0]
     
@@ -262,12 +269,15 @@ class OpenfluidEngine(cognitive_engine.Engine):
         if extras.setting_value.scene == -1:
             self.sendStyle = True
 
+        
         with self.lock:
-            if (self.screen_ratio != extras.screen_value.ratio) or (self.screen_h != extras.screen_value.height):
+            if (self.screen_ratio != extras.screen_value.ratio) or (self.screen_w != extras.screen_value.resolution) or (extras.fps != self.vsync):
                 print(self.screen_ratio, extras.screen_value.ratio)
                 self.screen_ratio = extras.screen_value.ratio
-                self.screen_h = extras.screen_value.height
-                self.screen_w = int(self.screen_ratio * self.screen_h + 0.5)
+                self.screen_w = extras.screen_value.resolution
+                self.screen_h = int(self.screen_ratio * self.screen_w + 0.5)
+                self.vsync = extras.fps
+                # print(extras.fps)
                 print(f'-windowed={self.screen_w }x{self.screen_h} reset')
                 self.reset_simulator()
 
@@ -275,18 +285,10 @@ class OpenfluidEngine(cognitive_engine.Engine):
             if self.phys_simulator == None:
                 print(f'-windowed={self.screen_w }x{self.screen_h} new')
                 self.start_sim()
-            # ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
-            # # ARGS = ['exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64', '-vsycn=0']
-            # self.phys_simulator = subprocess.Popen(ARGS, shell=True, stdout=subprocess.PIPE, start_new_session=True)
-            # outs, errs = self.phys_simulator.communicate()
         
         # send imu data/get new rendered frame from/to the Physics simulation Engine
         self.send_imu(extras)
         img_data = self.process_image(None)
-
-        # while (img_data == None):
-        #     img_data = self.process_image(None)
-
 
         # Serialize the result (protobuf)
         result = gabriel_pb2.ResultWrapper.Result()
@@ -298,6 +300,12 @@ class OpenfluidEngine(cognitive_engine.Engine):
             for k, v in self.scene_list.items():
                 extras.style_list[k] = v
             self.sendStyle = False
+
+        if self.latency_return:
+            extras.latency_token = True
+            self.latency_return = False
+        
+        extras.fps = self.server_fps
             
         status = gabriel_pb2.ResultWrapper.Status.SUCCESS
 
@@ -313,20 +321,3 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
     def inference(self, image):
         return self.get_frame()
-    
-    def _resize_watermark(self):
-        self.mrk_w = int(self.screen_w / 3.0 + 0.5)
-        self.mrk_h = int(self.mrk_w * self.mrk_ratio + 0.5)
-
-        self.mrk = cv2.resize(self.mrk, (self.mrk_w , self.mrk_h), interpolation=cv2.INTER_NEAREST)
-        self.alpha = cv2.resize(self.alpha, (self.mrk_w , self.mrk_h), interpolation=cv2.INTER_NEAREST)
-        
-        self.mrk = np.expand_dims(self.mrk, axis=-1)
-        self.alpha = np.expand_dims(self.alpha, axis=-1)
-
-
-    def _apply_watermark(self, image):
-        img_mrk = image[-self.mrk_h:, -self.mrk_w:]
-        img_mrk = (1 - self.alpha) * img_mrk + self.alpha * self.mrk # Broad Casting
-        image[-self.mrk_h:, -self.mrk_w:, :] = img_mrk
-        return image

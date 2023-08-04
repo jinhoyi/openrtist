@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fopenrtist.proto\x12\topenrtist\"\xea\x05\n\x06\x45xtras\x12\x34\n\nstyle_list\x18\x01 \x03(\x0b\x32 .openrtist.Extras.StyleListEntry\x12-\n\timu_value\x18\x02 \x01(\x0b\x32\x1a.openrtist.Extras.IMUValue\x12\x33\n\x0cscreen_value\x18\x03 \x01(\x0b\x32\x1d.openrtist.Extras.ScreenValue\x12\x31\n\x0btouch_value\x18\x04 \x01(\x0b\x32\x1c.openrtist.Extras.TouchInput\x12-\n\tarrow_key\x18\x05 \x01(\x0b\x32\x1a.openrtist.Extras.ArrowKey\x12\x30\n\rsetting_value\x18\x06 \x01(\x0b\x32\x19.openrtist.Extras.Setting\x1a\x1b\n\nBytesValue\x12\r\n\x05value\x18\x01 \x01(\x0c\x1a+\n\x08IMUValue\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\x12\t\n\x01z\x18\x03 \x01(\x02\x1a\x46\n\nTouchInput\x12\r\n\x05scale\x18\x01 \x01(\x02\x12\t\n\x01x\x18\x02 \x01(\x02\x12\t\n\x01y\x18\x03 \x01(\x02\x12\x13\n\x0b\x64oubleTouch\x18\x04 \x01(\x08\x1a,\n\x0bScreenValue\x12\r\n\x05ratio\x18\x01 \x01(\x02\x12\x0e\n\x06height\x18\x02 \x01(\x05\x1a\x41\n\x08\x41rrowKey\x12\x0c\n\x04left\x18\x01 \x01(\x08\x12\r\n\x05right\x18\x02 \x01(\x08\x12\n\n\x02up\x18\x03 \x01(\x08\x12\x0c\n\x04\x64own\x18\x04 \x01(\x08\x1a}\n\x07Setting\x12\r\n\x05scene\x18\x01 \x01(\x05\x12\x14\n\x0c\x61lign_center\x18\x02 \x01(\x08\x12\x0f\n\x07\x61r_view\x18\x03 \x01(\x08\x12\r\n\x05reset\x18\x04 \x01(\x08\x12\r\n\x05pause\x18\x05 \x01(\x08\x12\x10\n\x08particle\x18\x06 \x01(\x08\x12\x0c\n\x04info\x18\x07 \x01(\x08\x1a\x30\n\x0eStyleListEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x1e\n\x14\x65\x64u.cmu.cs.openrtistB\x06Protosb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fopenrtist.proto\x12\topenrtist\"\x92\x06\n\x06\x45xtras\x12\x34\n\nstyle_list\x18\x01 \x03(\x0b\x32 .openrtist.Extras.StyleListEntry\x12-\n\timu_value\x18\x02 \x01(\x0b\x32\x1a.openrtist.Extras.IMUValue\x12\x33\n\x0cscreen_value\x18\x03 \x01(\x0b\x32\x1d.openrtist.Extras.ScreenValue\x12\x31\n\x0btouch_value\x18\x04 \x01(\x0b\x32\x1c.openrtist.Extras.TouchInput\x12-\n\tarrow_key\x18\x05 \x01(\x0b\x32\x1a.openrtist.Extras.ArrowKey\x12\x30\n\rsetting_value\x18\x06 \x01(\x0b\x32\x19.openrtist.Extras.Setting\x12\x15\n\rlatency_token\x18\x07 \x01(\x08\x12\x0b\n\x03\x66ps\x18\x08 \x01(\x05\x1a\x1b\n\nBytesValue\x12\r\n\x05value\x18\x01 \x01(\x0c\x1a+\n\x08IMUValue\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\x12\t\n\x01z\x18\x03 \x01(\x02\x1a\x46\n\nTouchInput\x12\r\n\x05scale\x18\x01 \x01(\x02\x12\t\n\x01x\x18\x02 \x01(\x02\x12\t\n\x01y\x18\x03 \x01(\x02\x12\x13\n\x0b\x64oubleTouch\x18\x04 \x01(\x08\x1a\x30\n\x0bScreenValue\x12\r\n\x05ratio\x18\x01 \x01(\x02\x12\x12\n\nresolution\x18\x02 \x01(\x05\x1a\x41\n\x08\x41rrowKey\x12\x0c\n\x04left\x18\x01 \x01(\x08\x12\r\n\x05right\x18\x02 \x01(\x08\x12\n\n\x02up\x18\x03 \x01(\x08\x12\x0c\n\x04\x64own\x18\x04 \x01(\x08\x1a}\n\x07Setting\x12\r\n\x05scene\x18\x01 \x01(\x05\x12\x14\n\x0c\x61lign_center\x18\x02 \x01(\x08\x12\x0f\n\x07\x61r_view\x18\x03 \x01(\x08\x12\r\n\x05reset\x18\x04 \x01(\x08\x12\r\n\x05pause\x18\x05 \x01(\x08\x12\x10\n\x08particle\x18\x06 \x01(\x08\x12\x0c\n\x04info\x18\x07 \x01(\x08\x1a\x30\n\x0eStyleListEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x1e\n\x14\x65\x64u.cmu.cs.openrtistB\x06Protosb\x06proto3')
 
 
 
@@ -96,19 +96,19 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _EXTRAS_STYLELISTENTRY._options = None
   _EXTRAS_STYLELISTENTRY._serialized_options = b'8\001'
   _EXTRAS._serialized_start=31
-  _EXTRAS._serialized_end=777
-  _EXTRAS_BYTESVALUE._serialized_start=343
-  _EXTRAS_BYTESVALUE._serialized_end=370
-  _EXTRAS_IMUVALUE._serialized_start=372
-  _EXTRAS_IMUVALUE._serialized_end=415
-  _EXTRAS_TOUCHINPUT._serialized_start=417
-  _EXTRAS_TOUCHINPUT._serialized_end=487
-  _EXTRAS_SCREENVALUE._serialized_start=489
-  _EXTRAS_SCREENVALUE._serialized_end=533
-  _EXTRAS_ARROWKEY._serialized_start=535
-  _EXTRAS_ARROWKEY._serialized_end=600
-  _EXTRAS_SETTING._serialized_start=602
-  _EXTRAS_SETTING._serialized_end=727
-  _EXTRAS_STYLELISTENTRY._serialized_start=729
-  _EXTRAS_STYLELISTENTRY._serialized_end=777
+  _EXTRAS._serialized_end=817
+  _EXTRAS_BYTESVALUE._serialized_start=379
+  _EXTRAS_BYTESVALUE._serialized_end=406
+  _EXTRAS_IMUVALUE._serialized_start=408
+  _EXTRAS_IMUVALUE._serialized_end=451
+  _EXTRAS_TOUCHINPUT._serialized_start=453
+  _EXTRAS_TOUCHINPUT._serialized_end=523
+  _EXTRAS_SCREENVALUE._serialized_start=525
+  _EXTRAS_SCREENVALUE._serialized_end=573
+  _EXTRAS_ARROWKEY._serialized_start=575
+  _EXTRAS_ARROWKEY._serialized_end=640
+  _EXTRAS_SETTING._serialized_start=642
+  _EXTRAS_SETTING._serialized_end=767
+  _EXTRAS_STYLELISTENTRY._serialized_start=769
+  _EXTRAS_STYLELISTENTRY._serialized_end=817
 # @@protoc_insertion_point(module_scope)

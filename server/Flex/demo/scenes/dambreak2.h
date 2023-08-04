@@ -76,7 +76,7 @@ public:
 		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 		
 		float scene_w = (g_sceneUpper.x - g_sceneLower.x);
-		float cam_z = g_sceneUpper.z + (scene_w / g_screenWidth) * 1630.0f;
+		float cam_z = g_sceneUpper.z + (scene_w / g_relativeW) * 1630.0f;
 		float cam_y = g_sceneUpper.y;
 
 		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, g_sceneUpper.y * 1.2, cam_z);

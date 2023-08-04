@@ -10,7 +10,7 @@
     <string name="stereo_option">Stereoscopic Effect (requires HUD)</string>
     <string name="reference_option">Show Style Reference Image</string>
     <string name="pref_title_recording">Show Screenshot/Recording Buttons</string>
-    <string name="show_fps">Display Metrics (FPS and Average RTT)</string>
+    <string name="show_fps">Limit simulation to 120 FPS</string>
     <string name="camera_option">Show Camera Toggling Button</string>
     <string name="autoiterate_option">Iterate Styles Periodically</string>
     <string name="serverlist_heading">Server List</string>
@@ -89,31 +89,39 @@
 
     <string name="pref_title_resolution">Image Resolution</string>
     <string-array name="pref_resolution_titles">
-        <item>320x240 px</item>
-        <item>640x480 px</item>
-        <item>1280x720 px</item>
+        <item> 240p </item>
+        <item> 360p </item>
+        <item> 480p </item>
+        <item> 720p </item>
+        <item> 1080p </item>
+        <item> 1440p </item>
+        <item> 2160p </item>
     </string-array>
     <string-array name="pref_resolution_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
+        <item>240</item>
+        <item>360</item>
+        <item>480</item>
+        <item>720</item>
+        <item>1080</item>
+        <item>1440</item>
+        <item>2160</item>
     </string-array>
 
-    <string name="pref_title_iterate_interval">Iterate Styles Periodically</string>
+    <string name="pref_title_iterate_interval">Autoplay Sequence Interval</string>
     <string name="fps_0">FPS: 0</string>
     <string-array name="pref_interval_list_titles">
-        <item>No iteration</item>
-        <item>5 sec delay</item>
-        <item>15 sec delay</item>
-        <item>30 sec delay</item>
-        <item>60 sec delay</item>
+        <item>1 sec</item>
+        <item>2 sec</item>
+        <item>3 sec</item>
+        <item>5 sec</item>
+        <item>10 sec</item>
     </string-array>
     <string-array name="pref_interval_list_values">
-        <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
-        <item>4</item>
+        <item>5</item>
+        <item>10</item>
     </string-array>
 
     <string name="help_cam">This is some helpful information for controlling cam</string>

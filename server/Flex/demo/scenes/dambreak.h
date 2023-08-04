@@ -64,8 +64,8 @@ public:
 
 	void CenterCamera() {
 		float scene_w = (g_sceneUpper.x - g_sceneLower.x);
-		float cam_z = g_sceneUpper.z + (scene_w / g_screenWidth) * 1630.0f;
-		float cam_y = (scene_w / g_screenWidth) * 1630.0f * 0.2;
+		float cam_z = g_sceneUpper.z + (scene_w / g_relativeW) * 1630.0f;
+		float cam_y = (scene_w / g_relativeW) * 1630.0f * 0.2;
 
 		g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, cam_y + (g_sceneUpper.y / 2), cam_z);
 		g_camAngle = Vec3(0.0f, -ATan2(cam_y , cam_z), 0.0f);

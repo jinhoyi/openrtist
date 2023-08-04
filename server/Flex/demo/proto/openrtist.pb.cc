@@ -205,7 +205,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_openrtist_2eproto::offsets[] P
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ScreenValue, ratio_),
-  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ScreenValue, height_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ScreenValue, resolution_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ArrowKey, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -247,6 +247,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_openrtist_2eproto::offsets[] P
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, touch_value_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, arrow_key_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras, setting_value_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras, latency_token_),
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras, fps_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::openrtist::Extras_BytesValue)},
@@ -271,7 +273,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_openrtist_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017openrtist.proto\022\topenrtist\"\352\005\n\006Extras\022"
+  "\n\017openrtist.proto\022\topenrtist\"\222\006\n\006Extras\022"
   "4\n\nstyle_list\030\001 \003(\0132 .openrtist.Extras.S"
   "tyleListEntry\022-\n\timu_value\030\002 \001(\0132\032.openr"
   "tist.Extras.IMUValue\0223\n\014screen_value\030\003 \001"
@@ -279,12 +281,13 @@ const char descriptor_table_protodef_openrtist_2eproto[] PROTOBUF_SECTION_VARIAB
   "ch_value\030\004 \001(\0132\034.openrtist.Extras.TouchI"
   "nput\022-\n\tarrow_key\030\005 \001(\0132\032.openrtist.Extr"
   "as.ArrowKey\0220\n\rsetting_value\030\006 \001(\0132\031.ope"
-  "nrtist.Extras.Setting\032\033\n\nBytesValue\022\r\n\005v"
-  "alue\030\001 \001(\014\032+\n\010IMUValue\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002"
-  " \001(\002\022\t\n\001z\030\003 \001(\002\032F\n\nTouchInput\022\r\n\005scale\030\001"
-  " \001(\002\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\022\023\n\013doubleTouc"
-  "h\030\004 \001(\010\032,\n\013ScreenValue\022\r\n\005ratio\030\001 \001(\002\022\016\n"
-  "\006height\030\002 \001(\005\032A\n\010ArrowKey\022\014\n\004left\030\001 \001(\010\022"
+  "nrtist.Extras.Setting\022\025\n\rlatency_token\030\007"
+  " \001(\010\022\013\n\003fps\030\010 \001(\005\032\033\n\nBytesValue\022\r\n\005value"
+  "\030\001 \001(\014\032+\n\010IMUValue\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
+  "\022\t\n\001z\030\003 \001(\002\032F\n\nTouchInput\022\r\n\005scale\030\001 \001(\002"
+  "\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\022\023\n\013doubleTouch\030\004 "
+  "\001(\010\0320\n\013ScreenValue\022\r\n\005ratio\030\001 \001(\002\022\022\n\nres"
+  "olution\030\002 \001(\005\032A\n\010ArrowKey\022\014\n\004left\030\001 \001(\010\022"
   "\r\n\005right\030\002 \001(\010\022\n\n\002up\030\003 \001(\010\022\014\n\004down\030\004 \001(\010"
   "\032}\n\007Setting\022\r\n\005scene\030\001 \001(\005\022\024\n\014align_cent"
   "er\030\002 \001(\010\022\017\n\007ar_view\030\003 \001(\010\022\r\n\005reset\030\004 \001(\010"
@@ -307,7 +310,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ope
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_openrtist_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_openrtist_2eproto = {
-  false, false, descriptor_table_protodef_openrtist_2eproto, "openrtist.proto", 817,
+  false, false, descriptor_table_protodef_openrtist_2eproto, "openrtist.proto", 857,
   &descriptor_table_openrtist_2eproto_once, descriptor_table_openrtist_2eproto_sccs, descriptor_table_openrtist_2eproto_deps, 8, 0,
   schemas, file_default_instances, TableStruct_openrtist_2eproto::offsets,
   file_level_metadata_openrtist_2eproto, 8, file_level_enum_descriptors_openrtist_2eproto, file_level_service_descriptors_openrtist_2eproto,
@@ -1056,15 +1059,15 @@ Extras_ScreenValue::Extras_ScreenValue(const Extras_ScreenValue& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&ratio_, &from.ratio_,
-    static_cast<size_t>(reinterpret_cast<char*>(&height_) -
-    reinterpret_cast<char*>(&ratio_)) + sizeof(height_));
+    static_cast<size_t>(reinterpret_cast<char*>(&resolution_) -
+    reinterpret_cast<char*>(&ratio_)) + sizeof(resolution_));
   // @@protoc_insertion_point(copy_constructor:openrtist.Extras.ScreenValue)
 }
 
 void Extras_ScreenValue::SharedCtor() {
   ::memset(&ratio_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&height_) -
-      reinterpret_cast<char*>(&ratio_)) + sizeof(height_));
+      reinterpret_cast<char*>(&resolution_) -
+      reinterpret_cast<char*>(&ratio_)) + sizeof(resolution_));
 }
 
 Extras_ScreenValue::~Extras_ScreenValue() {
@@ -1099,8 +1102,8 @@ void Extras_ScreenValue::Clear() {
   (void) cached_has_bits;
 
   ::memset(&ratio_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&height_) -
-      reinterpret_cast<char*>(&ratio_)) + sizeof(height_));
+      reinterpret_cast<char*>(&resolution_) -
+      reinterpret_cast<char*>(&ratio_)) + sizeof(resolution_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1119,10 +1122,10 @@ const char* Extras_ScreenValue::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // int32 height = 2;
+      // int32 resolution = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          resolution_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -1160,10 +1163,10 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_ratio(), target);
   }
 
-  // int32 height = 2;
-  if (this->height() != 0) {
+  // int32 resolution = 2;
+  if (this->resolution() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_height(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_resolution(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1187,11 +1190,11 @@ size_t Extras_ScreenValue::ByteSizeLong() const {
     total_size += 1 + 4;
   }
 
-  // int32 height = 2;
-  if (this->height() != 0) {
+  // int32 resolution = 2;
+  if (this->resolution() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_height());
+        this->_internal_resolution());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1228,8 +1231,8 @@ void Extras_ScreenValue::MergeFrom(const Extras_ScreenValue& from) {
   if (!(from.ratio() <= 0 && from.ratio() >= 0)) {
     _internal_set_ratio(from._internal_ratio());
   }
-  if (from.height() != 0) {
-    _internal_set_height(from._internal_height());
+  if (from.resolution() != 0) {
+    _internal_set_resolution(from._internal_resolution());
   }
 }
 
@@ -1255,8 +1258,8 @@ void Extras_ScreenValue::InternalSwap(Extras_ScreenValue* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Extras_ScreenValue, height_)
-      + sizeof(Extras_ScreenValue::height_)
+      PROTOBUF_FIELD_OFFSET(Extras_ScreenValue, resolution_)
+      + sizeof(Extras_ScreenValue::resolution_)
       - PROTOBUF_FIELD_OFFSET(Extras_ScreenValue, ratio_)>(
           reinterpret_cast<char*>(&ratio_),
           reinterpret_cast<char*>(&other->ratio_));
@@ -1966,14 +1969,17 @@ Extras::Extras(const Extras& from)
   } else {
     setting_value_ = nullptr;
   }
+  ::memcpy(&latency_token_, &from.latency_token_,
+    static_cast<size_t>(reinterpret_cast<char*>(&fps_) -
+    reinterpret_cast<char*>(&latency_token_)) + sizeof(fps_));
   // @@protoc_insertion_point(copy_constructor:openrtist.Extras)
 }
 
 void Extras::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Extras_openrtist_2eproto.base);
   ::memset(&imu_value_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&setting_value_) -
-      reinterpret_cast<char*>(&imu_value_)) + sizeof(setting_value_));
+      reinterpret_cast<char*>(&fps_) -
+      reinterpret_cast<char*>(&imu_value_)) + sizeof(fps_));
 }
 
 Extras::~Extras() {
@@ -2033,6 +2039,9 @@ void Extras::Clear() {
     delete setting_value_;
   }
   setting_value_ = nullptr;
+  ::memset(&latency_token_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&fps_) -
+      reinterpret_cast<char*>(&latency_token_)) + sizeof(fps_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -2088,6 +2097,20 @@ const char* Extras::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_setting_value(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool latency_token = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+          latency_token_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 fps = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
+          fps_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -2204,6 +2227,18 @@ failure:
         6, _Internal::setting_value(this), target, stream);
   }
 
+  // bool latency_token = 7;
+  if (this->latency_token() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(7, this->_internal_latency_token(), target);
+  }
+
+  // int32 fps = 8;
+  if (this->fps() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(8, this->_internal_fps(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2264,6 +2299,18 @@ size_t Extras::ByteSizeLong() const {
         *setting_value_);
   }
 
+  // bool latency_token = 7;
+  if (this->latency_token() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // int32 fps = 8;
+  if (this->fps() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_fps());
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -2311,6 +2358,12 @@ void Extras::MergeFrom(const Extras& from) {
   if (from.has_setting_value()) {
     _internal_mutable_setting_value()->::openrtist::Extras_Setting::MergeFrom(from._internal_setting_value());
   }
+  if (from.latency_token() != 0) {
+    _internal_set_latency_token(from._internal_latency_token());
+  }
+  if (from.fps() != 0) {
+    _internal_set_fps(from._internal_fps());
+  }
 }
 
 void Extras::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -2336,8 +2389,8 @@ void Extras::InternalSwap(Extras* other) {
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   style_list_.Swap(&other->style_list_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Extras, setting_value_)
-      + sizeof(Extras::setting_value_)
+      PROTOBUF_FIELD_OFFSET(Extras, fps_)
+      + sizeof(Extras::fps_)
       - PROTOBUF_FIELD_OFFSET(Extras, imu_value_)>(
           reinterpret_cast<char*>(&imu_value_),
           reinterpret_cast<char*>(&other->imu_value_));
