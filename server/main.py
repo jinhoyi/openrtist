@@ -2,7 +2,7 @@
 
 from gabriel_server import local_engine
 # from openrtist_engine import OpenrtistEngine
-from openfluid_engine import OpenrfluidEngine
+from openfluid_engine import OpenfluidEngine
 from timing_engine import TimingEngine
 import logging
 import cv2
@@ -15,6 +15,8 @@ DEFAULT_NUM_TOKENS = 5
 INPUT_QUEUE_MAXSIZE = 240
 DEFAULT_STYLE = "the_scream"
 COMPRESSION_PARAMS = [cv2.IMWRITE_JPEG_QUALITY, 67]
+import signal 
+import sys
 
 logging.basicConfig(level=logging.INFO)
 
@@ -64,18 +66,29 @@ def main():
         if args.timing:
             engine = TimingEngine(COMPRESSION_PARAMS, None)
         else:
-            engine = OpenrfluidEngine(COMPRESSION_PARAMS, None)
+            engine = OpenfluidEngine(COMPRESSION_PARAMS, None)
 
         return engine
 
+
+
+
     local_engine.run(
         engine_setup,
-        OpenrfluidEngine.SOURCE_NAME,
+        OpenfluidEngine.SOURCE_NAME,
         INPUT_QUEUE_MAXSIZE,
         args.port,
         args.tokens,
     )
 
+def signal_handler(signal, frame):
+    for obj in OpenfluidEngine.instances:
+        print("releasing")
+        obj.release()
+    sys.exit(0)
+
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
+
     main()

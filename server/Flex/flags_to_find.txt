@@ -71,3 +71,5 @@ https://registry.khronos.org/EGL/sdk/docs/man/
 
 OpenGL threads
 https://stackoverflow.com/questions/64484835/how-to-setup-one-shared-opengl-contexts-per-thread-with-sdl2
+
+https://stackoverflow.com/questions/25676835/signal-handling-in-multi-threaded-python

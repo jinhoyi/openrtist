@@ -36,32 +36,29 @@ import logging
 from gabriel_server import cognitive_engine
 from gabriel_protocol import gabriel_pb2
 import openrtist_pb2
-import os
-from io import BytesIO
 from time import time
 import zmq
-import os
-import signal
 import subprocess
 import sys
 from easyprocess import EasyProcess
 from pyvirtualdisplay.smartdisplay import SmartDisplay
 import time
-from threading import Thread, Lock
+import multiprocessing
+from threading import Thread, RLock, Event, Condition
+import threading
+import sys
 
 logger = logging.getLogger(__name__)
 
-
-from azure.cognitiveservices.vision.face import FaceClient
-from azure.cognitiveservices.vision.face.models import FaceAttributeType
-from msrest.authentication import CognitiveServicesCredentials
 import http.client, urllib.request, urllib.parse, urllib.error, base64
 
 
-class OpenrfluidEngine(cognitive_engine.Engine):
+class OpenfluidEngine(cognitive_engine.Engine):
     SOURCE_NAME = "openfluid"
     SHAKE_STYLE = "going_to_work"
-    REQUEST_TIMEOUT = 2500
+    REQUEST_TIMEOUT = 3000
+    
+    instances = []
 
     scene_list = {"00":"Rock Pool",
                   "01":"Pot Pourri",
@@ -76,35 +73,21 @@ class OpenrfluidEngine(cognitive_engine.Engine):
                   "10":"Fluid Block"
     }
 
+    monitor_stop = False
+
     def __init__(self, compression_params, args_engine = None):
+        OpenfluidEngine.instances.append(self)
+        self.lock = threading.RLock()
         if args_engine == None:
             args_engine = {'frame_port': '5559', 'imu_port': '5560'}
         
         self.zmq_address = args_engine['frame_port']
         self.zmq_imu_address = args_engine['imu_port']
 
-        # Water Mark
-        self.compression_params = compression_params
-        wtr_mrk4 = cv2.imread("../wtrMrk.png", -1)
-
-        self.mrk, _, _, mrk_alpha = cv2.split(wtr_mrk4)     # The RGB channels are equivalent
-        self.alpha = mrk_alpha.astype(float) / 255
-        self.mrk = np.expand_dims(self.mrk, axis=-1)
-        self.alpha = np.expand_dims(self.alpha, axis=-1)
-
-        self.mrk_h = self.mrk.shape[0]
-        self.mrk_w = self.mrk.shape[1]
-        self.mrk_ratio = self.mrk_h / self.mrk_w  # H / W
-
         # Initialize ZeroMQ Context and Socket
         self.zmq_context = zmq.Context()
 
-        # self.frame_socket = self.zmq_context.socket(zmq.PULL)
-        # self.frame_socket.setsockopt(zmq.RCVHWM, 1)
-        # self.frame_socket.connect(self.zmq_address)
-        # # self.frame_socket.setsockopt_string(zmq.SUBSCRIBE, "Img")
         self.frame_socket = self.zmq_context.socket(zmq.REQ)
-        # self.frame_socket.setsockopt( zmq.RCVTIMEO, 500 ) # milliseconds
         self.frame_socket.connect("tcp://localhost:" + self.zmq_address)
 
         self.imu_socket = self.zmq_context.socket(zmq.PUSH)
@@ -118,110 +101,126 @@ class OpenrfluidEngine(cognitive_engine.Engine):
 
         # Initialize Screen Resolution of the client
         self.screen_w = 480
-        self.screen_h = 1080
-        # self.screen_h = 1440
-        # self.screen_h = 2176
+        # self.screen_h = 1080
+        self.screen_h = 640
+        self.screen_ratio = self.screen_w / self.screen_h
 
         # Pointer to the Physics Simulation Engine Process
         self.phys_simulator = None
+        self.activity_monitor = None
 
         # Scene List retreived
         self.sendStyle = True
+        self.client_event = threading.Event()        
 
-        print(f'-windowed={480}x{640}')
-        ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={480}x{640}']
-        self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
-        self.get_scenes()
+        # Initialize simulation engine
+        self.start_sim()
+        self.monitor_stop = False
+        self.last_user_call = time.time()
+        self.activity_monitor = threading.Thread(target = self.time_monitor, args=(10, ))
+        self.activity_monitor.start()
+        # multiprocessing.Process(target = self.test_monitor).start()
 
         logger.info("FINISHED INITIALISATION")
-
-    def __del__(self):
-        if self.phys_simulator != None:
-            self.phys_simulator.kill()
         
-        while self.phys_simulator.poll() is None:
-                    time.sleep(0.1)
+    def release(self):
+        print("Gracefully Terminating OpenfluidEngine")
+        
+        self.monitor_stop = True
+        if self.activity_monitor != None:
+            self.client_event.set()
+            self.activity_monitor.join()
+        print("time Monitor killed")
+        
+        self.terminate_sim()
+        print("terminatd backend")
 
-    
+
+    # def test_monitor(self):
+    #     while True:
+    #         if self.phys_simulator == None:
+    #             print("HI")
+
+        
+    # Turn off the simulation engine when no client is detected. 
+    def time_monitor(self, timeout=30):
+        while not self.monitor_stop:
+            if self.client_event.wait(timeout = timeout):
+                self.client_event.clear()
+            else:
+                print("Client Inactive, terminating the simulation engine")
+                with self.lock:
+                    self.terminate_sim()
+                self.client_event.wait()
+                self.client_event.clear()
     
     def get_scenes(self):
-        print("sending 1")
+        print("Updating scenes... sending request")
         self.frame_socket.send_string("1")
 
-        print("sent 1")
         reply = None
         while True:
             if (self.frame_socket.poll(self.REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
                 reply = self.frame_socket.recv()
-                print("got reply")
                 break
             
             print("No response from server")
-            self.reset_simulator()
+            with self.lock:
+                self.reset_simulator()
 
-            print("resending 1")
+            print("\nResening Scene request")
             self.frame_socket.send_string("1")
 
-        print("got scenes")
+
         extras = openrtist_pb2.Extras()
         extras.ParseFromString(reply)
         self.scene_list = dict()
         for key in extras.style_list:
             self.scene_list[key] = extras.style_list[key]
+        print("Got Scene reply. Scene-lists Updated")
 
+    def terminate_sim(self):
+        with self.lock:
+            if self.phys_simulator != None:
+                print("terminating...")
+                self.phys_simulator.kill()
+                
+                while self.phys_simulator.poll() is None:
+                    time.sleep(0.1)
+                self.phys_simulator = None
+                # self.screen_h = 0
 
-
-
-
-    # def get_frame(self):
-    #     #Async Request of new rendered frame to the Simulation Engin
-    #     self.frame_socket.send_string("0")
-    #     raw_msg = self.frame_socket.recv()
-
-    #     input_frame = gabriel_pb2.InputFrame()
-    #     input_frame.ParseFromString(raw_msg)
-    #     orig_img = np.frombuffer(input_frame.payloads[0], dtype=np.uint8)
-    #     orig_img = np.flipud(orig_img.reshape((self.screen_h,self.screen_w,4)))
-    #     orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGRA2BGR)
-
-    #     return orig_img
-
-    def reset_simulator(self):
-
-        self.phys_simulator.kill()
-        while self.phys_simulator.poll() is None:
-            time.sleep(0.1)
+        # if self.frame_socket != None:
+        #     self.frame_socket.setsockopt(zmq.LINGER, 0)
+        #     self.frame_socket.close()
         
+        # if self.imu_socket != None:
+        #     self.imu_socket.setsockopt(zmq.LINGER, 0)
+        #     self.imu_socket.close()
 
-        self.frame_socket.setsockopt(zmq.LINGER, 0)
-        self.frame_socket.close()
+    def start_sim(self):
+        print("New Simulator")
         self.frame_socket = self.zmq_context.socket( zmq.REQ )
         self.frame_socket.connect("tcp://localhost:" + self.zmq_address)
 
-        self.imu_socket.setsockopt(zmq.LINGER, 0)
-        self.imu_socket.close()
-        self.imu_socket = self.zmq_context.socket( zmq.PUSH )
+        self.imu_socket = self.zmq_context.socket( zmq.PUSH )        
         self.imu_socket.setsockopt(zmq.SNDHWM , 1)
         self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_address)
 
 
-        ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
-        self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
+        with self.lock:
+            ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
+            
+            print("New Simulator starting...")
+            self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
         self.get_scenes()
 
-
-        pass
-        # self.imu_socket.unbind(self.zmq_imu_address)
-        
-        # url = self.imu_socket.LAST_ENDPOINT
-        # self.imu_socket.unbind(url)
-        # self.imu_socket.close()
-        # self.imu_socket = self.zmq_context.socket(zmq.PUSH)
-        # self.imu_socket.setsockopt(zmq.SNDHWM , 1)
-        # self.imu_socket.bind(self.zmq_imu_address)
+    def reset_simulator(self):
+        self.terminate_sim()
+        self.start_sim()
     
     def get_frame(self):
-        # Async Request of new rendered frame to the Simulation Engine
+        # Request of new rendered frame to the Simulation Engine
         self.frame_socket.send_string("0")
         reply = None
         while True:
@@ -229,10 +228,11 @@ class OpenrfluidEngine(cognitive_engine.Engine):
                 reply = self.frame_socket.recv()
                 break
             
-            print("No response from server")
-            self.reset_simulator()
-
+            print("No response from the Simulation Engine, restarting it")
+            with self.lock:
+                self.reset_simulator()
             self.frame_socket.send_string("0")
+            
         if reply == None:
             return None
 
@@ -240,33 +240,16 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         input_frame.ParseFromString(reply)
 
         return input_frame.payloads[0]
-
-
-    # def get_frame(self):
-    #     # Async Request of new rendered frame to the Simulation Engine
-    #     # print("sending 0")
-    #     self.frame_socket.send_string("0")
-    #     # print("asking for frame")
-    #     raw_msg = self.frame_socket.recv()
-    #     # except:
-    #     #     return None
-
-    #     # print("done")
-    #     if raw_msg == None:
-    #         return None
-
-    #     input_frame = gabriel_pb2.InputFrame()
-    #     input_frame.ParseFromString(raw_msg)
-
-    #     return input_frame.payloads[0]
     
     def send_imu(self, extras):
-        #Async Reply to the IMU_data request from the Simulation Engine
+        #Push IMU_data to the Simulation Engine
         self.imu_socket.send(extras.SerializeToString())
         return
 
-
     def handle(self, input_frame):
+        
+        self.client_event.set()
+
         # Check Input
         if input_frame.payload_type != gabriel_pb2.PayloadType.IMAGE:
             status = gabriel_pb2.ResultWrapper.Status.WRONG_INPUT_FORMAT
@@ -279,30 +262,22 @@ class OpenrfluidEngine(cognitive_engine.Engine):
         if extras.setting_value.scene == -1:
             self.sendStyle = True
 
-        # print(extras.screen_value.width,  extras.screen_value.height)
-
-
-        ratio = extras.screen_value.width / extras.screen_value.height
-        # ratio = self.screen_h / self.screen_w
-        if int(ratio * self.screen_h) != self.screen_w :
-            print(extras.screen_value.width,  extras.screen_value.height)
-            self.screen_w = int(ratio * self.screen_h)
-            print(f'-windowed={self.screen_w }x{self.screen_h}')
-            self._resize_watermark()
-            if self.phys_simulator != None:
+        with self.lock:
+            if (self.screen_ratio != extras.screen_value.ratio) or (self.screen_h != extras.screen_value.height):
+                print(self.screen_ratio, extras.screen_value.ratio)
+                self.screen_ratio = extras.screen_value.ratio
+                self.screen_h = extras.screen_value.height
+                self.screen_w = int(self.screen_ratio * self.screen_h + 0.5)
+                print(f'-windowed={self.screen_w }x{self.screen_h} reset')
                 self.reset_simulator()
-                # self.phys_simulator.kill()
-                # while self.phys_simulator.poll() is None:
-                #     time.sleep(0.1)
-                # self.reset_my_socket()
-                # ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
-                # self.phys_simulator = subprocess.Popen(ARGS, shell=True, stdout=subprocess.PIPE, start_new_session=True)
 
-        if self.phys_simulator == None:
-            print(f'-windowed={self.screen_w }x{self.screen_h}')
-            ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
-            # ARGS = ['exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64', '-vsycn=0']
-            self.phys_simulator = subprocess.Popen(ARGS, shell=True, stdout=subprocess.PIPE, start_new_session=True)
+        with self.lock:
+            if self.phys_simulator == None:
+                print(f'-windowed={self.screen_w }x{self.screen_h} new')
+                self.start_sim()
+            # ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsycn=0 -windowed={self.screen_w }x{self.screen_h}']
+            # # ARGS = ['exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64', '-vsycn=0']
+            # self.phys_simulator = subprocess.Popen(ARGS, shell=True, stdout=subprocess.PIPE, start_new_session=True)
             # outs, errs = self.phys_simulator.communicate()
         
         # send imu data/get new rendered frame from/to the Physics simulation Engine

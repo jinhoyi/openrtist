@@ -1,8 +1,8 @@
-from openfluid_engine import OpenrfluidEngine
+from openfluid_engine import OpenfluidEngine
 import time
 
 
-class TimingEngine(OpenrfluidEngine):
+class TimingEngine(OpenfluidEngine):
     def __init__(self, compression_params, args_engine = None):
         super().__init__(compression_params)
         self.count = 0
