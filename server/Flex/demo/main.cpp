@@ -786,7 +786,6 @@ void imu_thread() {
 		imu_socket.recv(pulled, zmq::recv_flags::none);
 
 		std::string serialized_extra(static_cast<char*>(pulled.data()), pulled.size());
-
 		extras.ParseFromString(serialized_extra);
 		
 		float sceneScale = extras.touch_value().scale();

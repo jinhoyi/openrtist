@@ -204,8 +204,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_openrtist_2eproto::offsets[] P
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ScreenValue, ratio_),
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ScreenValue, height_),
-  PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ScreenValue, width_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::openrtist::Extras_ArrowKey, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -283,8 +283,8 @@ const char descriptor_table_protodef_openrtist_2eproto[] PROTOBUF_SECTION_VARIAB
   "alue\030\001 \001(\014\032+\n\010IMUValue\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002"
   " \001(\002\022\t\n\001z\030\003 \001(\002\032F\n\nTouchInput\022\r\n\005scale\030\001"
   " \001(\002\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\022\023\n\013doubleTouc"
-  "h\030\004 \001(\010\032,\n\013ScreenValue\022\016\n\006height\030\001 \001(\005\022\r"
-  "\n\005width\030\002 \001(\005\032A\n\010ArrowKey\022\014\n\004left\030\001 \001(\010\022"
+  "h\030\004 \001(\010\032,\n\013ScreenValue\022\r\n\005ratio\030\001 \001(\002\022\016\n"
+  "\006height\030\002 \001(\005\032A\n\010ArrowKey\022\014\n\004left\030\001 \001(\010\022"
   "\r\n\005right\030\002 \001(\010\022\n\n\002up\030\003 \001(\010\022\014\n\004down\030\004 \001(\010"
   "\032}\n\007Setting\022\r\n\005scene\030\001 \001(\005\022\024\n\014align_cent"
   "er\030\002 \001(\010\022\017\n\007ar_view\030\003 \001(\010\022\r\n\005reset\030\004 \001(\010"
@@ -1055,16 +1055,16 @@ Extras_ScreenValue::Extras_ScreenValue(::PROTOBUF_NAMESPACE_ID::Arena* arena)
 Extras_ScreenValue::Extras_ScreenValue(const Extras_ScreenValue& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&height_, &from.height_,
-    static_cast<size_t>(reinterpret_cast<char*>(&width_) -
-    reinterpret_cast<char*>(&height_)) + sizeof(width_));
+  ::memcpy(&ratio_, &from.ratio_,
+    static_cast<size_t>(reinterpret_cast<char*>(&height_) -
+    reinterpret_cast<char*>(&ratio_)) + sizeof(height_));
   // @@protoc_insertion_point(copy_constructor:openrtist.Extras.ScreenValue)
 }
 
 void Extras_ScreenValue::SharedCtor() {
-  ::memset(&height_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&width_) -
-      reinterpret_cast<char*>(&height_)) + sizeof(width_));
+  ::memset(&ratio_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&ratio_)) + sizeof(height_));
 }
 
 Extras_ScreenValue::~Extras_ScreenValue() {
@@ -1098,9 +1098,9 @@ void Extras_ScreenValue::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&height_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&width_) -
-      reinterpret_cast<char*>(&height_)) + sizeof(width_));
+  ::memset(&ratio_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&ratio_)) + sizeof(height_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1112,17 +1112,17 @@ const char* Extras_ScreenValue::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // int32 height = 1;
+      // float ratio = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          ratio_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // int32 width = 2;
+      // int32 height = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -1154,16 +1154,16 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 height = 1;
-  if (this->height() != 0) {
+  // float ratio = 1;
+  if (!(this->ratio() <= 0 && this->ratio() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_height(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_ratio(), target);
   }
 
-  // int32 width = 2;
-  if (this->width() != 0) {
+  // int32 height = 2;
+  if (this->height() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_width(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_height(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1182,18 +1182,16 @@ size_t Extras_ScreenValue::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // int32 height = 1;
+  // float ratio = 1;
+  if (!(this->ratio() <= 0 && this->ratio() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // int32 height = 2;
   if (this->height() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_height());
-  }
-
-  // int32 width = 2;
-  if (this->width() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_width());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1227,11 +1225,11 @@ void Extras_ScreenValue::MergeFrom(const Extras_ScreenValue& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (!(from.ratio() <= 0 && from.ratio() >= 0)) {
+    _internal_set_ratio(from._internal_ratio());
+  }
   if (from.height() != 0) {
     _internal_set_height(from._internal_height());
-  }
-  if (from.width() != 0) {
-    _internal_set_width(from._internal_width());
   }
 }
 
@@ -1257,11 +1255,11 @@ void Extras_ScreenValue::InternalSwap(Extras_ScreenValue* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Extras_ScreenValue, width_)
-      + sizeof(Extras_ScreenValue::width_)
-      - PROTOBUF_FIELD_OFFSET(Extras_ScreenValue, height_)>(
-          reinterpret_cast<char*>(&height_),
-          reinterpret_cast<char*>(&other->height_));
+      PROTOBUF_FIELD_OFFSET(Extras_ScreenValue, height_)
+      + sizeof(Extras_ScreenValue::height_)
+      - PROTOBUF_FIELD_OFFSET(Extras_ScreenValue, ratio_)>(
+          reinterpret_cast<char*>(&ratio_),
+          reinterpret_cast<char*>(&other->ratio_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Extras_ScreenValue::GetMetadata() const {

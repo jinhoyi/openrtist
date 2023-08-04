@@ -692,25 +692,25 @@ class Extras_ScreenValue PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kHeightFieldNumber = 1,
-    kWidthFieldNumber = 2,
+    kRatioFieldNumber = 1,
+    kHeightFieldNumber = 2,
   };
-  // int32 height = 1;
+  // float ratio = 1;
+  void clear_ratio();
+  float ratio() const;
+  void set_ratio(float value);
+  private:
+  float _internal_ratio() const;
+  void _internal_set_ratio(float value);
+  public:
+
+  // int32 height = 2;
   void clear_height();
   ::PROTOBUF_NAMESPACE_ID::int32 height() const;
   void set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
   ::PROTOBUF_NAMESPACE_ID::int32 _internal_height() const;
   void _internal_set_height(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // int32 width = 2;
-  void clear_width();
-  ::PROTOBUF_NAMESPACE_ID::int32 width() const;
-  void set_width(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_width() const;
-  void _internal_set_width(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:openrtist.Extras.ScreenValue)
@@ -720,8 +720,8 @@ class Extras_ScreenValue PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  float ratio_;
   ::PROTOBUF_NAMESPACE_ID::int32 height_;
-  ::PROTOBUF_NAMESPACE_ID::int32 width_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_openrtist_2eproto;
 };
@@ -1633,7 +1633,27 @@ inline void Extras_TouchInput::set_doubletouch(bool value) {
 
 // Extras_ScreenValue
 
-// int32 height = 1;
+// float ratio = 1;
+inline void Extras_ScreenValue::clear_ratio() {
+  ratio_ = 0;
+}
+inline float Extras_ScreenValue::_internal_ratio() const {
+  return ratio_;
+}
+inline float Extras_ScreenValue::ratio() const {
+  // @@protoc_insertion_point(field_get:openrtist.Extras.ScreenValue.ratio)
+  return _internal_ratio();
+}
+inline void Extras_ScreenValue::_internal_set_ratio(float value) {
+  
+  ratio_ = value;
+}
+inline void Extras_ScreenValue::set_ratio(float value) {
+  _internal_set_ratio(value);
+  // @@protoc_insertion_point(field_set:openrtist.Extras.ScreenValue.ratio)
+}
+
+// int32 height = 2;
 inline void Extras_ScreenValue::clear_height() {
   height_ = 0;
 }
@@ -1651,26 +1671,6 @@ inline void Extras_ScreenValue::_internal_set_height(::PROTOBUF_NAMESPACE_ID::in
 inline void Extras_ScreenValue::set_height(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_height(value);
   // @@protoc_insertion_point(field_set:openrtist.Extras.ScreenValue.height)
-}
-
-// int32 width = 2;
-inline void Extras_ScreenValue::clear_width() {
-  width_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_ScreenValue::_internal_width() const {
-  return width_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 Extras_ScreenValue::width() const {
-  // @@protoc_insertion_point(field_get:openrtist.Extras.ScreenValue.width)
-  return _internal_width();
-}
-inline void Extras_ScreenValue::_internal_set_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  width_ = value;
-}
-inline void Extras_ScreenValue::set_width(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_width(value);
-  // @@protoc_insertion_point(field_set:openrtist.Extras.ScreenValue.width)
 }
 
 // -------------------------------------------------------------------
