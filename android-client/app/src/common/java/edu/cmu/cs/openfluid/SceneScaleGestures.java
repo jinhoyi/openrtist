@@ -1,20 +1,10 @@
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 import android.content.Context;
-import android.graphics.Point;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
-
-import com.google.protobuf.ByteString;
-
-import java.util.function.Consumer;
-
-import edu.cmu.cs.gabriel.camera.ImageViewUpdater;
 // https://stackoverflow.com/questions/5790503/can-we-use-scale-gesture-detector-for-pinch-zoom-in-android
 
 public class SceneScaleGestures implements View.OnTouchListener, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {

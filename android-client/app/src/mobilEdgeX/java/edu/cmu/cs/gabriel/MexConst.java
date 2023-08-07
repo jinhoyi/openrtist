@@ -4,7 +4,7 @@ import android.content.Context;
 
 public class MexConst {
     //These MEX DME parameters are case-sensitive
-    public static String MEX_APP = "openrtist";
+    public static String MEX_APP = "openfluid";
     public static String MEX_DEV = "CMU";
     public static String MEX_CARRIER = "CMU";
     public static String MEX_TAG = "latest";

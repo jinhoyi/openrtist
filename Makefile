@@ -31,7 +31,7 @@ LOCAL_EXEC_ASSET_DIR = android-client/app/src/main/assets
 GENERATED_FILES = \
 	$(LOCAL_EXECUTION_MODELS:%.model=$(LOCAL_EXEC_ASSET_DIR)/%.pt) \
 	python-client/src/openrtist/design.py \
-	python-client/src/openrtist/openrtist_pb2.py
+	python-client/src/openrtist/openfluid_pb2.py
 
 REQUIREMENTS = \
 	'PyQT5==$(PYQT5_VERSION)' \
@@ -73,9 +73,9 @@ distclean: clean
 	.venv/bin/pyuic5 -x $< -o $@
 
 #update pip install grpcio-tools
-python-client/src/openrtist/openrtist_pb2.py: android-client/app/src/main/proto/openrtist.proto .venv
-	.venv/bin/python -m grpc_tools.protoc --python_out=server -I android-client/app/src/main/proto openrtist.proto
-	.venv/bin/python -m grpc_tools.protoc --python_out=python-client/src/openrtist -I android-client/app/src/main/proto openrtist.proto
+python-client/src/openfluid/openfluid_pb2.py: android-client/app/src/main/proto/openfluid.proto .venv
+	.venv/bin/python -m grpc_tools.protoc --python_out=server -I android-client/app/src/main/proto openfluid.proto
+	.venv/bin/python -m grpc_tools.protoc --python_out=python-client/src/openfluid -I android-client/app/src/main/proto openfluid.proto
 
 $(LOCAL_EXEC_ASSET_DIR)/%.pt: models/%.model .venv
 	mkdir -p $(LOCAL_EXEC_ASSET_DIR)

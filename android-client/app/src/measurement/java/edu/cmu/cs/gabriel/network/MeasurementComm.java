@@ -13,7 +13,7 @@ import edu.cmu.cs.gabriel.protocol.Protos.ResultWrapper;
 
 public class MeasurementComm {
     private final MeasurementServerComm measurementServerComm;
-    private final OpenrtistComm openrtistComm;
+    private final OpenfluidComm openfluidComm;
 
     public MeasurementComm(
             String endpoint, int port, GabrielClientActivity gabrielClientActivity,
@@ -32,11 +32,11 @@ public class MeasurementComm {
                     Integer.parseInt(tokenLimit));
         }
 
-        this.openrtistComm = new OpenrtistComm(this.measurementServerComm, onDisconnect);
+        this.openfluidComm = new OpenfluidComm(this.measurementServerComm, onDisconnect);
     }
 
-    public OpenrtistComm getOpenrtistComm() {
-        return openrtistComm;
+    public OpenfluidComm getOpenfluidComm() {
+        return openfluidComm;
     }
 
     public double computeOverallFps() {

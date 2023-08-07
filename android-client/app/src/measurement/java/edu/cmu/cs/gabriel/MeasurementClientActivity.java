@@ -14,7 +14,7 @@ public class MeasurementClientActivity extends GabrielClientActivity {
         int port = getPort();
         this.measurementComm = new MeasurementComm(
                 this.serverIP, port, this, this.returnMsgHandler, Const.TOKEN_LIMIT);
-        this.setOpenrtistComm(this.measurementComm.getOpenrtistComm());
+        this.setOpenfluidComm(this.measurementComm.getOpenfluidComm());
     }
 
     @Override

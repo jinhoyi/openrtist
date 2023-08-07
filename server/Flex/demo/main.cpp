@@ -54,7 +54,7 @@
 #include <chrono>
 #include <zmq.hpp>
 #include "proto/gabriel.pb.h"
-#include "proto/openrtist.pb.h"
+#include "proto/openfluid.pb.h"
 
 #include "shaders.h"
 #include "imgui.h"
@@ -701,7 +701,7 @@ void video_compressor() {
 void send_image(zmq::socket_t& socket) {
     gabriel::InputFrame frame;
 	zmq::message_t request;
-	openrtist::Extras extras;
+	openfluid::Extras extras;
 	std::string serialized_msg;
 
 	// Wait for next request from the client
@@ -755,12 +755,12 @@ void video_sender(){
 
 void imu_receiver() {
 	
-	openrtist::Extras extras;
+	openfluid::Extras extras;
 	zmq::message_t pulled;
 	zmq::socket_t imu_socket(context, zmq::socket_type::pull);
 	int hwm = 1;
-	// imu_socket.set(zmq::sockopt::rcvhwm, hwm);
-	imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
+	imu_socket.set(zmq::sockopt::rcvhwm, hwm);
+	// imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
 	imu_socket.bind("tcp://*:" + std::to_string(zmq_port + 1));
 	printf("Flex: binded for receiving client input\n");
 
@@ -864,8 +864,8 @@ void imu_receiver() {
 			} else {
 				x_speed += touchX*g_camSpeed * scrollSensitivity;
 				y_speed += -touchY*g_camSpeed * scrollSensitivity;
-				dx = ((int)right_key - (int)left_key) * 3 * (sensor_input_ack);
-				dy = ((int)down_key - (int)up_key) * 3 * (sensor_input_ack);
+				dx = ((int)right_key - (int)left_key) * (sensor_input_ack);
+				dy = ((int)down_key - (int)up_key) * (sensor_input_ack);
 			}
 
 			// Forward backword
@@ -3316,8 +3316,8 @@ int main(int argc, char* argv[])
 	g_scenes.push_back(new DamBreak("DamBreak LowRes", 0.1f));
 	g_scenes.push_back(new DamBreak("DamBreak MedRes", 0.07f));
 	g_scenes.push_back(new DamBreak("DamBreak HighRes", 0.05f));
-	g_scenes.push_back(new DamBreak3("DamBreak Full LowRes", 0.1f));
-	g_scenes.push_back(new DamBreak3("DamBreak Full MedRes", 0.1f));
+	g_scenes.push_back(new DamBreak3("DamBreak Half-Full LowRes", 0.1f));
+	g_scenes.push_back(new DamBreak3("DamBreak Half-Full MedRes", 0.1f));
 
 	// viscous fluids
 	g_scenes.push_back(new DamBreak2("Viscosity Low", 0.1f));

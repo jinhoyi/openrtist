@@ -34,7 +34,7 @@ from gabriel_protocol import gabriel_pb2
 from gabriel_server import cognitive_engine
 from threading import Event, RLock, Thread
 import logging
-import openrtist_pb2
+import openfluid_pb2
 import subprocess
 import time
 import zmq
@@ -133,7 +133,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
             print("\nResening Scene request...")
             self.frame_socket.send_string("1")
 
-        extras = openrtist_pb2.Extras()
+        extras = openfluid_pb2.Extras()
         extras.ParseFromString(reply)
         OpenfluidEngine.scene_list = dict()
         for key in extras.style_list:
@@ -201,7 +201,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         input_frame.ParseFromString(reply)
         
         try:
-            extras = cognitive_engine.unpack_extras(openrtist_pb2.Extras, input_frame)
+            extras = cognitive_engine.unpack_extras(openfluid_pb2.Extras, input_frame)
             if (extras.latency_token == True):
                 self.latency_return = True
             else:
@@ -226,7 +226,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
             return cognitive_engine.create_result_wrapper(status)
         
         # Retrieve data sent by the client
-        extras = cognitive_engine.unpack_extras(openrtist_pb2.Extras, input_frame)
+        extras = cognitive_engine.unpack_extras(openfluid_pb2.Extras, input_frame)
         
         # Check if Scene info needs to be updated
         if extras.setting_value.scene == -1:
@@ -257,7 +257,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         result.payload_type = gabriel_pb2.PayloadType.IMAGE
         result.payload = img_data
 
-        extras = openrtist_pb2.Extras()
+        extras = openfluid_pb2.Extras()
         if self.sendStyle:
             for k, v in self.scene_list.items():
                 extras.style_list[k] = v

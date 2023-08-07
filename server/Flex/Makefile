@@ -31,7 +31,7 @@ protobuf==3.20.3
 # LOCAL_EXEC_ASSET_DIR = android-client/app/src/main/assets
 
 GENERATED_FILES = \
-	./demo/proto/include/openrtist.pb.cc
+	./demo/proto/include/openrfluid.pb.cc
 
 REQUIREMENTS = \
 	'PyQT5==$(PYQT5_VERSION)' \
@@ -56,8 +56,6 @@ check: .venv
 reformat: .venv
 	.venv/bin/black .
 
-# docker: all
-# 	docker build -t cmusatyalab/openrtist .
 
 clean:
 	$(RM) $(GENERATED_FILES)
@@ -75,11 +73,9 @@ distclean: clean
 	.venv/bin/pyuic5 -x $< -o $@
 
 #update pip install grpcio-tools
-demo/proto/include/openrtist.pb.cc: .venv
+demo/proto/include/openrfluid.pb.cc: .venv
 	/usr/bin/protoc -I=./demo/proto -I=./demo/proto/include --cpp_out=demo/proto gabriel.proto
-	/usr/bin/protoc -I=./demo/proto -I=./demo/proto/include --cpp_out=demo/proto openrtist.proto
-
-# .venv/bin/python -m grpc_tools.protoc --python_out=python-client/src/openrtist -I android-client/app/src/main/proto openrtist.proto
+	/usr/bin/protoc -I=./demo/proto -I=./demo/proto/include --cpp_out=demo/proto openfluid.proto
 
 .PHONY: all check reformat docker clean distclean
 .PRECIOUS: $(GENERATED_FILES)

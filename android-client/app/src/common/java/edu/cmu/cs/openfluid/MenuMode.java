@@ -1,8 +1,7 @@
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.util.Pair;
 import android.view.HapticFeedbackConstants;
@@ -10,10 +9,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.content.res.ResourcesCompat;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -114,19 +111,19 @@ public class MenuMode extends AbstractModeManager {
                 ArrayAdapter<String> sceneAdapter = clientActivity.getSceneAdapter();
                 return (v -> {
                     // Create an ArrayAdapter
-                    ArrayAdapter<String> adapter = sceneAdapter;
                     List<String> styleIds = clientActivity.getSceneIDs();
+                    List<String> styleDescriptions = clientActivity.getSceneDescriptions();
+                    List<Pair<Integer, String>> items = new ArrayList<>();
+                    for(String scenes : styleDescriptions) {
+                        items.add(new Pair<>(R.drawable.baseline_arrow_right_24, scenes));
+                    }
 
+                    CustomListAdapter customAdapter = new CustomListAdapter(clientActivity, R.layout.my_scene_list, items);
                     AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
-                    builder.setIcon(R.drawable.outline_landscape_24).setTitle(" ")
-                            .setAdapter(adapter, (dialog, position) -> clientActivity.setSceneType(styleIds.get(position)));
-
+                    builder.setTitle("Choose Scene")
+                            .setAdapter(customAdapter, (dialog, position) -> clientActivity.setSceneType(styleIds.get(position)));
                     AlertDialog dialog = builder.create();
                     dialog.show();
-
-                    ImageView imageView = dialog.findViewById(android.R.id.icon);
-                    if (imageView != null)
-                        imageView.setColorFilter(Color.WHITE);
 
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
                     clientActivity.switchMode(GabrielClientActivity.AppMode.MAIN);
@@ -187,7 +184,7 @@ public class MenuMode extends AbstractModeManager {
                 items.add(new Pair<>(R.drawable.outline_landscape_24,
                         clientActivity.getString(R.string.help_scene)));
 
-                CustomListAdapter adapter = new CustomListAdapter(clientActivity, items);
+                CustomListAdapter adapter = new CustomListAdapter(clientActivity, R.layout.my_help_list, items);
                 AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
                 builder.setTitle("Menus")
                         .setAdapter(adapter, (dialog, which) -> {});

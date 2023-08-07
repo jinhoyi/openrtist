@@ -14,15 +14,14 @@ import edu.cmu.cs.gabriel.client.comm.ServerComm;
 import edu.cmu.cs.gabriel.protocol.Protos.InputFrame;
 import edu.cmu.cs.gabriel.protocol.Protos.ResultWrapper;
 
-public class OpenrtistComm {
+public class OpenfluidComm {
     private final ServerComm serverComm;
     private final ErrorConsumer onDisconnect;
 
-    public static OpenrtistComm createOpenrtistComm(
+    public static OpenfluidComm createOpenfluidComm(
             String endpoint, int port, GabrielClientActivity gabrielClientActivity,
-            ImageView referenceView, Consumer<ByteString> imageView, String tokenLimit) {
-        Consumer<ResultWrapper> consumer = new ResultConsumer(
-                referenceView, imageView, gabrielClientActivity);
+            Consumer<ByteString> imageView, String tokenLimit) {
+        Consumer<ResultWrapper> consumer = new ResultConsumer(imageView, gabrielClientActivity);
         ErrorConsumer onDisconnect = new ErrorConsumer(gabrielClientActivity);
         ServerComm serverComm;
         Application application = gabrielClientActivity.getApplication();
@@ -35,10 +34,10 @@ public class OpenrtistComm {
                     Integer.parseInt(tokenLimit));
         }
 
-        return new OpenrtistComm(serverComm, onDisconnect);
+        return new OpenfluidComm(serverComm, onDisconnect);
     }
 
-    OpenrtistComm(ServerComm serverComm, ErrorConsumer onDisconnect) {
+    OpenfluidComm(ServerComm serverComm, ErrorConsumer onDisconnect) {
         this.serverComm = serverComm;
         this.onDisconnect = onDisconnect;
     }

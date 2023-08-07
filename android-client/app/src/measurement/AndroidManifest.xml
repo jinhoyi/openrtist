@@ -9,7 +9,7 @@
             tools:replace="android:parentActivityName">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.cmu.cs.openrtist.MeasurementServerListActivity"
+                android:value="edu.cmu.cs.openfluid.MeasurementServerListActivity"
                 tools:replace="android:value" />
         </activity>
         <activity

@@ -12,12 +12,12 @@ public:
 
 		int dx = int(ceilf(2.5f / restDistance));
 		int dy = int(ceilf(2.5f / restDistance));
-		int dz = int(ceilf(2.0f / restDistance));
+		int dz = int(ceilf(1.8f / restDistance));
 
 		CreateParticleGrid(Vec3(0.0f, restDistance, 0.0f), dx, dy, dz, restDistance, Vec3(0.0f), 1.0f, false, 0.0f, NvFlexMakePhase(0, eNvFlexPhaseSelfCollide | eNvFlexPhaseFluid), restDistance*0.01f);
 
 		g_sceneLower = Vec3(0.0f, 0.0f, 0.0f);
-		g_sceneUpper = Vec3(2.5f, 2.5f, 2.0f);
+		g_sceneUpper = Vec3(2.5f, 2.5f, 2.5f);
 
 		g_numSubsteps = 2;
 

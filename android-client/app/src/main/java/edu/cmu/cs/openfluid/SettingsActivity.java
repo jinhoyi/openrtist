@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;

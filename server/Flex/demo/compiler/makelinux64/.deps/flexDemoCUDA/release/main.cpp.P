@@ -52,7 +52,7 @@ build/flexDemoCUDA_release/main.cpp.o: ../../main.cpp \
  ../../../external/EGL/egl.h ../../../external/EGL/eglext.h \
  ../../../include/NvFlex.h ../../../include/NvFlexExt.h \
  ../../../include/NvFlex.h ../../../include/NvFlexDevice.h \
- ../../proto/gabriel.pb.h ../../proto/openrtist.pb.h ../../shaders.h \
+ ../../proto/gabriel.pb.h ../../proto/openfluid.pb.h ../../shaders.h \
  ../../imgui.h ../../shadersDemoContext.h ../../demoContext.h \
  ../../helpers.h ../../scenes.h ../../scenes/adhesion.h \
  ../../scenes/armadilloshower.h ../../scenes/bananas.h \
@@ -135,7 +135,7 @@ build/flexDemoCUDA_release/main.cpp.o: ../../main.cpp \
  ../../../external/EGL/egl.h ../../../external/EGL/eglext.h :
  ../../../include/NvFlex.h ../../../include/NvFlexExt.h :
  ../../../include/NvFlex.h ../../../include/NvFlexDevice.h :
- ../../proto/gabriel.pb.h ../../proto/openrtist.pb.h ../../shaders.h :
+ ../../proto/gabriel.pb.h ../../proto/openfluid.pb.h ../../shaders.h :
  ../../imgui.h ../../shadersDemoContext.h ../../demoContext.h :
  ../../helpers.h ../../scenes.h ../../scenes/adhesion.h :
  ../../scenes/armadilloshower.h ../../scenes/bananas.h :

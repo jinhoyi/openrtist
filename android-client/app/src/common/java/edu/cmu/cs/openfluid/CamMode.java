@@ -1,12 +1,9 @@
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Pair;
 import android.view.HapticFeedbackConstants;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -119,7 +116,7 @@ public class CamMode extends AbstractModeManager {
                 items.add(new Pair<>(R.drawable.baseline_keyboard_arrow_left_24,
                         clientActivity.getString(R.string.help_cam_back)));
 
-                CustomListAdapter adapter = new CustomListAdapter(clientActivity, items);
+                CustomListAdapter adapter = new CustomListAdapter(clientActivity, R.layout.my_help_list, items);
                 AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
                 builder.setTitle("Camera Controls")
                         .setAdapter(adapter, (dialog, which) -> {});

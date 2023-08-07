@@ -31,7 +31,7 @@
             android:theme="@style/MyGabrielMaterialTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.cmu.cs.openrtist.ServerListActivity" />
+                android:value="edu.cmu.cs.openfluid.ServerListActivity" />
         </activity>
         <!-- tools:node="remove" -->
         <activity
@@ -61,7 +61,7 @@
 
             <!-- Enable below for Google Glass -->
             <intent-filter>
-                <action android:name="edu.cmu.cs.openrtist.GabrielClientActivity" />
+                <action android:name="edu.cmu.cs.openfluid.GabrielClientActivity" />
                 <category android:name="android:android.intent.category.DEFAULT" />
             </intent-filter>
 

@@ -1,3 +1,0 @@
-build/flexDemoCUDA_debug/proto/openrtist.pb.cc.o: \
- ../../proto/openrtist.pb.cc ../../proto/openrtist.pb.h
- ../../proto/openrtist.pb.cc ../../proto/openrtist.pb.h :

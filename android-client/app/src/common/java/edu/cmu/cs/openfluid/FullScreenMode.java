@@ -1,17 +1,14 @@
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
-import android.app.AlertDialog;
 import android.os.Build;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 
 public class FullScreenMode extends AbstractModeManager {

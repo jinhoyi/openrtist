@@ -7,7 +7,7 @@
         android:title="@string/pref_mex_dme" />
 
     <EditTextPreference
-        android:defaultValue="openrtist"
+        android:defaultValue="openfluid"
         android:key="mex_app"
         android:title="@string/pref_mex_app" />
 

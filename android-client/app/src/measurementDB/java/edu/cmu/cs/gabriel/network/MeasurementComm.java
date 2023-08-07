@@ -6,14 +6,14 @@ import android.os.Handler;
 import java.util.function.Consumer;
 
 import edu.cmu.cs.gabriel.Const;
-import edu.cmu.cs.openrtist.GabrielClientActivity;
+import edu.cmu.cs.openfluid.GabrielClientActivity;
 import edu.cmu.cs.gabriel.client.comm.MeasurementServerComm;
 import edu.cmu.cs.gabriel.protocol.Protos.ResultWrapper;
 import edu.cmu.cs.measurementDb.MeasurementDbConsumer;
 
 public class MeasurementComm {
     private final MeasurementServerComm measurementServerComm;
-    private final OpenrtistComm openrtistComm;
+    private final OpenfluidComm openfluidComm;
 
     public MeasurementComm(
             String endpoint, int port, GabrielClientActivity gabrielClientActivity,
@@ -33,11 +33,11 @@ public class MeasurementComm {
                     Integer.parseInt(tokenLimit));
         }
 
-        this.openrtistComm = new OpenrtistComm(this.measurementServerComm, onDisconnect);
+        this.openfluidComm = new OpenfluidComm(this.measurementServerComm, onDisconnect);
     }
 
-    public OpenrtistComm getOpenrtistComm() {
-        return openrtistComm;
+    public OpenfluidComm getOpenfluidComm() {
+        return openfluidComm;
     }
 
     public double computeOverallFps() {

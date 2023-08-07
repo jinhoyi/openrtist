@@ -1,4 +1,4 @@
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 import android.app.AlertDialog;
 import android.os.Build;
@@ -96,7 +96,7 @@ public class MainMode extends AbstractModeManager {
                 items.add(new Pair<>(R.drawable.baseline_fullscreen_24,
                         clientActivity.getString(R.string.help_fullscreen)));
 
-                CustomListAdapter adapter = new CustomListAdapter(clientActivity, items);
+                CustomListAdapter adapter = new CustomListAdapter(clientActivity, R.layout.my_help_list, items);
                 AlertDialog.Builder builder = new AlertDialog.Builder(clientActivity);
                 builder.setTitle("Help")
                         .setAdapter(adapter, (dialog, which) -> {});

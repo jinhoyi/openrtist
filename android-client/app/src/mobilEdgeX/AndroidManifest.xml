@@ -13,7 +13,7 @@
             android:theme="@style/MyGabrielMaterialTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.cmu.cs.openrtist.MexServerListActivity" />
+                android:value="edu.cmu.cs.openfluid.MexServerListActivity" />
         </activity>
         <activity
             android:name=".MexServerListActivity"

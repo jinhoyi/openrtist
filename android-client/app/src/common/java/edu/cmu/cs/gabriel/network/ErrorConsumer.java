@@ -2,9 +2,9 @@ package edu.cmu.cs.gabriel.network;
 
 import java.util.function.Consumer;
 
-import edu.cmu.cs.openrtist.GabrielClientActivity;
+import edu.cmu.cs.openfluid.GabrielClientActivity;
 import edu.cmu.cs.gabriel.client.results.ErrorType;
-import edu.cmu.cs.openrtist.R;
+import edu.cmu.cs.openfluid.R;
 
 public class ErrorConsumer implements Consumer<ErrorType> {
     private final GabrielClientActivity gabrielClientActivity;

@@ -19,7 +19,7 @@ flexDemoCUDA_cppfiles   += ./../../../core/voxelize.cpp
 flexDemoCUDA_cppfiles   += ./../../opengl/imguiRenderGL.cpp
 flexDemoCUDA_cppfiles   += ./../../opengl/shader.cpp
 flexDemoCUDA_cppfiles   += ./../../opengl/shadersGL.cpp
-flexDemoCUDA_ccfiles   += ./../../proto/openrtist.pb.cc
+flexDemoCUDA_ccfiles   += ./../../proto/openfluid.pb.cc
 flexDemoCUDA_ccfiles   += ./../../proto/gabriel.pb.cc
 
 flexDemoCUDA_cpp_release_dep    = $(addprefix $(DEPSDIR)/flexDemoCUDA/release/, $(subst ./, , $(subst ../, , $(patsubst %.cpp, %.cpp.P, $(flexDemoCUDA_cppfiles)))))

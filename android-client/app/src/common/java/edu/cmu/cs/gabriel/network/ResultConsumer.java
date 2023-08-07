@@ -10,23 +10,20 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 
 import edu.cmu.cs.gabriel.Const;
-import edu.cmu.cs.openrtist.GabrielClientActivity;
+import edu.cmu.cs.openfluid.GabrielClientActivity;
 import edu.cmu.cs.gabriel.camera.ImageViewUpdater;
 import edu.cmu.cs.gabriel.protocol.Protos.ResultWrapper;
 import edu.cmu.cs.gabriel.protocol.Protos.PayloadType;
-import edu.cmu.cs.openrtist.Protos.Extras;
+import edu.cmu.cs.openfluid.Protos.Extras;
 
 public class ResultConsumer implements Consumer<ResultWrapper> {
     private static final String TAG = "ResultConsumer";
 
-    private final ImageViewUpdater referenceViewUpdater;
     private final Consumer<ByteString> imageViewUpdater;
     private final GabrielClientActivity gabrielClientActivity;
 
-    public ResultConsumer(
-            ImageView referenceView, Consumer<ByteString> imageViewUpdater,
+    public ResultConsumer(Consumer<ByteString> imageViewUpdater,
             GabrielClientActivity gabrielClientActivity) {
-        this.referenceViewUpdater = new ImageViewUpdater(referenceView);
         this.imageViewUpdater = imageViewUpdater;
         this.gabrielClientActivity = gabrielClientActivity;
     }

@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ListView;
-import android.widget.ImageView;
+
 import androidx.appcompat.widget.Toolbar;
 import android.os.Bundle;
 import android.Manifest;
@@ -43,15 +36,9 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.SensorManager;
 import android.hardware.Sensor;
 
-import org.w3c.dom.Text;
-
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 import edu.cmu.cs.gabriel.Const;
-import edu.cmu.cs.gabriel.client.socket.SocketWrapper;
-import edu.cmu.cs.gabriel.serverlist.Server;
 import edu.cmu.cs.gabriel.serverlist.ServerListFragment;
 
 public class ServerListActivity extends AppCompatActivity {
