@@ -9,11 +9,6 @@ public:
 		float radius = 0.1f; // 10cm
 		float restDistance = radius*0.5f;
 
-		// convex rocks
-		float minSize = 0.1f;
-		float maxSize = 0.5f;
-
-
 		int dx = int(ceilf(2.0f / (radius*0.5f)));
 		int dy = int(ceilf(3.0f / (radius*0.5f)));
 		int dz = int(ceilf(1.0f / (radius*0.5f)));

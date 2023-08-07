@@ -203,10 +203,6 @@ GLuint LoadTexture(const char* filename)
 
         return tex;
     }
-    else
-    {
-        return NULL;
-    }
 }
 
 struct RenderTexture
@@ -507,35 +503,11 @@ void ReshapeRender(int width, int height, bool minimized)
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		GLenum error = glGetError();
-		printf("OpenGL error code: 0x%04X\n", error);
-		if (status == GL_FRAMEBUFFER_UNDEFINED){
-			printf("GL_FRAMEBUFFER_UNDEFINED\n");
-		}
-		if (status == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT){
-			printf("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
-		}
-		if (status == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT){
-			printf("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
-		}
-		if (status == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER){
-			printf("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
-		}
-		if (status == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER){
-			printf("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
-		}
-		if (status == GL_FRAMEBUFFER_UNSUPPORTED){
-			printf("GL_FRAMEBUFFER_UNSUPPORTED\n");
-		}
-		if (status == GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE){
-			printf("GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
-		}
-		if (status == GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS){
-			printf("GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS\n");
-		}
+		printf("Flex: OpenGL error code = 0x%04X\n", error);
 		return;
 	}
 
-	printf("created FBO\n");	
+	printf("Flex: FBO Created\n");	
 }
 
 void GetViewRay(int x, int y, Vec3& origin, Vec3& dir)

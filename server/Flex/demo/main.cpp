@@ -120,14 +120,11 @@ SDL_GameController* g_gamecontroller = NULL;
 using namespace std;
 
 //FLAG:SCREEN_SIZE
-// int g_screenWidth = 1280;
-// int g_screenHeight = 720;
+int g_screenWidth = 480; // 1280;
+int g_screenHeight = 640; // 720;
 int g_relativeW = 480;
 
-int g_screenWidth = 480;
-int g_screenHeight = 640;
 int g_msaaSamples = 8;
-
 int g_numSubsteps;
 
 // a setting of -1 means Flex will use the device specified in the NVIDIA control panel
@@ -441,9 +438,6 @@ float g_camSpeed;
 float g_camNear;
 float g_camFar;
 
-float g_sceneLastScale = 1.0f;
-float g_sceneScale = 1.0f;
-
 Vec3 g_lightPos;
 Vec3 g_lightDir;
 Vec3 g_lightTarget;
@@ -623,6 +617,8 @@ std::atomic_bool latency_request(false);
 std::atomic_bool latency_feedback(false);
 std::atomic_bool latency_return(false);
 
+int zmq_port = 5559;
+
 std::vector<std::function<void(float,float,float,float,float,float)>> cameraViews;
 
 std::vector<unsigned char> g_jpegImage;
@@ -702,19 +698,6 @@ void video_compressor() {
 	}
 }
 
-// void send_scenes(zmq::message_t& request) {
-// 	openrtist::Extras extras;
-	
-// 	int idx = 0;
-// 	for (const auto& scene : g_scenes) {
-// 		(*extras.mutable_style_list())[std::to_string(idx++)] = scene->mName;
-//     }
-
-// 	std::string serialized_extras;
-//     extras.SerializeToString(&serialized_extras);
-
-// }
-
 void send_image(zmq::socket_t& socket) {
     gabriel::InputFrame frame;
 	zmq::message_t request;
@@ -725,15 +708,14 @@ void send_image(zmq::socket_t& socket) {
 	socket.recv(request, zmq::recv_flags::none);
 
 	std::string str(static_cast<char*>(request.data()), request.size());
-	// std::cout << str << std::endl;
-	if (str == "1"){
+	if (str == "1") { // Scene Request
 		int idx = 0;
 		for (const auto& scene : g_scenes) {
 			(*extras.mutable_style_list())[std::to_string(idx++)] = scene->mName;
 		}
 
 		extras.SerializeToString(&serialized_msg);
-	} else {
+	} else { // Frame Request
 		bitmap_mtx.lock();
 			frame.add_payloads((char*)g_jpegData.data(), g_jpegData.size());
 		bitmap_mtx.unlock();
@@ -743,7 +725,6 @@ void send_image(zmq::socket_t& socket) {
 			latency_return = false;
 		}
 		extras.set_fps((int) (1.0f/g_realdt + 0.5));
-		// std::cout << (int) (1.0f/g_realdt + 0.5) << std::endl;
 
 		google::protobuf::Any any;
 		any.PackFrom(extras);
@@ -759,8 +740,8 @@ void send_image(zmq::socket_t& socket) {
 
 void video_sender(){
 	zmq::socket_t video_socket(context, zmq::socket_type::rep);
-	video_socket.bind("tcp://*:5559");
-	printf("binded for video Thread\n");
+	video_socket.bind("tcp://*:" + std::to_string(zmq_port));
+	printf("Flex: binded for sending frames\n");
 	send_image(video_socket);
 
 	while(running) {
@@ -777,7 +758,8 @@ void imu_receiver() {
 	zmq::socket_t imu_socket(context, zmq::socket_type::pull);
 	int hwm = 1;
 	imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
-	imu_socket.bind("tcp://*:5560");
+	imu_socket.bind("tcp://*:" + std::to_string(zmq_port + 1));
+	printf("Flex: binded for receiving client input\n");
 
 	const float si_g = 9.81f;
 
@@ -801,9 +783,9 @@ void imu_receiver() {
 		std::string serialized_extra(static_cast<char*>(pulled.data()), pulled.size());
 		extras.ParseFromString(serialized_extra);
 		
-		float sceneScale = extras.touch_value().scale();
-		float sceneX = extras.touch_value().x();
-		float sceneY = extras.touch_value().y();
+		float touchScale = extras.touch_value().scale();
+		float touchX = extras.touch_value().x();
+		float touchY = extras.touch_value().y();
 		bool left_key = extras.arrow_key().left();
 		bool right_key = extras.arrow_key().right();
 		bool up_key = extras.arrow_key().up();
@@ -892,30 +874,30 @@ void imu_receiver() {
 
 
 			// printf("dx: %f, %f\n", extras.touch_value().x(), extras.touch_value().y());
-			// printf("Scale: %f\n\n", sceneScale);
+			// printf("Scale: %f\n\n", touchScale);
 
 			if (doubleTouch) {
-				dx = extras.touch_value().x()*0.8;
-				dy = extras.touch_value().y()*0.8;
+				dx = touchX*0.8;
+				dy = touchY*0.8;
 			} else {
-				x_speed += extras.touch_value().x()*g_camSpeed * scrollSensitivity;
-				y_speed += -extras.touch_value().y()*g_camSpeed * scrollSensitivity;
+				x_speed += touchX*g_camSpeed * scrollSensitivity;
+				y_speed += -touchY*g_camSpeed * scrollSensitivity;
 				dx = ((int)right_key - (int)left_key) * 3 * (new_frame_sensors);
 				dy = ((int)down_key - (int)up_key) * 3 * (new_frame_sensors);
 			}
 
 			// Forward backword
-			if (sceneScale == 1.0f) {
+			if (touchScale == 1.0f) {
 				g_camVel.z = 0;
 			} else {
-				if (sceneScale > 1.0f) {
-					float diff = (sceneScale - 1.0);
+				if (touchScale > 1.0f) {
+					float diff = (touchScale - 1.0);
 					diff *= diff;
 					g_camVel.z += diff * 5.0f +  g_camSpeed/50.0f;
 				}
 					
 				else{
-					float diff = (1.0 - sceneScale);
+					float diff = (1.0 - touchScale);
 					diff *= diff;
 					g_camVel.z += -g_camSpeed/50.0f - (diff * 5.0f);
 				}		
@@ -1389,7 +1371,7 @@ void Init(int scene, bool centerCamera = true)
 	// perform initial sim warm up
 	if (g_warmup)
 	{
-		printf("Warming up sim..\n");
+		printf("Flex: Warming up sim..\n");
 
 		// warm it up (relax positions to reach rest density without affecting velocity)
 		NvFlexParams copy = g_params;
@@ -1410,7 +1392,7 @@ void Init(int scene, bool centerCamera = true)
 		NvFlexGetSmoothParticles(g_solver, g_buffers->smoothPositions.buffer, NULL);
 		NvFlexGetAnisotropy(g_solver, g_buffers->anisotropy1.buffer, g_buffers->anisotropy2.buffer, g_buffers->anisotropy3.buffer, NULL);
 
-		printf("Finished warm up.\n");
+		printf("Flex: Finished warm up.\n");
 	}
 }
 
@@ -1558,7 +1540,6 @@ void CameraFront(float lowerX, float upperX, float lowerY, float upperY, float l
 	
 	float scene_w = (upperX - lowerX);
 	float cam_z = upperZ + (scene_w / g_relativeW) * 1600.0f;
-	float cam_y = (scene_w / g_relativeW) * 1630.0f * 0.2;
 
 	g_camPos = Vec3((lowerX + upperX)*0.5f, (lowerY + upperY)*0.5f, cam_z);
 	g_camAngle = Vec3(0.0f, 0.0f, 0.0f);
@@ -1574,7 +1555,6 @@ void Camera3D(float lowerX, float upperX, float lowerY, float upperY, float lowe
 	float fromCenter = cam_z - ((upperZ + lowerZ) * 0.5);
 	float sqr = fromCenter * fromCenter;
 	float adjacent = sqrt(sqr + sqr);
-	float opposite = cam_y;
 
 	g_camPos = Vec3((lowerX + upperX) * 0.5 + cam_z, cam_y + (upperY / 1.7), (lowerZ + upperZ) * 0.5 + cam_z);
 	g_camAngle = Vec3(DegToRad(45), -ATan2(cam_y , adjacent), 0.0f);
@@ -2265,10 +2245,10 @@ int DoUI()
 
 		x -= 180;
 
-		int uiOffset = 250;
+		// int uiOffset = 250;
 		int uiBorder = 20;
 		int uiWidth = 200;
-		int uiHeight = g_screenHeight - uiOffset - uiBorder * 3;
+		// int uiHeight = g_screenHeight - uiOffset - uiBorder * 3;
 		int uiLeft = uiBorder;
 
 		// if (g_tweakPanel)
@@ -2289,7 +2269,7 @@ int DoUI()
 
 		if (g_tweakPanel)
 		{
-			static int scroll = 0;
+			// static int scroll = 0;
 
 			// imguiBeginScrollArea("Options", uiLeft, g_screenHeight - uiBorder - uiHeight - uiOffset - uiBorder, uiWidth, uiHeight, &scroll);
 			imguiBeginScrollArea("Infos", uiLeft, 6 * uiBorder, uiWidth, g_screenHeight - 12 * uiBorder, &g_levelScroll);
@@ -2430,15 +2410,11 @@ void UpdateFrame()
 	double frameBeginTime = GetSeconds();
 
 	g_realdt = float(frameBeginTime - lastTime);
-	
-
-
-	// printf("g_realdt = %f\n", g_realdt);
 	lastTime = frameBeginTime;
 
 	// do gamepad input polling
-	double currentTime = frameBeginTime;
-	static double lastJoyTime = currentTime;
+	// double currentTime = frameBeginTime;
+	// static double lastJoyTime = currentTime;
 
 	//-------------------------------------------------------------------
 	// Scene Update
@@ -2697,8 +2673,8 @@ void DumpAftermathData()
 
 void ReshapeWindow(int width, int height)
 {
-	if (!g_benchmark)
-		printf("Reshaping\n");
+	// if (!g_benchmark)
+	// 	printf("Reshaping\n");
 
 	ReshapeRender(g_window, width, height);
 
@@ -3159,7 +3135,7 @@ void SDLMainLoop()
 #endif
 	{
 		bool quit = false;
-		SDL_Event e;
+		// SDL_Event e;
 		g_framebuffer.m_width = g_screenWidth;
 		g_framebuffer.m_height = g_screenHeight;
 		g_framebuffer.m_data = new uint32_t[g_screenWidth*g_screenHeight];
@@ -3306,7 +3282,6 @@ int main(int argc, char* argv[])
 			g_screenWidth = w;
 			g_screenHeight = h;
 			g_fullscreen = false;
-			printf("Rendering Size %d x %d\n", g_screenWidth, g_screenHeight);
 		}
 		else if (strstr(argv[i], "-windowed"))
 		{
@@ -3318,12 +3293,7 @@ int main(int argc, char* argv[])
 		if (sscanf(argv[i], "-vsync=%d", &d))
 			g_vsync = d != 0;
 
-		if (g_vsync) {
-			printf("VSYNC On\n");
-
-		} else {
-			printf("VSYNC Off");
-		}
+		
 
 		if (sscanf(argv[i], "-multiplier=%d", &d) == 1)
 		{
@@ -3349,6 +3319,12 @@ int main(int argc, char* argv[])
 		{
 			if (d >= 0 && d <= 2)
 				g_graphics = d;
+		}
+
+		if (sscanf(argv[i], "-zmqport=%d", &d) == 1)
+		{
+			if (d >= 0 && d <= 2)
+				zmq_port = d;
 		}
 	}
 
@@ -3387,7 +3363,7 @@ int main(int argc, char* argv[])
 
 	//FLAG:CREATE_CONTEXT
 #ifndef ANDROID
-	DemoContext* demoContext = nullptr;
+	// DemoContext* demoContext = nullptr;
 #if FLEX_DX
 	// Flex DX demo will always create the renderer using the same DX api as the flex lib
 	if (g_d3d12)
@@ -3449,8 +3425,14 @@ int main(int argc, char* argv[])
 	options.fullscreen = g_fullscreen;
 
 	InitRender(options);
+	printf("\nRendering Size %d x %d\n", g_screenWidth, g_screenHeight);
+	if (g_vsync) {
+		printf("Flex: vsync On\n");
 
-	printf("g_screenWidth = %d, g_screenHeight = %d\n",g_screenWidth, g_screenHeight );
+	} else {
+		printf("Flex: vsync Off\n");
+	}
+
 	if (g_fullscreen)
 		SDL_SetWindowFullscreen(g_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
@@ -3533,13 +3515,13 @@ int main(int argc, char* argv[])
 
 	if (g_Error || g_flexLib == NULL)
 	{
-		printf("Could not initialize Flex, exiting.\n");
+		printf("Flex: Could not initialize Flex, exiting.\n");
 		exit(-1);
 	}
 
 	// store device name
 	strcpy(g_deviceName, NvFlexGetDeviceName(g_flexLib));
-	printf("Compute Device: %s\n\n", g_deviceName);
+	printf("Flex: Compute Device: %s\n\n", g_deviceName);
 
 	if (g_benchmark)
 		g_scene = BenchmarkInit();

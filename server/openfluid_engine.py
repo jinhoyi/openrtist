@@ -1,4 +1,4 @@
-# OpenRTiST
+# OpenRTiST !!!! NEED UPDATE
 #   - Real-time Style Transfer
 #
 #   Authors: Zhuo Chen <zhuoc@cs.cmu.edu>
@@ -30,58 +30,32 @@
 # distributed under the BSD 3-Clause License.
 # https://github.com/pytorch/examples/blob/master/LICENSE
 
-import cv2
-import numpy as np
-import logging
-from gabriel_server import cognitive_engine
 from gabriel_protocol import gabriel_pb2
+from gabriel_server import cognitive_engine
+from threading import Event, RLock, Thread
+import logging
 import openrtist_pb2
-from time import time
-import zmq
 import subprocess
-import sys
-from easyprocess import EasyProcess
-from pyvirtualdisplay.smartdisplay import SmartDisplay
 import time
-import multiprocessing
-from threading import Thread, RLock, Event, Condition
-import threading
-import sys
+import zmq
 
 logger = logging.getLogger(__name__)
-
-import http.client, urllib.request, urllib.parse, urllib.error, base64
-
 
 class OpenfluidEngine(cognitive_engine.Engine):
     SOURCE_NAME = "openfluid"
     REQUEST_TIMEOUT = 3000
     
     instances = []
-
-    scene_list = {"00":"Rock Pool",
-                  "01":"Pot Pourri",
-                  "02":"Viscosity Low",
-                  "03":"Viscosity Med",
-                  "04":"Viscosity High",
-                  "05":"Buoyancy",
-                  "06":"Surface Tension Low",
-                  "07":"Surface Tension Med",
-                  "08":"Surface Tension High",
-                  "09":"DamBreak",
-                  "10":"Fluid Block"
-    }
-
-    monitor_stop = False
+    scene_list = {}
 
     def __init__(self, compression_params, args_engine = None, timeout = 30):
         OpenfluidEngine.instances.append(self)
-        self.lock = threading.RLock()
+        self.lock = RLock()
         if args_engine == None:
-            args_engine = {'frame_port': '5559', 'imu_port': '5560'}
+            args_engine = 5559
         
-        self.zmq_address = args_engine['frame_port']
-        self.zmq_imu_address = args_engine['imu_port']
+        self.zmq_address = str(args_engine)
+        self.zmq_imu_address = str(args_engine + 1)
 
         # Initialize ZeroMQ Context and Socket
         self.zmq_context = zmq.Context()
@@ -93,34 +67,27 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.imu_socket.setsockopt(zmq.SNDHWM , 1)
         self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_address)
 
-        # IMU sensor Data
-        self.x = 0
-        self.y = 0
-        self.z = 0
-
-        # Initialize Screen Resolution of the client
+        # Initialize Screen Resolution
         self.screen_w = 480
-        # self.screen_h = 1080
         self.screen_h = 640
-        # self.screen_ratio = self.screen_w / self.screen_h
         self.screen_ratio = self.screen_h / self.screen_w
         self.vsync = 0
 
         # Pointer to the Physics Simulation Engine Process
         self.phys_simulator = None
-        self.activity_monitor = None
 
         # Scene List retreived
         self.sendStyle = True
-        self.client_event = threading.Event()        
 
         # Initialize simulation engine and Client activity monitor
+        self.activity_monitor = None
         self.start_sim()
         self.monitor_stop = False
-        self.last_user_call = time.time()
-        self.activity_monitor = threading.Thread(target = self.client_activity_monitor, args=(timeout, ))
+        self.client_event = Event()      
+        self.activity_monitor = Thread(target = self.client_activity_monitor, args=(timeout, ))
         self.activity_monitor.start()
 
+        # For Performance Measurement
         self.latency_return = False
         self.server_fps = 0
 
@@ -145,14 +112,14 @@ class OpenfluidEngine(cognitive_engine.Engine):
             if self.client_event.wait(timeout = timeout):
                 self.client_event.clear()
             else:
-                print("Client Inactive, terminating the simulation engine")
+                print("Client inactive, terminating the simulation engine...")
                 with self.lock:
                     self.terminate_sim()
                 self.client_event.wait()
                 self.client_event.clear()
     
     def get_scenes(self):
-        print("Updating scenes... sending request")
+        print("Updating scenes, sending request...")
         self.frame_socket.send_string("1")
 
         reply = None
@@ -165,37 +132,35 @@ class OpenfluidEngine(cognitive_engine.Engine):
             with self.lock:
                 self.reset_simulator()
 
-            print("\nResening Scene request")
+            print("\nResening Scene request...")
             self.frame_socket.send_string("1")
-
 
         extras = openrtist_pb2.Extras()
         extras.ParseFromString(reply)
-        self.scene_list = dict()
+        OpenfluidEngine.scene_list = dict()
         for key in extras.style_list:
-            self.scene_list[key] = extras.style_list[key]
+            OpenfluidEngine.scene_list[key] = extras.style_list[key]
         print("Got Scene reply. Scene-lists Updated")
 
     def terminate_sim(self):
         with self.lock:
             if self.phys_simulator != None:
-                print("terminating...")
                 self.phys_simulator.kill()
                 
                 while self.phys_simulator.poll() is None:
                     time.sleep(0.1)
                 self.phys_simulator = None
+                print("Simulator Terminated")
 
-        # if self.frame_socket != None:
-        #     self.frame_socket.setsockopt(zmq.LINGER, 0)
-        #     self.frame_socket.close()
+        if isinstance(self.frame_socket, zmq.sugar.socket.Socket):
+            self.frame_socket.setsockopt(zmq.LINGER, 0)
+            self.frame_socket.close()
         
-        # if self.imu_socket != None:
-        #     self.imu_socket.setsockopt(zmq.LINGER, 0)
-        #     self.imu_socket.close()
+        if isinstance(self.imu_socket, zmq.sugar.socket.Socket):
+            self.imu_socket.setsockopt(zmq.LINGER, 0)
+            self.imu_socket.close()
 
     def start_sim(self):
-        print("New Simulator")
         self.frame_socket = self.zmq_context.socket( zmq.REQ )
         self.frame_socket.connect("tcp://localhost:" + self.zmq_address)
 
@@ -203,9 +168,11 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.imu_socket.setsockopt(zmq.SNDHWM , 1)
         self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_address)
 
-
         with self.lock:
-            ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64 -vsync={self.vsync} -windowed={self.screen_w }x{self.screen_h}']
+            ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64'
+                    + f' -vsync={self.vsync}'
+                    + f' -zmqport=' + self.zmq_address 
+                    + f' -windowed={self.screen_w }x{self.screen_h}']
             
             print("New Simulator starting...")
             self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
@@ -243,7 +210,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 self.latency_return = False
             self.server_fps = extras.fps
         except:
-            print("Exception")
             self.latency_return = False
 
         return input_frame.payloads[0]
@@ -254,7 +220,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
         return
 
     def handle(self, input_frame):
-        
         self.client_event.set()
 
         # Check Input
@@ -277,7 +242,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 self.screen_w = extras.screen_value.resolution
                 self.screen_h = int(self.screen_ratio * self.screen_w + 0.5)
                 self.vsync = extras.fps
-                # print(extras.fps)
                 print(f'-windowed={self.screen_w }x{self.screen_h} reset')
                 self.reset_simulator()
 
