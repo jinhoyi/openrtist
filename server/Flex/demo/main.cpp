@@ -606,7 +606,7 @@ std::mutex latency_mtx;
 zmq::context_t context(1);
 std::atomic_bool running(false);
 std::atomic_bool new_frame(false);
-std::atomic_bool new_frame_sensors(false);
+std::atomic_bool sensor_input_ack(false);
 std::atomic_bool flag_align(false);
 std::atomic_bool ack_align(false);
 std::atomic_bool flag_ar(false);
@@ -793,10 +793,8 @@ void imu_receiver() {
 		bool reset = extras.setting_value().reset();
 		bool alignCenter = extras.setting_value().align_center();
 		bool arView = extras.setting_value().ar_view();
-		
 		bool latency_token = extras.latency_token();
 		
-
 		// Click Actions
 		if (reset == true) {
 			flag_reset = true;
@@ -809,8 +807,6 @@ void imu_receiver() {
 		if (arView == true) {
 			flag_ar = true;
 		} 
-
-		
 
 		// Scene value
 		g_newScene.store(extras.setting_value().scene());
@@ -842,39 +838,22 @@ void imu_receiver() {
 		imu_y = -extras.imu_value().y();
 		imu_z = -extras.imu_value().z();
 
-
-		// Camera Movements
-		// float dx = extras.touch_value().x()*100;
-		// float dy = extras.touch_value().y()*100;
-
-		// float x_speed = ((int)right_key - (int)left_key) * g_camSpeed / 3;
-		// float y_speed = ((int)up_key - (int)down_key) * g_camSpeed / 3;
-
-		// float dx = ((int)right_key - (int)left_key);
-		// float dy = ((int)down_key - (int)up_key);
-
 		bool doubleTouch = extras.touch_value().doubletouch();
-		
 
-		// float x_speed = extras.touch_value().x()*g_camSpeed * scrollSensitivity;
-		// float y_speed = -extras.touch_value().y()*g_camSpeed * scrollSensitivity;
 		latency_mtx.lock();
 			if (latency_token == true) {
 				latency_request = true;
 			} 
 		latency_mtx.unlock();
 
+		// Camera Movement
 		scale_mtx.lock();
 			float dx = 0;
 			float dy = 0;
-			if (new_frame_sensors.load()) {
+			if (sensor_input_ack.load()) {
 				x_speed = 0;
 				y_speed = 0;
 			}
-
-
-			// printf("dx: %f, %f\n", extras.touch_value().x(), extras.touch_value().y());
-			// printf("Scale: %f\n\n", touchScale);
 
 			if (doubleTouch) {
 				dx = touchX*0.8;
@@ -882,8 +861,8 @@ void imu_receiver() {
 			} else {
 				x_speed += touchX*g_camSpeed * scrollSensitivity;
 				y_speed += -touchY*g_camSpeed * scrollSensitivity;
-				dx = ((int)right_key - (int)left_key) * 3 * (new_frame_sensors);
-				dy = ((int)down_key - (int)up_key) * 3 * (new_frame_sensors);
+				dx = ((int)right_key - (int)left_key) * 3 * (sensor_input_ack);
+				dy = ((int)down_key - (int)up_key) * 3 * (sensor_input_ack);
 			}
 
 			// Forward backword
@@ -907,15 +886,13 @@ void imu_receiver() {
 			g_camAngle.x -= Clamp(dx*kSensitivity, -FLT_MAX, FLT_MAX);
 			g_camAngle.y -= Clamp(dy*kSensitivity, -FLT_MAX, FLT_MAX);
 
-			new_frame_sensors = false;
+			sensor_input_ack = false;
 
 			// Up/Down/Right/Left
 			g_camVel.x = x_speed;
 			g_camVel.y = y_speed;
 		scale_mtx.unlock();		
 		
-
-
 		g_params.gravity[0] = imu_x;
 		g_params.gravity[1] = imu_y;
 		g_params.gravity[2] = imu_z;
@@ -1249,6 +1226,7 @@ void Init(int scene, bool centerCamera = true)
 		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*2.0f);
 		// g_camPos = Vec3((g_sceneLower.x + g_sceneUpper.x)*0.5f, min(g_sceneUpper.y*1.25f, 6.0f), g_sceneUpper.z + min(g_sceneUpper.y, 6.0f)*4.5f);
 		// g_camAngle = Vec3(0.0f, -DegToRad(5.0f), 0.0f);
+
 		float scene_w = (g_sceneUpper.x - g_sceneLower.x);
 		float cam_z = g_sceneUpper.z + (scene_w / g_relativeW) * 1500.0f;
 
@@ -1593,7 +1571,7 @@ void UpdateCamera()
 			// Forward backword
 			Vec3 forward(-sinf(g_camAngle.x)*cosf(g_camAngle.y), sinf(g_camAngle.y), -cosf(g_camAngle.x)*cosf(g_camAngle.y));
 			Vec3 right(Normalize(Cross(forward, Vec3(0.0f, 1.0f, 0.0f))));
-			new_frame_sensors = true;
+			sensor_input_ack = true;
 		scale_mtx.unlock();
 
 		// Camera Angle
@@ -3102,28 +3080,28 @@ void ControllerDeviceUpdate()
 // Originally Used for Device with monitor (and GUI)
 void SDLInit(const char* title)
 {
-	// if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)	// Initialize SDL's Video subsystem and game controllers
-	// 	printf("Unable to initialize SDL");
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)	// Initialize SDL's Video subsystem and game controllers
+		printf("Unable to initialize SDL");
 
-	// if (SDL_Init(SDL_INIT_VIDEO ) < 0)	// Initialize SDL's Video subsystem and game controllers
-	// 	printf("Unable to initialize SDL");
+	if (SDL_Init(SDL_INIT_VIDEO ) < 0)	// Initialize SDL's Video subsystem and game controllers
+		printf("Unable to initialize SDL");
 
-// 	unsigned int flags = SDL_WINDOW_RESIZABLE;
-// #if !FLEX_DX
-// 	if (g_graphics == 0)
-// 	{
-// 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-// 		// For Sharing Context
-// 		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+	unsigned int flags = SDL_WINDOW_RESIZABLE;
+#if !FLEX_DX
+	if (g_graphics == 0)
+	{
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		// For Sharing Context
+		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
-// 		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS;
-// 	}
-// #endif
+		flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS;
+	}
+#endif
 
-	// g_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-	// 	g_screenWidth, g_screenHeight, flags);
+	g_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		g_screenWidth, g_screenHeight, flags);
 	
-	// g_windowId = SDL_GetWindowID(g_window);
+	g_windowId = SDL_GetWindowID(g_window);
 }
 
 
@@ -3416,7 +3394,7 @@ int main(int argc, char* argv[])
 	}
 	const char* title = str.c_str();
 
-	SDLInit(title);
+	// SDLInit(title);
 
 	options.window = g_window;
 	options.numMsaaSamples = g_msaaSamples;
