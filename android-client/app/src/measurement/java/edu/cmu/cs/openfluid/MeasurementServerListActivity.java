@@ -1,4 +1,4 @@
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 public class MeasurementServerListActivity extends ServerListActivity {
     ServerListAdapter createServerListAdapter() {

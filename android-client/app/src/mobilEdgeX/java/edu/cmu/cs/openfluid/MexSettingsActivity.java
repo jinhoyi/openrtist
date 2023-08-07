@@ -1,4 +1,4 @@
-package edu.cmu.cs.openrtist;
+package edu.cmu.cs.openfluid;
 
 import android.content.Intent;
 import android.os.Bundle;
