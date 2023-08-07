@@ -3,8 +3,8 @@ import time
 
 
 class TimingEngine(OpenfluidEngine):
-    def __init__(self, compression_params, args_engine = None):
-        super().__init__(compression_params)
+    def __init__(self, zmq_port=5559, timeout=30, vsync=0):
+        super().__init__(zmq_port, timeout, vsync)
         self.count = 0
         self.lasttime = time.time()
         self.lastcount = 0

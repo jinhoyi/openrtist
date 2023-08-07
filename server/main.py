@@ -13,8 +13,8 @@ DEFAULT_PORT = 9099
 DEFAULT_ZMQ_PORT = 5559
 DEFAULT_NUM_TOKENS = 5
 INPUT_QUEUE_MAXSIZE = 240
-DEFAULT_STYLE = "the_scream"
-COMPRESSION_PARAMS = [cv2.IMWRITE_JPEG_QUALITY, 67]
+DEFAULT_TIMEOUT = 30
+# COMPRESSION_PARAMS = [cv2.IMWRITE_JPEG_QUALITY, 67]
 import signal 
 import sys
 
@@ -38,13 +38,20 @@ def main():
     parser.add_argument(
         "--zmqport", type=int, default=DEFAULT_ZMQ_PORT, help="Set port for zmq IPC"
     )
+    parser.add_argument(
+        "--timeout", type=int, default=DEFAULT_TIMEOUT, help="Set client inactive duration before the simulation goes to sleep mode (sec)"
+    )
+    parser.add_argument(
+        "-v", "--vsync", type=int, default=0, help="Set client inactive duration before the simulation goes to sleep mode (sec)"
+    )
+    
     args = parser.parse_args()
 
     def engine_setup():
         if args.timing:
-            engine = TimingEngine(COMPRESSION_PARAMS, args.zmqport)
+            engine = TimingEngine(args.zmqport, args.timeout, args.vsync)
         else:
-            engine = OpenfluidEngine(COMPRESSION_PARAMS, args.zmqport)
+            engine = OpenfluidEngine(args.zmqport, args.timeout, args.vsync)
 
         return engine
 

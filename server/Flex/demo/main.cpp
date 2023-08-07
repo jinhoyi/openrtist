@@ -740,6 +740,8 @@ void send_image(zmq::socket_t& socket) {
 
 void video_sender(){
 	zmq::socket_t video_socket(context, zmq::socket_type::rep);
+	// int hwm = 1;
+	// video_socket.set(zmq::sockopt::sndhwm, hwm);
 	video_socket.bind("tcp://*:" + std::to_string(zmq_port));
 	printf("Flex: binded for sending frames\n");
 	send_image(video_socket);
@@ -757,6 +759,7 @@ void imu_receiver() {
 	zmq::message_t pulled;
 	zmq::socket_t imu_socket(context, zmq::socket_type::pull);
 	int hwm = 1;
+	// imu_socket.set(zmq::sockopt::rcvhwm, hwm);
 	imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
 	imu_socket.bind("tcp://*:" + std::to_string(zmq_port + 1));
 	printf("Flex: binded for receiving client input\n");
@@ -3392,7 +3395,7 @@ int main(int argc, char* argv[])
 		str += "(Graphics: DX12)";
 		break;
 	}
-	const char* title = str.c_str();
+	// const char* title = str.c_str();
 
 	// SDLInit(title);
 

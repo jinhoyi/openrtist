@@ -48,14 +48,12 @@ class OpenfluidEngine(cognitive_engine.Engine):
     instances = []
     scene_list = {}
 
-    def __init__(self, compression_params, args_engine = None, timeout = 30):
+    def __init__(self, zmq_port=5559, timeout=30, vsync=0):
         OpenfluidEngine.instances.append(self)
         self.lock = RLock()
-        if args_engine == None:
-            args_engine = 5559
         
-        self.zmq_address = str(args_engine)
-        self.zmq_imu_address = str(args_engine + 1)
+        self.zmq_address = str(zmq_port)
+        self.zmq_imu_address = str(zmq_port + 1)
 
         # Initialize ZeroMQ Context and Socket
         self.zmq_context = zmq.Context()
@@ -71,7 +69,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.screen_w = 480
         self.screen_h = 640
         self.screen_ratio = self.screen_h / self.screen_w
-        self.vsync = 0
+        self.vsync = vsync
 
         # Pointer to the Physics Simulation Engine Process
         self.phys_simulator = None
