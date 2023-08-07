@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
 from gabriel_server import local_engine
-# from openrtist_engine import OpenrtistEngine
 from openfluid_engine import OpenfluidEngine
 from timing_engine import TimingEngine
 import logging
-import cv2
 import argparse
 import sys
 

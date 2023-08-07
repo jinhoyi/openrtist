@@ -150,14 +150,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 self.phys_simulator = None
                 print("Simulator Terminated")
 
-        if isinstance(self.frame_socket, zmq.sugar.socket.Socket):
-            self.frame_socket.setsockopt(zmq.LINGER, 0)
-            self.frame_socket.close()
-        
-        if isinstance(self.imu_socket, zmq.sugar.socket.Socket):
-            self.imu_socket.setsockopt(zmq.LINGER, 0)
-            self.imu_socket.close()
-
     def start_sim(self):
         self.frame_socket = self.zmq_context.socket( zmq.REQ )
         self.frame_socket.connect("tcp://localhost:" + self.zmq_address)

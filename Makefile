@@ -5,37 +5,14 @@
 # specific versions to ensure consistent rebuilds
 BLACK_VERSION = 22.6.0
 PYQT5_VERSION = 5.14.2
-TORCH_VERSION = 1.11.0 # originally 1.4.0
-TORCHVISION_VERSION = 0.12.0 # originally 0.5.0
-
-
-LOCAL_EXECUTION_MODELS = \
-	cafe_gogh.model \
-	candy.model \
-	david_vaughan.model \
-	dido_carthage.model \
-	fall_icarus.model \
-	femmes_d_alger.model \
-	going_to_work.model \
-	monet.model \
-	mosaic.model \
-	rain_princess.model \
-	starry-night.model \
-	sunday_afternoon.model \
-	the_scream.model \
-	udnie.model \
-	weeping_woman.model
 
 LOCAL_EXEC_ASSET_DIR = android-client/app/src/main/assets
 
 GENERATED_FILES = \
-	$(LOCAL_EXECUTION_MODELS:%.model=$(LOCAL_EXEC_ASSET_DIR)/%.pt) \
-	python-client/src/openrtist/design.py \
 	python-client/src/openrtist/openfluid_pb2.py
 
 REQUIREMENTS = \
 	'PyQT5==$(PYQT5_VERSION)' \
-	'opencv-python' \
 	'fire' \
 	'torch==$(TORCH_VERSION)' \
 	'torchvision==$(TORCHVISION_VERSION)' \
