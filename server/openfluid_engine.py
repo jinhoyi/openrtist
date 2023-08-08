@@ -92,16 +92,16 @@ class OpenfluidEngine(cognitive_engine.Engine):
         logger.info("FINISHED INITIALISATION")
         
     def release(self):
-        print("Gracefully Terminating OpenfluidEngine")
+        logger.info("Gracefully Terminating OpenfluidEngine")
         
         self.monitor_stop = True
         if self.activity_monitor != None:
             self.client_event.set()
             self.activity_monitor.join()
-        print("time Monitor killed")
+        logger.info("time Monitor killed")
         
         self.terminate_sim()
-        print("terminatd backend")
+        logger.info("terminatd backend")
 
         
     # Turn off the simulation engine when no client is detected. 
@@ -110,14 +110,14 @@ class OpenfluidEngine(cognitive_engine.Engine):
             if self.client_event.wait(timeout = timeout):
                 self.client_event.clear()
             else:
-                print("Client inactive, terminating the simulation engine...")
+                logger.info("Client inactive, terminating the simulation engine...")
                 with self.lock:
                     self.terminate_sim()
                 self.client_event.wait()
                 self.client_event.clear()
     
     def get_scenes(self):
-        print("Updating scenes, sending request...")
+        logger.info("Updating scenes, sending request...")
         self.frame_socket.send_string("1")
 
         reply = None
@@ -126,11 +126,11 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 reply = self.frame_socket.recv()
                 break
             
-            print("No response from server")
+            logger.info("No response from server")
             with self.lock:
                 self.reset_simulator()
 
-            print("\nResening Scene request...")
+            logger.info("\nResening Scene request...")
             self.frame_socket.send_string("1")
 
         extras = openfluid_pb2.Extras()
@@ -138,7 +138,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         OpenfluidEngine.scene_list = dict()
         for key in extras.style_list:
             OpenfluidEngine.scene_list[key] = extras.style_list[key]
-        print("Got Scene reply. Scene-lists Updated")
+        logger.info("Got Scene reply. Scene-lists Updated")
 
     def terminate_sim(self):
         with self.lock:
@@ -148,7 +148,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 while self.phys_simulator.poll() is None:
                     time.sleep(0.1)
                 self.phys_simulator = None
-                print("Simulator Terminated")
+                logger.info("Simulator Terminated")
 
     def start_sim(self):
         self.frame_socket = self.zmq_context.socket( zmq.REQ )
@@ -164,7 +164,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
                     + f' -zmqport=' + self.zmq_address 
                     + f' -windowed={self.screen_w }x{self.screen_h}']
             
-            print("New Simulator starting...")
+            logger.info("New Simulator starting...")
             self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
         self.get_scenes()
 
@@ -181,7 +181,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 reply = self.frame_socket.recv()
                 break
             
-            print("No response from the Simulation Engine, restarting it")
+            logger.info("No response from the Simulation Engine, restarting it")
             with self.lock:
                 self.reset_simulator()
             self.frame_socket.send_string("0")
@@ -227,17 +227,16 @@ class OpenfluidEngine(cognitive_engine.Engine):
         
         with self.lock:
             if (self.screen_ratio != extras.screen_value.ratio) or (self.screen_w != extras.screen_value.resolution) or (extras.fps != self.vsync):
-                print(self.screen_ratio, extras.screen_value.ratio)
                 self.screen_ratio = extras.screen_value.ratio
                 self.screen_w = extras.screen_value.resolution
                 self.screen_h = int(self.screen_ratio * self.screen_w + 0.5)
                 self.vsync = extras.fps
-                print(f'-windowed={self.screen_w }x{self.screen_h} reset')
+                logger.info(f'-windowed={self.screen_w }x{self.screen_h} reset')
                 self.reset_simulator()
 
         with self.lock:
             if self.phys_simulator == None:
-                print(f'-windowed={self.screen_w }x{self.screen_h} new')
+                logger.info(f'-windowed={self.screen_w }x{self.screen_h} new')
                 self.start_sim()
         
         # send imu data/get new rendered frame from/to the Physics simulation Engine

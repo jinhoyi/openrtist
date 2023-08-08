@@ -16,7 +16,8 @@ clean:
 #update pip install grpcio-tools
 ./demo/proto/openfluid.pb.cc:
 	/usr/bin/protoc -I=./demo/proto --cpp_out=demo/proto gabriel.proto
-	/usr/bin/protoc -I=../../android-client/app/src/main/proto --cpp_out=demo/proto openfluid.proto
+	# /usr/bin/protoc -I=../../android-client/app/src/main/proto --cpp_out=demo/proto openfluid.proto
+	/usr/bin/protoc -I=./demo/proto --cpp_out=demo/proto openfluid.proto
 
 .PHONY: all check reformat docker clean distclean
 .PRECIOUS: $(GENERATED_FILES)
