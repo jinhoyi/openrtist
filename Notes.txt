@@ -90,3 +90,12 @@ https://stackoverflow.com/questions/25676835/signal-handling-in-multi-threaded-p
 download gcc7
 https://askubuntu.com/questions/1406962/install-gcc7-on-ubuntu-22-04
 
+
+
+DOCKER Calling
+sudo docker run -it --rm --name=testenv --mount type=bind,source=${PWD}/../server,target=/test testenv/testenv_build:0.1
+sudo docker build -t testenv/testenv_build:0.1 -f DockerfileBuildEnv .
+
+
+cuda 9.2 
+https://developer.nvidia.com/cuda-92-download-archive

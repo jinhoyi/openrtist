@@ -2,9 +2,12 @@
 .gradle/
 .idea/
 .venv/
+.vscode/
 __pycache__/
 local.properties
 **/app/build/
 **/app/src/main/assets/
+server/cuda-9.2/
+cuda-9.2/
 env/
 dist/

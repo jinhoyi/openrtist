@@ -71,6 +71,7 @@
         "valarray": "cpp",
         "cfenv": "cpp",
         "csignal": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "typeindex": "cpp"
     }
 }

@@ -50,20 +50,21 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
     def __init__(self, zmq_port=5559, timeout=30, vsync=0):
         OpenfluidEngine.instances.append(self)
+        logger.info("Initializing OpenfluidEngine")
         self.lock = RLock()
         
-        self.zmq_address = str(zmq_port)
-        self.zmq_imu_address = str(zmq_port + 1)
+        self.zmq_frame_addr = str(zmq_port)
+        self.zmq_imu_addr = str(zmq_port + 1)
 
         # Initialize ZeroMQ Context and Socket
         self.zmq_context = zmq.Context()
 
         self.frame_socket = self.zmq_context.socket(zmq.REQ)
-        self.frame_socket.connect("tcp://localhost:" + self.zmq_address)
+        self.frame_socket.connect("tcp://localhost:" + self.zmq_frame_addr)
 
         self.imu_socket = self.zmq_context.socket(zmq.PUSH)
         self.imu_socket.setsockopt(zmq.SNDHWM , 1)
-        self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_address)
+        self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_addr)
 
         # Initialize Screen Resolution
         self.screen_w = 480
@@ -80,6 +81,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         # Initialize simulation engine and Client activity monitor
         self.activity_monitor = None
         self.start_sim()
+        self.get_scenes()
         self.monitor_stop = False
         self.client_event = Event()      
         self.activity_monitor = Thread(target = self.client_activity_monitor, args=(timeout, ))
@@ -92,7 +94,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         logger.info("FINISHED INITIALISATION")
         
     def release(self):
-        logger.info("Gracefully Terminating OpenfluidEngine")
+        logger.info("Terminating OpenfluidEngine")
         
         self.monitor_stop = True
         if self.activity_monitor != None:
@@ -101,7 +103,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
         logger.info("time Monitor killed")
         
         self.terminate_sim()
-        logger.info("terminatd backend")
 
         
     # Turn off the simulation engine when no client is detected. 
@@ -130,7 +131,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
             with self.lock:
                 self.reset_simulator()
 
-            logger.info("\nResening Scene request...")
+            logger.info("Resening Scene request...")
             self.frame_socket.send_string("1")
 
         extras = openfluid_pb2.Extras()
@@ -148,25 +149,24 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 while self.phys_simulator.poll() is None:
                     time.sleep(0.1)
                 self.phys_simulator = None
-                logger.info("Simulator Terminated")
+                logger.info("Flex Simulator Terminated")
 
     def start_sim(self):
         self.frame_socket = self.zmq_context.socket( zmq.REQ )
-        self.frame_socket.connect("tcp://localhost:" + self.zmq_address)
+        self.frame_socket.connect("tcp://localhost:" + self.zmq_frame_addr)
 
         self.imu_socket = self.zmq_context.socket( zmq.PUSH )        
         self.imu_socket.setsockopt(zmq.SNDHWM , 1)
-        self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_address)
+        self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_addr)
 
         with self.lock:
             ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64'
                     + f' -vsync={self.vsync}'
-                    + f' -zmqport=' + self.zmq_address 
+                    + f' -zmqport=' + self.zmq_frame_addr 
                     + f' -windowed={self.screen_w }x{self.screen_h}']
             
-            logger.info("New Simulator starting...")
+            logger.info("New Flex Simulator starting...")
             self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
-        self.get_scenes()
 
     def reset_simulator(self):
         self.terminate_sim()

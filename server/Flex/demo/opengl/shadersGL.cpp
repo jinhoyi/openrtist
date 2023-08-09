@@ -428,9 +428,17 @@ void ReshapeRender(int width, int height, bool minimized)
 	};
 
 	eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-	eglInitialize(eglDpy, &major, &minor);
+	if (eglDpy == EGL_NO_DISPLAY) {
+		fprintf( stderr, "ERROR: eglGetDisplay() returned NULL!\n" );
+		exit(1);
+	} 
+	EGLBoolean success = eglInitialize(eglDpy, &major, &minor);
+	if (!success) {
+		fprintf( stderr, "ERROR: eglGetDisplay() failed!  eglGetError() = 0x%x\n", eglGetError() );
+		exit(1);
+	}
 	eglChooseConfig(eglDpy, configAttribs, &eglCfg, 1, &numConfigs);
-	
+
 	eglSurf = eglCreatePbufferSurface(eglDpy, eglCfg, pbufferAttribs);
 	eglBindAPI(EGL_OPENGL_API);
 	eglCtx = eglCreateContext(eglDpy, eglCfg, EGL_NO_CONTEXT, NULL);
