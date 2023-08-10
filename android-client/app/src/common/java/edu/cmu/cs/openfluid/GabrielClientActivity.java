@@ -721,6 +721,21 @@ public class GabrielClientActivity extends AppCompatActivity implements SensorEv
     public void showNetworkErrorMessage(String message) {
         // suppress this error when screen recording as we have to temporarily leave this
         // activity causing a network disruption
+        this.runOnUiThread(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(
+                    this, android.R.style.Theme_Material_Light_Dialog_Alert);
+            builder.setMessage(message)
+                    .setTitle(R.string.connection_error)
+                    .setNegativeButton(R.string.back_button,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    GabrielClientActivity.this.finish();
+                                }
+                            }).setCancelable(false);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        });
         return;
     }
 
