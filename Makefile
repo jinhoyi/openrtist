@@ -2,63 +2,43 @@
 # Makefile to build and run dockerfile
 #
 
-IMAGE_ID ?= 9ac5dec1e42b
+IMAGE_ID ?= dfb24ed01b95
 GITHUB_USRNAME ?= jinhoyi
 VERSION ?= version1.0
 
+# Handle docker-push arguments
 ifeq (docker-push,$(firstword $(MAKECMDGOALS)))
-	ifneq ($(word 2,$(MAKECMDGOALS)),)
-		IMAGE_ID := $(word 2,$(MAKECMDGOALS))
-		$(eval $(IMAGE_ID):;@:)
-	endif
-
-	ifneq ($(word 3,$(MAKECMDGOALS)),)
-  		VERSION := $(word 3,$(MAKECMDGOALS))
-		$(eval $(VERSION):;@:)
-	endif
-
-	ifneq ($(word 4,$(MAKECMDGOALS)),)
-  		GITHUB_USRNAME := $(word 4,$(MAKECMDGOALS))
-		$(eval $(GITHUB_USRNAME):;@:)
-	endif
-	
-    # RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-    # # ...and turn them into do-nothing targets
-    # $(eval $(RUN_ARGS):;@:)
+	IMAGE_ID := $(or $(word 2,$(MAKECMDGOALS)),$(IMAGE_ID))
+	VERSION := $(or $(word 3,$(MAKECMDGOALS)),$(VERSION))
+	GITHUB_USRNAME := $(or $(word 4,$(MAKECMDGOALS)),$(GITHUB_USRNAME))
 endif
 
-ifeq ($(filter docker-git-run docker-run docker-build docker-pull,$(firstword $(MAKECMDGOALS))), $(firstword $(MAKECMDGOALS)) )
-	ifneq ($(word 2,$(MAKECMDGOALS)),)
-  		VERSION := $(word 2,$(MAKECMDGOALS))
-		$(eval $(VERSION):;@:)
-	endif
-
-	ifneq ($(word 3,$(MAKECMDGOALS)),)
-  		GITHUB_USRNAME := $(word 3,$(MAKECMDGOALS))
-		$(eval $(GITHUB_USRNAME):;@:)
-	endif
+# Handle docker-git-run, docker-run, docker-build, and docker-pull arguments
+ifeq ($(filter docker-git-run docker-run docker-build docker-pull,$(firstword $(MAKECMDGOALS))), $(firstword $(MAKECMDGOALS)))
+	VERSION := $(or $(word 2,$(MAKECMDGOALS)),$(VERSION))
+	GITHUB_USRNAME := $(or $(word 3,$(MAKECMDGOALS)),$(GITHUB_USRNAME))
 endif
 
+# Handle docker-env-build, docker-env-run, and docker-env-git-run arguments
 ifeq ($(filter docker-env-build docker-env-run docker-env-git-run,$(firstword $(MAKECMDGOALS))),$(firstword $(MAKECMDGOALS)))
-	ifneq ($(word 2,$(MAKECMDGOALS)),)
-  		GITHUB_USRNAME := $(word 2,$(MAKECMDGOALS))
-		$(eval $(GITHUB_USRNAME):;@:)
-	endif
+	GITHUB_USRNAME := $(or $(word 2,$(MAKECMDGOALS)),$(GITHUB_USRNAME))
 endif
 
-all:
+process_args:
 
+all: process_args
+	
 
 # docker-build [version] [username] 
-docker-build:
+docker-build: process_args
 	sudo docker build -t $(GITHUB_USRNAME)/openfluid:$(VERSION) -f Dockerfile .
 
 # docker-run [version] [username] 
-docker-run:
+docker-run: process_args
 	sudo docker run --gpus all --rm -it -p 9099:9099 $(GITHUB_USRNAME)/openfluid:$(VERSION)
 
 # docker-push [image-id] [version] [username] 
-docker-push:
+docker-push: process_args
 	echo $(CR_PAT) | sudo docker login ghcr.io -u $(GITHUB_USRNAME) --password-stdin && \
 	sudo docker tag $(IMAGE_ID) ghcr.io/$(GITHUB_USRNAME)/openfluid:$(VERSION) && \
 	sudo docker push ghcr.io/$(GITHUB_USRNAME)/openfluid:$(VERSION)
@@ -69,24 +49,24 @@ docker-push:
 # 	xargs -I {} sudo docker pull ghcr.io/$(GITHUB_USRNAME)/openfluid@{}
 
 # docker-pull [version] [username] 
-docker-pull:
+docker-pull: process_args
 	echo $(CR_PAT) | sudo docker login ghcr.io -u $(GITHUB_USRNAME) --password-stdin
 	sudo docker pull ghcr.io/$(GITHUB_USRNAME)/openfluid:$(VERSION)
 
 # docker-git-run [version] [username] 
-docker-git-run:
+docker-git-run: process_args
 	sudo docker run --gpus all --rm -it -p 9099:9099 ghcr.io/$(GITHUB_USRNAME)/openfluid:$(VERSION)
 
 # docker-env-build [username] 
-docker-env-build:
+docker-env-build: process_args
 	sudo docker build -t $(GITHUB_USRNAME)/openfluid:env -f DockerfileBuildEnv .
 
 # docker-env-run [username] 
-docker-env-run:
+docker-env-run: process_args
 	sudo docker run --gpus all -it -p 9099:9099 --rm --name=openfluid-env --mount type=bind,source=${PWD}/server,target=/server $(GITHUB_USRNAME)/openfluid:env
 
 # docker-env-git-run [username] 
-docker-env-git-run:
+docker-env-git-run: process_args
 	sudo docker run --gpus all -it -p 9099:9099 --rm --name=openfluid-env --mount type=bind,source=${PWD}/server,target=/server ghcr.io/$(GITHUB_USRNAME)/openfluid:env
 
 .PHONY: all docker-env-build docker-env-run docker-build docker-run docker-pull docker-push docker-git-run
