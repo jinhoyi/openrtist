@@ -2,6 +2,7 @@
 # Flex (simulation engine) build stage
 ########################################################################################################################
 FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 AS build
+# FROM nvidia/cuda:11.4.3-devel-ubuntu20.04 AS build
 MAINTAINER Satyalab, satya-group@lists.andrew.cmu.edu
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -30,6 +31,7 @@ RUN cd server && \
 # openfluid server image
 ########################################################################################################################
 FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+# FROM 11.4.3-runtime-ubuntu20.04
 LABEL org.opencontainers.image.source=https://github.com/jinhoyi/openrtist
 
 ARG DEBIAN_FRONTEND=noninteractive

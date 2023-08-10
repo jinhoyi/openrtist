@@ -103,6 +103,11 @@ https://developer.nvidia.com/cuda-92-download-archive
 append in command Line
 echo "things to append" | tee -a path-to-file
 
-
+NVIDA COMPATIBILITY
 https://docs.nvidia.com/deploy/cuda-compatibility/
 
+Packages to download
+sudo apt install nvidia-driver-470 libnvidia-gl-470 libnvidia-compute-470 libnvidia-decode-470 libnvidia-encode-470 libnvidia-ifr1-470 libnvidia-fbc1-470
+
+Fixing Nvidia Docker
+https://github.com/NVIDIA/nvidia-docker/issues/1243

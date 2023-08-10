@@ -2,7 +2,7 @@
 # Makefile to build and run dockerfile
 #
 
-IMAGE_ID ?= dfb24ed01b95
+IMAGE_ID ?= 7e040cd2f5a2
 GITHUB_USRNAME ?= jinhoyi
 VERSION ?= version1.0
 
