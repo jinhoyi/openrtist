@@ -102,3 +102,6 @@ https://developer.nvidia.com/cuda-92-download-archive
 
 append in command Line
 echo "things to append" | tee -a path-to-file
+
+Android release
+https://stackoverflow.com/questions/66579530/error-the-apk-for-your-currently-selected-variant-unknown-output-is-not-signe
