@@ -49,9 +49,6 @@ RUN apt-get -y install \
 
 RUN apt-get -y install \
     libnvidia-gl-440 
-    # libnvidia-gl-510
-# RUN apt-get -y install \
-#     xvfb
 
 # Python Server Requirement
 RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y \

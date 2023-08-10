@@ -11,3 +11,5 @@ server/cuda-9.2/
 cuda-9.2/
 env/
 dist/
+android-client/java_pid8756.hprof
+android-client/app/standard/release/app-standard-release.apk

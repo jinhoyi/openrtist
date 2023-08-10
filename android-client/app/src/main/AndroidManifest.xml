@@ -37,6 +37,7 @@
         <activity
             android:name=".ServerListActivity"
             android:label="@string/title_activity_main"
+            android:exported="true"
             android:screenOrientation="sensor"
             android:theme="@style/MyGabrielMaterialTheme">
             <intent-filter>
@@ -48,6 +49,7 @@
         <activity
             android:name=".GabrielClientActivity"
             android:label="@string/title_activity_main"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:configChanges="keyboardHidden|orientation|screenSize">
