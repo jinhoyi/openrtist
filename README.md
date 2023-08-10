@@ -1,3 +1,40 @@
+# OpenFluid: Real-Time Fluid Simulation
+UPDATE NEEDED
+
+update ./Makefile:
+GITHUG_USERNAME to username of the github repositor --> change the default value
+
+Building the server-app docker image:
+Download cuda toolkit 9.2 from the link bellow, and place the /usr/local/cuda-9.2 in server/cuda-9.2 first
+https://developer.nvidia.com/cuda-92-download-archive
+make docker-build [version] [username] # username is github username (prob cmusatyalab)
+
+Running the local docker image:
+make docker-run [version] [username] 
+
+Pushing docker image to the github container registry:
+make docker-push <image-id> [version] [username] 
+--> check the image-id by "docker image list" and see the IMAGE ID column
+
+Pulling docker image from the github container registry:
+make docker-pull [version] [username] 
+
+Running the image pulled from the github container registry:
+make docker-git-run [version] [username] 
+
+Building the development environment image:
+make docker-env-build [username]
+
+Running the local environment image:
+make docker-env-run [username] 
+
+Pushing, pulling environment image:
+use docker-push with "env" for the version name
+
+Running the image pulled from the github container registry:
+make docker-env-git-run [username]  
+
+
 # OpenRTiST: Real-Time Style Transfer
 
 OpenRTiST utilizes Gabriel, a platform for wearable cognitive assistance applications, to transform the live video from a mobile client into the styles of various artworks. The frames are streamed to a server where the chosen style is applied and the transformed images are returned to the client.
