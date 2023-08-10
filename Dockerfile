@@ -21,13 +21,16 @@ RUN apt-get -y install \
 # https://developer.nvidia.com/cuda-92-download-archive
 COPY server/ ./server/
    
-RUN cd server/ && make clean && make release
+RUN cd server && \
+    make clean && \
+    make release
 
 
 ########################################################################################################################
 # openfluid server image
 ########################################################################################################################
 FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+LABEL org.opencontainers.image.source=https://github.com/jinhoyi/openrtist
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -51,7 +54,7 @@ RUN apt-get -y install \
 RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y \
     python3.8 \
     python3-pip \
- && apt-get install -y --reinstall python3.8-distutils\
+ && apt-get install -y --reinstall python3.8-distutils
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

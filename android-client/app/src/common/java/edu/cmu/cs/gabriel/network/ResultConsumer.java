@@ -34,6 +34,7 @@ public class ResultConsumer implements Consumer<ResultWrapper> {
             Log.e(TAG, "Got " + resultWrapper.getResultsCount() + " results in output.");
             return;
         }
+        this.gabrielClientActivity.setLoadingLable(false);
 
         ResultWrapper.Result result = resultWrapper.getResults(0);
         try {

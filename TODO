@@ -1,0 +1,7 @@
+Make Android Client exit if backend server not running
+
+UPDATE README
+UPDATE LICENSE
+
+Add version descriptoin for the container image: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#labelling-container-images
+

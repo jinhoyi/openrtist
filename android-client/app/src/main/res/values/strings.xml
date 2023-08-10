@@ -111,6 +111,7 @@
 
     <string name="pref_title_iterate_interval">Autoplay Sequence Interval</string>
     <string name="fps_0">FPS: 0</string>
+    <string name="loading">Loading Simulator… Please Wait</string>
     <string-array name="pref_interval_list_titles">
         <item>1 sec</item>
         <item>2 sec</item>

@@ -101,6 +101,8 @@ public class GabrielClientActivity extends AppCompatActivity implements SensorEv
     private Handler fpsHandler;
     private TextView fpsLabel;
 
+    private TextView loadingLabel;
+
     private int framesProcessed = 0;
     private int serverFPS = 0;
 
@@ -324,6 +326,14 @@ public class GabrielClientActivity extends AppCompatActivity implements SensorEv
         modeList.get(mode).init();
     }
 
+    public void setLoadingLable(boolean b) {
+        if (b) {
+            loadingLabel.setVisibility(View.VISIBLE);
+        } else {
+            loadingLabel.setVisibility(View.INVISIBLE);
+        }
+    }
+
     private boolean doubleTouch = false;
     public boolean isDoubleTouch() {
         return doubleTouch;
@@ -371,6 +381,7 @@ public class GabrielClientActivity extends AppCompatActivity implements SensorEv
                 + WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
         fpsLabel = findViewById(R.id.fpsLabel);
+        loadingLabel = findViewById(R.id.loadingMsg);
 
         buttonLeft = findViewById(R.id.button_left);
         buttonRight = findViewById(R.id.button_right);
@@ -537,6 +548,7 @@ public class GabrielClientActivity extends AppCompatActivity implements SensorEv
         super.onResume();
         Log.v(LOG_TAG, "++onResume");
         setIMUSensor(true);
+        setLoadingLable(true);
 
         initOnce();
         Intent intent = getIntent();

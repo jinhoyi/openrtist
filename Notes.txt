@@ -99,3 +99,6 @@ sudo docker build -t testenv/testenv_build:0.1 -f DockerfileBuildEnv .
 
 cuda 9.2 
 https://developer.nvidia.com/cuda-92-download-archive
+
+append in command Line
+echo "things to append" | tee -a path-to-file

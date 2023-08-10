@@ -1,7 +1,8 @@
+## NEED UPDATE
 version: '2.3'
 services:
-  openrtist:
-    image: cmusatyalab/openrtist:${OPENRTIST_TAG}
+  openfluid:
+    image: cmusatyalab/openfluid:${OPENRTIST_TAG}
     ports:
       - "9099:9099"
     devices:
@@ -18,19 +19,5 @@ services:
       - FaceEnabled=${FACE_ENABLED}
       - ApiKey=${API_KEY}
 
-  ms-face-service:
-    image: containerpreview.azurecr.io/microsoft/cognitive-services-face
-    container_name: ms-face-service
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
-    cpus: '1.0'
-    mem_reservation: 4gb
-    networks:
-      - openrtist-net
-    environment:
-      - Eula=accept
-      - Billing=${BILLING_ENDPOINT}
-      - ApiKey=${API_KEY}
 networks:
   openrtist-net:

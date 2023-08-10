@@ -323,8 +323,24 @@
             android:layout_height="wrap_content"
             android:background="@color/navigationBarColor"
             android:elevation="12dp"
-            android:gravity="center_horizontal"
+            android:fontFamily="@font/rubik_light"
+            android:gravity="left|center_vertical"
             android:text="@string/fps_0"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/loadingMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@color/navigationBarColor"
+            android:elevation="12dp"
+            android:fontFamily="@font/rubik_light"
+            android:gravity="center_horizontal"
+            android:text="@string/loading"
             android:textColor="@color/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -373,6 +389,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#00000000"
             android:elevation="5dp">
 
         </FrameLayout>
