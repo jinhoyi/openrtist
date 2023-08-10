@@ -8,6 +8,7 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 def artifactory_user = properties.getProperty("artifactory_user")
 def artifactory_password = properties.getProperty("artifactory_password")
 
+
 repositories {
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
@@ -50,7 +51,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         customDebugType {
@@ -138,8 +140,6 @@ dependencies {
     implementation 'edu.cmu.cs.gabriel:serverlist:2.3.0'
     implementation 'androidx.preference:preference:1.1.0'
 
-    implementation 'org.pytorch:pytorch_android:1.4.0-SNAPSHOT'
-    implementation 'org.pytorch:pytorch_android_torchvision:1.4.0-SNAPSHOT'
 
     if (artifactory_user != null) {
         mobilEdgeXImplementation 'com.mobiledgex:matchingengine:1.4.11'
