@@ -34,6 +34,8 @@ use docker-push with "env" for the version name
 Running the image pulled from the github container registry:
 make docker-env-git-run [username]  
 
+# Using the Package
+Make sure the machine has nvidia-driver-535
 
 # OpenRTiST: Real-Time Style Transfer
 
