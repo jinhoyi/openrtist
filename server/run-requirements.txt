@@ -1,11 +1,4 @@
 gabriel-server==2.1.1
-# pillow<7
-# torchvision>=0.3, <0.5
-# torchvision>=0.3, <0.13
-# py-cpuinfo
-#required for MS Face Cognitive Service
-# azure-cognitiveservices-vision-face
 asyncio==3.4.3
-# grpcio-tools==1.44.0
 protobuf==3.20.3
 pyzmq

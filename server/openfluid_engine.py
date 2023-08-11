@@ -35,7 +35,10 @@ from gabriel_server import cognitive_engine
 from threading import Event, RLock, Thread
 import logging
 import openfluid_pb2
+import os
+import signal
 import subprocess
+import sys
 import time
 import zmq
 
@@ -43,28 +46,27 @@ logger = logging.getLogger(__name__)
 
 class OpenfluidEngine(cognitive_engine.Engine):
     SOURCE_NAME = "openfluid"
-    REQUEST_TIMEOUT = 3000
+    REQUEST_TIMEOUT = 2000
     
     instances = []
     scene_list = {}
 
+    def sim_init_signal(self, signum, frame):
+        self.signal_event.set()
+
+
     def __init__(self, zmq_port=5559, timeout=30, vsync=0):
         OpenfluidEngine.instances.append(self)
         logger.info("Initializing OpenfluidEngine")
-        self.lock = RLock()
         
+        self.lock = RLock()
+        signal.signal(signal.SIGUSR1, self.sim_init_signal)
+        self.signal_event = Event()
+
+        # Initialize ZeroMQ Context and Socket addrr
+        self.zmq_context = zmq.Context()
         self.zmq_frame_addr = str(zmq_port)
         self.zmq_imu_addr = str(zmq_port + 1)
-
-        # Initialize ZeroMQ Context and Socket
-        self.zmq_context = zmq.Context()
-
-        self.frame_socket = self.zmq_context.socket(zmq.REQ)
-        self.frame_socket.connect("tcp://localhost:" + self.zmq_frame_addr)
-
-        self.imu_socket = self.zmq_context.socket(zmq.PUSH)
-        self.imu_socket.setsockopt(zmq.SNDHWM , 1)
-        self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_addr)
 
         # Initialize Screen Resolution
         self.screen_w = 480
@@ -81,6 +83,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         # Initialize simulation engine and Client activity monitor
         self.activity_monitor = None
         self.start_sim()
+
         self.get_scenes()
         self.monitor_stop = False
         self.client_event = Event()      
@@ -91,8 +94,9 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.latency_return = False
         self.server_fps = 0
 
-        logger.info("FINISHED INITIALISATION")
+        logger.info("\nFINISHED INITIALISATION")
         
+
     def release(self):
         logger.info("Terminating OpenfluidEngine")
         
@@ -103,8 +107,8 @@ class OpenfluidEngine(cognitive_engine.Engine):
         logger.info("time Monitor killed")
         
         self.terminate_sim()
-
         
+
     # Turn off the simulation engine when no client is detected. 
     def client_activity_monitor(self, timeout=30):
         while not self.monitor_stop:
@@ -117,22 +121,76 @@ class OpenfluidEngine(cognitive_engine.Engine):
                 self.client_event.wait()
                 self.client_event.clear()
     
-    def get_scenes(self):
-        logger.info("Updating scenes, sending request...")
-        self.frame_socket.send_string("1")
 
-        reply = None
+    def close_socket(self):
+        try:
+            self.frame_socket.setsockopt(zmq.LINGER, 0)
+            self.frame_socket.close()
+        except:
+            logger.info("Socket Already Closed")
+
+        try:
+            self.imu_socket.setsockopt(zmq.LINGER, 0)
+            self.imu_socket.close()
+        except:
+            logger.info("Socket Already Closed")
+
+    def setup_socket(self):
+        self.frame_socket = self.zmq_context.socket( zmq.REQ )
+        self.frame_socket.connect("ipc:///tmp/openfluid" + self.zmq_frame_addr)
+        self.frame_socket.RCVTIMEO = self.REQUEST_TIMEOUT
+
+        self.imu_socket = self.zmq_context.socket( zmq.PUSH )        
+        self.imu_socket.setsockopt(zmq.SNDHWM , 1)
+        self.imu_socket.connect("ipc:///tmp/openfluid" + self.zmq_imu_addr)
+
+
+    def terminate_sim(self):
+        with self.lock:
+            if self.phys_simulator != None:
+                os.killpg(os.getpgid(self.phys_simulator.pid), signal.SIGTERM)
+                self.phys_simulator.kill()
+                while self.phys_simulator.poll() is None:
+                    time.sleep(0.1)
+            
+                self.phys_simulator = None
+
+                logger.info("Flex Simulator Terminated")
+
+
+    def start_sim(self):
+        prog_path = os.path.join(os.path.abspath(sys.path[0]), 'Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64')
+        with self.lock:
+            ARGS = [prog_path, 
+                    f'-vsync={1}',
+                    f'-zmqport=' + self.zmq_frame_addr,
+                    f'-windowed={self.screen_w }x{self.screen_h}',
+                    f'-pid={os.getpid()}']
+            logger.info("New Flex Simulator starting...")
+            self.phys_simulator = subprocess.Popen(ARGS, start_new_session=True)
+
+        self.signal_event.wait()
+        self.setup_socket()
+
+
+    def reset_simulator(self):
+        self.terminate_sim()
+        self.close_socket()
+        self.start_sim()
+
+    def get_scenes(self):
+        logger.info("\nUpdating scenes, sending request...")
+
         while True:
-            if (self.frame_socket.poll(self.REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
+            try:
+                self.frame_socket.send_string("1")
                 reply = self.frame_socket.recv()
                 break
-            
-            logger.info("No response from server")
-            with self.lock:
-                self.reset_simulator()
-
-            logger.info("Resening Scene request...")
-            self.frame_socket.send_string("1")
+            except zmq.Again:
+                logger.info("No response from the server, resending Scene Request...")
+                # self.close_socket()   # Re-initiating Sockets would be suficient
+                # self.setup_socket()
+                self.reset_simulator() # Just in case that process got killed
 
         extras = openfluid_pb2.Extras()
         extras.ParseFromString(reply)
@@ -140,55 +198,21 @@ class OpenfluidEngine(cognitive_engine.Engine):
         for key in extras.style_list:
             OpenfluidEngine.scene_list[key] = extras.style_list[key]
         logger.info("Got Scene reply. Scene-lists Updated")
-
-    def terminate_sim(self):
-        with self.lock:
-            if self.phys_simulator != None:
-                self.phys_simulator.kill()
-                
-                while self.phys_simulator.poll() is None:
-                    time.sleep(0.1)
-                self.phys_simulator = None
-                logger.info("Flex Simulator Terminated")
-
-    def start_sim(self):
-        self.frame_socket = self.zmq_context.socket( zmq.REQ )
-        self.frame_socket.connect("tcp://localhost:" + self.zmq_frame_addr)
-
-        self.imu_socket = self.zmq_context.socket( zmq.PUSH )        
-        self.imu_socket.setsockopt(zmq.SNDHWM , 1)
-        self.imu_socket.connect("tcp://localhost:" + self.zmq_imu_addr)
-
-        with self.lock:
-            ARGS = [f'exec Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64'
-                    + f' -vsync={self.vsync}'
-                    + f' -zmqport=' + self.zmq_frame_addr 
-                    + f' -windowed={self.screen_w }x{self.screen_h}']
-            
-            logger.info("New Flex Simulator starting...")
-            self.phys_simulator = subprocess.Popen(ARGS, shell=True, start_new_session=True)
-
-    def reset_simulator(self):
-        self.terminate_sim()
-        self.start_sim()
     
+
     def get_frame(self):
         # Request of new rendered frame to the Simulation Engine
-        self.frame_socket.send_string("0")
-        reply = None
         while True:
-            if (self.frame_socket.poll(self.REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
+            try:
+                self.frame_socket.send_string("0")
                 reply = self.frame_socket.recv()
                 break
+            except zmq.Again:
+                logger.info("No response from the Simulation Engine, restarting it")
+                # self.close_socket()   # Re-initiating Sockets would be suficient
+                # self.setup_socket()
+                self.reset_simulator() # Just in case that process got killed
             
-            logger.info("No response from the Simulation Engine, restarting it")
-            with self.lock:
-                self.reset_simulator()
-            self.frame_socket.send_string("0")
-            
-        if reply == None:
-            return None
-
         input_frame = gabriel_pb2.InputFrame()
         input_frame.ParseFromString(reply)
         
@@ -204,10 +228,12 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
         return input_frame.payloads[0]
     
+
     def send_imu(self, extras):
         #Push IMU_data to the Simulation Engine
         self.imu_socket.send(extras.SerializeToString())
         return
+
 
     def handle(self, input_frame):
         self.client_event.set()
@@ -224,7 +250,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
         if extras.setting_value.scene == -1:
             self.sendStyle = True
 
-        
         with self.lock:
             if (self.screen_ratio != extras.screen_value.ratio) or (self.screen_w != extras.screen_value.resolution) or (extras.fps != self.vsync):
                 self.screen_ratio = extras.screen_value.ratio
@@ -268,9 +293,11 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
         return result_wrapper
 
+
     def process_image(self, image):
         post_inference = self.inference(image)
         return post_inference
+
 
     def inference(self, image):
         return self.get_frame()

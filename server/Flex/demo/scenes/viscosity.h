@@ -151,6 +151,8 @@ public:
 		g_fluidColor = Vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		// g_fluidColor = Vec4(255.0f/255.0f, 0.0f/255.0f, 127.0/255.0f, 1.0f);
 		g_fluidColor = Vec4(227.0f/255.0f, 11.0f/255.0f, 93.0/255.0f, 0.9f);
+		g_fluidColor = Vec4(243.0f/255.0f, 227.0f/255.0f, 207.0/255.0f, 0.0f);
+		// g_fluidColor = Vec4(247.0f/255.0f, 145.0f/255.0f, 1.0/255.0f, 0.9f);
 	}
 
 	void CenterCamera() {

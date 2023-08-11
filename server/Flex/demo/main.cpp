@@ -47,12 +47,12 @@
 
 #include <iostream>
 #include <map>
-#include <jpeglib.h>
 
 // For Sending Frames to the Gabriel Server
 #include <thread>
 #include <chrono>
 #include <zmq.hpp>
+#include <jpeglib.h>
 #include "proto/gabriel.pb.h"
 #include "proto/openfluid.pb.h"
 
@@ -116,6 +116,9 @@ inline float joyAxisFilter(int value, int stick)
 }
 
 SDL_GameController* g_gamecontroller = NULL;
+
+TgaImage g_framebuffer;
+std::vector<unsigned char> g_jpegData;
 
 using namespace std;
 
@@ -618,11 +621,11 @@ std::atomic_bool latency_feedback(false);
 std::atomic_bool latency_return(false);
 
 int zmq_port = 5559;
+int parent_pid = 0;
 
 std::vector<std::function<void(float,float,float,float,float,float)>> cameraViews;
 
 std::vector<unsigned char> g_jpegImage;
-
 std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int height, int quality) {
     struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr jerr;
@@ -680,17 +683,13 @@ std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int h
     return jpegData;
 }
 
-
-TgaImage g_framebuffer;
-std::vector<unsigned char> g_jpegData;
-
 void video_compressor() {
-	int *bitmap = (int*)g_framebuffer.m_data;
+	// int *bitmap = (int*)(g_framebuffer.m_data);
 
 	while(running) {
 		if (new_frame){
 			new_frame = false;
-			std::vector<unsigned char> data = compressJpeg((uint32_t *)bitmap, g_screenWidth, g_screenHeight, 67);
+			std::vector<unsigned char> data = compressJpeg((uint32_t *)(g_framebuffer.m_data), g_screenWidth, g_screenHeight, 67);
 			bitmap_mtx.lock();
 				g_jpegData = data;
 			bitmap_mtx.unlock();
@@ -739,10 +738,10 @@ void send_image(zmq::socket_t& socket) {
 }
 
 void video_sender(){
-	zmq::socket_t video_socket(context, zmq::socket_type::rep);
+	zmq::socket_t video_socket(context, ZMQ_REP);
 	// int hwm = 1;
 	// video_socket.set(zmq::sockopt::sndhwm, hwm);
-	video_socket.bind("tcp://*:" + std::to_string(zmq_port));
+	video_socket.bind("ipc:///tmp/openfluid" + std::to_string(zmq_port));
 	printf("Flex: binded for sending frames\n");
 	send_image(video_socket);
 
@@ -757,11 +756,11 @@ void imu_receiver() {
 	
 	openfluid::Extras extras;
 	zmq::message_t pulled;
-	zmq::socket_t imu_socket(context, zmq::socket_type::pull);
+	zmq::socket_t imu_socket(context, ZMQ_PULL);
 	int hwm = 1;
 	imu_socket.set(zmq::sockopt::rcvhwm, hwm);
 	// imu_socket.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
-	imu_socket.bind("tcp://*:" + std::to_string(zmq_port + 1));
+	imu_socket.bind("ipc:///tmp/openfluid" + std::to_string(zmq_port + 1));
 	printf("Flex: binded for receiving client input\n");
 
 	const float si_g = 9.81f;
@@ -2454,15 +2453,9 @@ void UpdateFrame()
 	DoUI();
 
 	EndFrame();
-		
-
-
-
-	
 	ReadFrame((int*)g_framebuffer.m_data, g_screenWidth, g_screenHeight);
 	new_frame = true;
 	
-
 	// If user has disabled async compute, ensure that no compute can overlap 
 	// graphics by placing a sync between them	
 	if (!g_useAsyncCompute)
@@ -2470,29 +2463,29 @@ void UpdateFrame()
 
 	UnmapBuffers(g_buffers);
 
-	// move mouse particle (must be done here as GetViewRay() uses the GL projection state)
-	if (g_mouseParticle != -1)
-	{
-		Vec3 origin, dir;
-		GetViewRay(g_lastx, g_screenHeight - g_lasty, origin, dir);
+	// // move mouse particle (must be done here as GetViewRay() uses the GL projection state)
+	// if (g_mouseParticle != -1)
+	// {
+	// 	Vec3 origin, dir;
+	// 	GetViewRay(g_lastx, g_screenHeight - g_lasty, origin, dir);
 
-		g_mousePos = origin + dir*g_mouseT;
-	}
+	// 	g_mousePos = origin + dir*g_mouseT;
+	// }
 
-	if (g_capture)
-	{
-		TgaImage img;
-		img.m_width = g_screenWidth;
-		img.m_height = g_screenHeight;
-		img.m_data = new uint32_t[g_screenWidth*g_screenHeight];
+	// if (g_capture)
+	// {
+	// 	TgaImage img;
+	// 	img.m_width = g_screenWidth;
+	// 	img.m_height = g_screenHeight;
+	// 	img.m_data = new uint32_t[g_screenWidth*g_screenHeight];
 
-		//FLAG:READ_FRAME
-		ReadFrame((int*)img.m_data, g_screenWidth, g_screenHeight);
+	// 	//FLAG:READ_FRAME
+	// 	ReadFrame((int*)img.m_data, g_screenWidth, g_screenHeight);
 
-		fwrite(img.m_data, sizeof(uint32_t)*g_screenWidth*g_screenHeight, 1, g_ffmpeg);
+	// 	fwrite(img.m_data, sizeof(uint32_t)*g_screenWidth*g_screenHeight, 1, g_ffmpeg);
 
-		delete[] img.m_data;
-	}
+	// 	delete[] img.m_data;
+	// }
 
 	double renderEndTime = GetSeconds();
 	
@@ -2503,8 +2496,6 @@ void UpdateFrame()
 		flag_reset = false;
 		g_resetScene = false;
 	}
-
-	
 
 	//-------------------------------------------------------------------
 	// Flex Update
@@ -3304,8 +3295,12 @@ int main(int argc, char* argv[])
 
 		if (sscanf(argv[i], "-zmqport=%d", &d) == 1)
 		{
-			if (d >= 0 && d <= 2)
 				zmq_port = d;
+		}
+
+		if (sscanf(argv[i], "-pid=%d", &d) == 1)
+		{
+				parent_pid = d;
 		}
 	}
 
@@ -3323,7 +3318,7 @@ int main(int argc, char* argv[])
 	g_scenes.push_back(new DamBreak2("Viscosity Low", 0.1f));
 	g_scenes.push_back(new ViscosityBox("Viscosity Med", 1.5f));
 	g_scenes.push_back(new ViscosityBox("Viscosity High", 3.0f));
-	g_scenes.push_back(new Viscosity("Rose Syrup", 1.5f));
+	g_scenes.push_back(new Viscosity("Sticky", 0.8f));
 
 	g_scenes.push_back(new SurfaceTension("Surface Tension Low", 0.0f));
 	g_scenes.push_back(new SurfaceTension("Surface Tension Med", 10.0f));
@@ -3406,7 +3401,7 @@ int main(int argc, char* argv[])
 	options.fullscreen = g_fullscreen;
 
 	InitRender(options);
-	printf("\nRendering Size %d x %d\n", g_screenWidth, g_screenHeight);
+	printf("\nFlex: Rendering Size %d x %d\n", g_screenWidth, g_screenHeight);
 	if (g_vsync) {
 		printf("Flex: vsync On\n");
 
@@ -3517,13 +3512,16 @@ int main(int argc, char* argv[])
 	Init(g_scene);
 	EndGpuWork();
 
-	//Start Frame_socket
-
+	//Start zmq Sockets
 	running = true;
-
 	thread video_compressor_thread(video_compressor);
 	thread video_sender_thread(video_sender);
 	thread imu_receiver_thread(imu_receiver);
+
+	//Signal Calling Process that it is ready to communicate
+	if (parent_pid != 0) {
+		kill(parent_pid, SIGUSR1);
+	}
 
 	//FLAG:MAIN_CALLING_MAIN_GUI_LOOP
 	SDLMainLoop();

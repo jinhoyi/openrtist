@@ -1,7 +1,13 @@
 UPDATE README
 UPDATE LICENSE
+UPDATE PRIVACY_POLICY
+UPDATE CREDITS
+UPDATE docker-compose, server/docker-compose
+
+create docker image for nvidia-driver version 530, 525, 520, 510, 495, 470?
+
+UPDATE server/Flex/README
 
 Add version descriptoin for the container image: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#labelling-container-images
 
-Android release
-https://stackoverflow.com/questions/66579530/error-the-apk-for-your-currently-selected-variant-unknown-output-is-not-signe
+

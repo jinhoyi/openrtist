@@ -62,7 +62,7 @@ def main():
     )
 
 def signal_handler(signal, frame):
-    logger.info("SIGINT Received")
+    print()
 
     for obj in OpenfluidEngine.instances:
         obj.release()

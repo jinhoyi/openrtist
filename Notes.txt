@@ -33,7 +33,6 @@ pre 0.1 ms, infer 0.5 ms, post 0.7 ms, wait 8.1 ms, fps 113.31
 Small_screen:
 
 
-
 https://stackoverflow.com/questions/47181993/list-of-available-icons
 
 
@@ -80,7 +79,6 @@ https://registry.khronos.org/EGL/sdk/docs/man/
 
 
 
-
 OpenGL threads
 https://stackoverflow.com/questions/64484835/how-to-setup-one-shared-opengl-contexts-per-thread-with-sdl2
 
@@ -89,7 +87,6 @@ https://stackoverflow.com/questions/25676835/signal-handling-in-multi-threaded-p
 
 download gcc7
 https://askubuntu.com/questions/1406962/install-gcc7-on-ubuntu-22-04
-
 
 
 DOCKER Calling
@@ -111,3 +108,17 @@ sudo apt install nvidia-driver-470 libnvidia-gl-470 libnvidia-compute-470 libnvi
 
 Fixing Nvidia Docker
 https://github.com/NVIDIA/nvidia-docker/issues/1243
+
+Android release
+https://stackoverflow.com/questions/66579530/error-the-apk-for-your-currently-selected-variant-unknown-output-is-not-signe
+
+
+REQUIREMENT: nvidia-driver = 535, libnvidia-gl-535
+Steps (docker container): 
+1. download docker
+2. download nvidia-driver-535 for Ubuntu 22.04
+3. download nvidia-docker2
+
+steps (local compile):
+1. download nvidia-driver-535 for Ubuntu 22.04
+2. download libnvidia-gl-535

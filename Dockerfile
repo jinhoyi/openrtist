@@ -2,7 +2,6 @@
 # Flex (simulation engine) build stage
 ########################################################################################################################
 FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 AS build
-# FROM nvidia/cuda:11.4.3-devel-ubuntu20.04 AS build
 MAINTAINER Satyalab, satya-group@lists.andrew.cmu.edu
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -31,7 +30,6 @@ RUN cd server && \
 # openfluid server image
 ########################################################################################################################
 FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
-# FROM 11.4.3-runtime-ubuntu20.04
 LABEL org.opencontainers.image.source=https://github.com/jinhoyi/openrtist
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -49,11 +47,15 @@ RUN apt-get -y install \
     libjpeg-dev \
     software-properties-common
 
+# need to match the Server Driver version
 RUN apt-get -y install \
-    libnvidia-gl-440     
-    # libnvidia-gl-510
-# RUN apt-get -y install \
-#     xvfb
+    libnvidia-gl-535     
+    #libnvidia-gl-530
+    #libnvidia-gl-525
+    #libnvidia-gl-520
+    #libnvidia-gl-510
+    #libnvidia-gl-495
+    #libnvidia-gl-470
 
 # Python Server Requirement
 RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y \
@@ -69,7 +71,7 @@ RUN python3.8 -m pip install --upgrade pip \
  && python3.8 -m pip install --no-cache-dir \
     -r /requirements.txt
 
-# copy built Binary and python files
+# copy built Binary, python files, and data file
 COPY --from=build \
     /server/*.py /server/entrypoint.sh /server/
 
@@ -81,6 +83,9 @@ COPY --from=build \
 
 COPY --from=build \
     /server/Flex/bin/ /server/Flex/bin/
+
+COPY --from=build \
+    /server/Flex/data/ /server/Flex/data/
 
 WORKDIR /server
 

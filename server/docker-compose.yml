@@ -13,11 +13,3 @@ services:
     # gpus: all     # not yet supported by docker-compose
     runtime: nvidia
     privileged: true
-    networks:
-      - openrtist-net
-    environment:
-      - FaceEnabled=${FACE_ENABLED}
-      - ApiKey=${API_KEY}
-
-networks:
-  openrtist-net:
