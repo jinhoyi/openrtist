@@ -72,7 +72,6 @@ class OpenfluidEngine(cognitive_engine.Engine):
         self.screen_w = 480
         self.screen_h = 640
         self.screen_ratio = self.screen_h / self.screen_w
-        self.vsync = vsync
 
         # Pointer to the Physics Simulation Engine Process
         self.phys_simulator = None
@@ -82,6 +81,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
 
         # Initialize simulation engine and Client activity monitor
         self.activity_monitor = None
+        self.fps_limit = 120 + vsync
         self.start_sim()
 
         self.get_scenes()
@@ -93,6 +93,7 @@ class OpenfluidEngine(cognitive_engine.Engine):
         # For Performance Measurement
         self.latency_return = False
         self.server_fps = 0
+        
 
         logger.info("\nFINISHED INITIALISATION")
         
@@ -162,10 +163,11 @@ class OpenfluidEngine(cognitive_engine.Engine):
         prog_path = os.path.join(os.path.abspath(sys.path[0]), 'Flex/bin/linux64/NvFlexDemoReleaseCUDA_x64')
         with self.lock:
             ARGS = [prog_path, 
-                    f'-vsync={1}',
+                    f'-vsync={self.fps_limit % 10}',
                     f'-zmqport=' + self.zmq_frame_addr,
                     f'-windowed={self.screen_w }x{self.screen_h}',
-                    f'-pid={os.getpid()}']
+                    f'-pid={os.getpid()}',
+                    f'-fpslimit={int(self.fps_limit / 10) * 10}']
             logger.info("New Flex Simulator starting...")
             self.phys_simulator = subprocess.Popen(ARGS, start_new_session=True)
 
@@ -251,11 +253,11 @@ class OpenfluidEngine(cognitive_engine.Engine):
             self.sendStyle = True
 
         with self.lock:
-            if (self.screen_ratio != extras.screen_value.ratio) or (self.screen_w != extras.screen_value.resolution) or (extras.fps != self.vsync):
+            if (self.screen_ratio != extras.screen_value.ratio) or (self.screen_w != extras.screen_value.resolution) or (extras.fps != self.fps_limit):
                 self.screen_ratio = extras.screen_value.ratio
                 self.screen_w = extras.screen_value.resolution
                 self.screen_h = int(self.screen_ratio * self.screen_w + 0.5)
-                self.vsync = extras.fps
+                self.fps_limit = extras.fps
                 logger.info(f'-windowed={self.screen_w }x{self.screen_h} reset')
                 self.reset_simulator()
 

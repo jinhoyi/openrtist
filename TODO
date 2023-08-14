@@ -9,5 +9,5 @@ create docker image for nvidia-driver version 530, 525, 520, 510, 495, 470?
 UPDATE server/Flex/README
 
 Add version descriptoin for the container image: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#labelling-container-images
-
+update LABEL for the the container
 

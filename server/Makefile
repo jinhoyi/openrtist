@@ -29,6 +29,8 @@ clean:
 	$(RM) $(GENERATED_FILES)
 	cd $(FLEX_BUILD_PATH); $(MAKE) clean
 
+protoc: protoc_c protoc_py
+
 protoc_c:
 	$(PROTOC_CPP) -I=$(PROTOC_IPATH) --cpp_out=$(PROTOC_OPATH_CPP) $(PROTOC_SRC).proto
 	$(PROTOC_CPP) -I=$(PROTOC_IPATH) --cpp_out=$(PROTOC_OPATH_CPP) gabriel.proto

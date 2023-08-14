@@ -75,8 +75,8 @@ RUN python3.8 -m pip install --upgrade pip \
 COPY --from=build \
     /server/*.py /server/entrypoint.sh /server/
 
-COPY --from=build \
-    /server/cuda-9.2/lib64/ /server/cuda-9.2/lib64/
+# COPY --from=build \
+#     /server/cuda-9.2/lib64/ /server/cuda-9.2/lib64/
 
 COPY --from=build \
     /server/Flex/external/SDL2-2.0.4/lib/ /server/Flex/external/SDL2-2.0.4/lib/

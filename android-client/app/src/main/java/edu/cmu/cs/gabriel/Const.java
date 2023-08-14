@@ -58,55 +58,21 @@ public class Const {
         Integer i = null;
         //update Const values so that new settings take effect
         switch(key) {
-//            case "general_recording":
-//                Const.SHOW_RECORDER = sharedPreferences.getBoolean(key, false);
-//                break;
             case "general_vsync":
                 b = sharedPreferences.getBoolean(key, true);
                 Const.VSYNC = b;
                 break;
             case "experimental_resolution":
                 i = new Integer(sharedPreferences.getString(key, "480"));
-//                if(i == 1) {
-//                    Const.IMAGE_HEIGHT = 240;
-//                    Const.IMAGE_WIDTH = 320;
-//                } else if(i == 2) {
-//                    Const.IMAGE_HEIGHT = 480;
-//                    Const.IMAGE_WIDTH = 640;
-//                } else if (i == 3) {
-//                    Const.IMAGE_HEIGHT = 720;
-//                    Const.IMAGE_WIDTH = 1280;
-//                } else {
-//                    Const.IMAGE_HEIGHT = 240;
-//                    Const.IMAGE_WIDTH = 320;
-//                }
                 Const.IMAGE_RES = i;
                 break;
             case "experimental_token_limit":
                 Const.TOKEN_LIMIT = sharedPreferences.getString(key, "None");
                 break;
-//            case "general_stereoscopic":
-//                b = sharedPreferences.getBoolean(key, false);
-//                Const.STEREO_ENABLED = b;
-//                if(b) {
-//                    Const.SHOW_FPS = false;
-//                    Const.SHOW_RECORDER = false;
-//                    Const.DISPLAY_REFERENCE = false;
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putBoolean("general_show_reference", false);
-//                    editor.putBoolean("general_front_camera", false);
-//                    editor.putBoolean("general_recording", false);
-//                    editor.putBoolean("general_show_fps", false);
-//                    editor.putString("general_iterate_delay", "2");
-//                    editor.commit();
-//
-//                }
-//                break;
-//            case "general_show_reference":
-//                b = sharedPreferences.getBoolean(key, true);
-//                Const.DISPLAY_REFERENCE = b;
-//                break;
-
+            case "general_FPS":
+                i = new Integer(sharedPreferences.getString(key, "120"));
+                Const.CAPTURE_FPS = i;
+                break;
             case "general_iterate_delay":
                 i = new Integer(sharedPreferences.getString(key, "2"));
                 Const.ITERATE_INTERVAL = i * 1000;

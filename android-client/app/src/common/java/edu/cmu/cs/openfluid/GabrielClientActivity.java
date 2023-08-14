@@ -682,7 +682,7 @@ public class GabrielClientActivity extends AppCompatActivity implements SensorEv
                     .setTouchValue(touchValue)
                     .setArrowKey(arrowKey)
                     .setLatencyToken(getLatency)
-                    .setFps(Const.VSYNC ? 1 : 0)
+                    .setFps((Const.VSYNC ? 1 : 0) + Const.CAPTURE_FPS)
                     .build();
 
             return InputFrame.newBuilder()

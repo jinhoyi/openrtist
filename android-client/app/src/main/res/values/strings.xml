@@ -10,7 +10,7 @@
     <string name="stereo_option">Stereoscopic Effect (requires HUD)</string>
     <string name="reference_option">Show Style Reference Image</string>
     <string name="pref_title_recording">Show Screenshot/Recording Buttons</string>
-    <string name="show_fps">Limit simulation to 120 FPS</string>
+    <string name="show_fps">Set FPS Limit (Vsync)</string>
     <string name="camera_option">Show Camera Toggling Button</string>
     <string name="autoiterate_option">Iterate Styles Periodically</string>
     <string name="serverlist_heading">Server List</string>
@@ -18,7 +18,7 @@
     <string name="address_subheading">Address</string>
     <string name="name_hint">Server Name</string>
     <string name="address_hint" translatable="false">10.0.0.2[:9099]</string>
-    <string name="backend_instructions">OpenFluid requires a backend server to connect to. The cmu-demo-server can be used to test. You can setup your own backend server by following the instructions at https://github.com/cmusatyalab/openrtist to launch the cmusatyalab/openrtist Docker container.</string>
+    <string name="backend_instructions">OpenFluid requires a backend server to connect to. The cmu-demo-server can be used to test. You can setup your own backend server by following the instructions at https://github.com/cmusatyalab/openfluid to launch the cmusatyalab/openfluid Docker container.</string>
     <string name="error_empty">Name and address are required.</string>
     <string name="error_invalidURI">Server address is an invalid URI.</string>
     <string name="error_exists">A server by that name already exists.</string>
@@ -47,7 +47,7 @@
     <string name="back_button">Go Back</string>
 
     <string name="demo_server">cmu-demo-server</string>  <!-- Need Update! -->
-    <string name="demo_dns">openrtist-demo.cmusatyalab.org</string> <!-- Need Update! -->
+    <string name="demo_dns">openfluid-demo.cmusatyalab.org</string> <!-- Need Update! -->
 
     <string name="local_execution">Local</string>
     <string name="local_execution_dns_placeholder">Run on Mobile Device (pytorch_android)</string>
@@ -126,6 +126,14 @@
         <item>5</item>
         <item>10</item>
     </string-array>
+
+    <string name="pref_title_FPS_LIST">Target FPS (Vsync) Limit</string>
+    <string-array name="fps_list_titles">
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+    </string-array>
+
 
     <string name="help_cam">This is some helpful information for controlling cam</string>
 <!--    <string name="help_menu">This is some helpful information for controlling cam</string>-->

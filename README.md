@@ -1,5 +1,6 @@
-# OpenFluid: Real-Time Fluid Simulation
 UPDATE NEEDED
+# OpenFluid: Real-Time Fluid Simulation
+OpenFluid leverages Gabriel, a platform designed for wearable cognitive assistance applications, to adjust fluid simulations in real-time based on acceleration sensor data from a mobile device. The simulation frames are then streamed to the device, facilitating interactive 3D fluid simulations on mobile platforms.
 
 update ./Makefile:
 GITHUG_USERNAME to username of the github repositor --> change the default value
@@ -47,83 +48,76 @@ Carnegie Mellon University
 This is a developing project.
 
 ## License
-
+UPDATE
 Unless otherwise stated, all source code and documentation are under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 A copy of this license is reproduced in the [LICENSE](LICENSE) file.
 
 Portions from the following third party sources have
-been modified and are included in this repository.
-These portions are noted in the source files and are
-copyright their respective authors with
-the licenses listed.
+been modified and are included in this repository. These portions are noted in the source files and are copyright their respective authors with the licenses listed. (Update Flex src, licence File)
 
 Project | Modified | License
 ---|---|---|
-[pytorch/examples](https://github.com/pytorch/examples) | Yes | BSD
+[NVIDIAGameWorks/FleX](https://github.com/NVIDIAGameWorks/FleX) | Yes | Nvidia Source Code License (1-Way Commercial)
 
 ## Prerequisites
 
-OpenRTiST using PyTorch (including the pre-built image) has been tested on __Ubuntu 18.04 LTS (Bionic)__ using several nVidia GPUs (GTX 960, GTX 1060, GTX 1080 Ti, Tesla K40).
+OpenFluid server has been tested on __Ubuntu 22.04 LTS (Jammy Jellyfish)__ using several nVidia GPUs ( Quadro P1000, GTX 1080 Ti).
 
-Alternatively, OpenRTiST can also use the [Intel&reg; OpenVINO toolkit](https://software.intel.com/en-us/openvino-toolkit) for accelerated processing on CPU and processor graphics on many Intel processors.  We have tested OpenVINO support using __Ubuntu 18.04 LTS (Bionic)__ and OpenVINO releases 2018.5 and 2019.3 on an Intel&reg; Core&trade; i7-6770HQ processor.  
-
-The OpenRTiST server can run on CPU alone.  See below on installing from source for details.
-
-OpenRTiST supports Android and standalone Python clients.  We have tested the Android client on __Nexus 6__, __Samsung Galaxy S7__, and __Essential PH-1__.
+OpenFluid supports Android Client. We have tested the Android client on __Nexus 6__, __Samsung Galaxy Z Fold 4__, and __Essential PH-1__.
 
 ## Server Installation using Docker
 
-The quickest way to set up an OpenRTiST server is to download and run our pre-built Docker container.  This build supports execution on NVIDIA GPUs, Intel integrated GPUs, and execution on the CPU. All of the following steps must be executed as root. We tested these steps using Docker 19.03.
+Easily set up an OpenFluid server by deploying our pre-configured Docker container. This build has been optimized for NVIDIA GPUs (still need to check compatibility with the RTX GPUs). Ensure you have root access to execute the following steps. We've validated these instructions using Docker version 24.0.5.
 
 ### Step 1. Install Docker
 
-If you do not already have Docker installed, install it using the steps in [this Docker install guide](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/) or use the following convenience script:
+If Docker isn't already on your system, you can follow [this Docker install guide](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/). Alternatively, use the convenience script below:
 
 ```sh
 curl -fsSL get.docker.com -o get-docker.sh
 sh get-docker.sh
 ```
 
-### Step 2. Install NVIDIA CUDA drivers (for NVIDIA GPU support)
+### Step 2. Install NVIDIA CUDA drivers version 535
 
-[The cuda downloads page](https://developer.nvidia.com/cuda-downloads) allows you to select your distribution and provides instructions on how to install the CUDA toolkit and NVIDIA drivers.
+Visit [the NVIDIA CUDA downloads page](https://developer.nvidia.com/cuda-downloads) to select your operating system and receive step-by-step installation guidance. __It is important that you get the version 535 for your driver.__
 
-If you think you may already have an NVIDIA driver installed, run `nvidia-smi`. The driver version will be listed at the top of the table that gets printed.
-
-### Step 3. Install the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker) (for NVIDIA GPU support)
-
-Follow [these instructions](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian).
-
-### Step 4. Obtain OpenRTiST Docker image
-
-```sh
-docker pull cmusatyalab/openrtist:stable
+For Debian-based Linux distributions, you can use the following command:
+```bash
+sudo apt-get update && apt-get install -y nvidia-driver-535
 ```
 
-### Step 5A. Launch the Docker container
+To verify an existing NVIDIA driver installation, execute `nvidia-smi`. The installed driver version will be displayed at the top of the output.
 
-For NVIDIA GPU support, run:
+### Step 3. Set Up the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker)
 
-```sh
-docker run --gpus all --rm -it -p 9099:9099 cmusatyalab/openrtist:stable
+This toolkit is essential for NVIDIA GPU support. Follow [this instructions guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian) or use the command below:
+
+```bash
+sudo apt-get update \
+    && sudo apt-get install -y nvidia-container-toolkit-base
 ```
 
-For Intel iGPU support, run:
-
-```sh
-docker run --device /dev/dri:/dev/dri --rm -it -p 9099:9099 cmusatyalab/openrtist:stable
+### Step 4. Download the OpenFluid Docker Image
+Fetch the Docker image using:
+```bash
+docker pull ghcr.io/jinhoyi/openfluid:version1.0
+```
+Or, if you're in the project's root directory:
+```bash
+make docker-pull
 ```
 
-For CPU support only, run:
-
-```sh
-docker run --rm -it -p 9099:9099 cmusatyalab/openrtist:stable
+### Step 5. Launch the Docker container
+Execute:
+```bash
+docker run --gpus all --rm -it -p 9099:9099 ghcr.io/jinhoyi/openfluid:version1.0
 ```
 
-Note:  With OpenVINO using an integrated GPU, it may take up to a minute to preload all of the style models.
-
----
-
+Alternatively, from the project root:
+```bash
+make docker-git-run
+```
 ## Running server on Amazon AWS
 
 If you wish to compare between running the server on a cloudlet versus a cloud instance, you can launch the following instance type/image from your Amazon EC2 Dashboard:
@@ -138,6 +132,7 @@ Once the server is running in AWS, you can follow the steps above to setup the s
 
 __Note__ : If using vanilla Ubuntu Server 16.04 Image, install the required Nvidia driver and reboot.
 
+UPDATE::
 ```bash
 wget http://us.download.nvidia.com/tesla/375.51/nvidia-driver-local-repo-ubuntu1604_375.51-1_amd64.deb
 sudo dpkg -i nvidia-driver-local-repo-ubuntu1604_375.51-1_amd64.deb
@@ -146,260 +141,183 @@ sudo apt-get -y install cuda-drivers
 sudo reboot
 ```
 
-## Client Installation
+## Compilation from Source
 
-### Python Client in Docker
+### Option A. Docker Environment
+We've provided a Docker image equipped with all necessary dependencies, enabling you to compile and run the server directly from the source within the given environment. 
 
-The docker image for the server component also includes the Python client which can be run on a non-Android machine. __The python client requires that a USB webcam is connected to the machine.__
-
-#### Step 1. Install Docker
-
-If you do not already have Docker installed, install as follows:
-
-``` bash
-apt-get update
-apt-get upgrade
-apt-get install docker.io
+#### A.1 Fetch the Docker Image
+```bash
+docker pull ghcr.io/jinhoyi/openfluid:env
+```
+Alternatively, from the project root:
+```bash
+make docker-env-pull
 ```
 
-Alternatively, you can follow the steps in [this Docker install guide](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/) or use the following convenience script:
+#### A.2 Download Cuda-9.2 Toolkit
+OpenFluid employs the Flex SDK, a GPU-centric particle simulation library, which mandates the CUDA 9.2.148 toolkit for compilation. Download the [cuda toolkit 9.2](https://developer.nvidia.com/cuda-92-download-archive), and position the acquired `/usr/local/cuda-9.2` in `project_root/server/cuda-9.2`.
 
-```sh
-curl -fsSL get.docker.com -o get-docker.sh
-sh get-docker.sh
+
+#### A.3 Launch the Docker Image
+From the project root:
+```bash
+docker run --gpus all -it -p 9099:9099 --rm --name=openfluid-env --mount type=bind,source=${PWD}/server,target=/server ghcr.io/jinhoyi/openfluid:env
+
+```
+Or:
+```bash
+make docker-env-git-run
 ```
 
-#### Step 2. Obtain OpenRTiST Docker image
+
+### Option B. Local Environment
+Set up required libraries on your machine.
+
+#### B.1 Set Up CUDA
+OpenFluid employs the Flex SDK, a GPU-centric particle simulation library, which mandates the CUDA 9.2.148 toolkit for compilation. Download the [cuda toolkit 9.2](https://developer.nvidia.com/cuda-92-download-archive), and position the acquired `/usr/local/cuda-9.2` in `project_root/server/cuda-9.2`.
+
+For the CUDA runtime library and driver, consider the latest versions. Follow [NVIDIA's guidelines](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation). 
+
+To verify your NVIDIA driver, use `nvidia-smi`. The driver version appears at the top of the resulting output.
+
+Ensure you've set the path for the CUDA runtime libraries, for instance, in your `.bashrc`:
+```bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
+```
+
+#### B.2 Install Remaining Dependencies
+OpenFluid relies on freeGLUT and EGL for headless fluid scene rendering, zeroMQ for IPCs, protobuf for packet serialization, and JPEG for image frame compression.
 
 ```bash
-docker pull cmusatyalab/openrtist
+sudo apt-get -y install \
+    libzmq3-dev \
+    protobuf-compiler libprotobuf-dev \
+    libegl1-mesa-dev libgl1-mesa-dev \
+    freeglut3-dev \
+    libjpeg-dev \
+    software-properties-common
 ```
 
-#### Step 3. Launch the container with the appropriate arguments
+Match the OpenGL library version to your NVIDIA Driver (use `nvidia-smi` for version checking):
 
 ```bash
-xhost +local:docker
-docker run --entrypoint /bin/bash --env DISPLAY=$DISPLAY --env="QT_X11_NO_MITSHM=1" --device /dev/video0:/dev/video0 -v /tmp/.X11-unix:/tmp/.X11-unix:ro --rm -it  cmusatyalab/openrtist
+sudo apt-get -y install \
+    libnvidia-gl-535  
 ```
 
-#### Step 4. Launch the Python client UI specifying the server's IP address
+A portion of the server is Python-based. __Ensure you use Python 3.8__
 
 ```bash
-cd /openrtist/python-client
-./ui.py <server ip address>
+sudo add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y \
+    python3.8 \
+    python3.8-dev \
+    python3-pip \
+ && apt-get install -y --reinstall python3.8-distutils \
+ && python3.8 -m pip install --upgrade pip \
+ && python3.8 -m pip install --no-cache-dir \
+    -r server/requirements.txt
 ```
 
-### Android Client
+### Compilation & Execution
+Navigate to `/server` and execute:
+```bash
+make release && make run
 
-You can download the client from the [Google Play Store](https://play.google.com/store/apps/details?id=edu.cmu.cs.openrtist).
+```
 
-Alternatively, you can build the client yourself using [Android Studio](https://developer.android.com/studio). The source code for the client is located in the `android-client` directory. You should use the standardDebug [build variant](https://developer.android.com/studio/run#changing-variant).
 
-#### Managing Servers
+## Android Client
 
-Servers can be added by entering a server name and address and pressing the + sign button. Once a server has been added, pressing the 'Play' button will connect to the OpenRTiST server at that address. Pressing the trash can button will remove the server from the server list.
+You can download the client from the [Google Play Store](https://play.google.com/store/apps/details?id=edu.cmu.cs.openrtist), or install openfluid-v1.0.apk in this repo. UPDATE
 
-#### Switching Styles
+Alternatively, build the client using [Android Studio](https://developer.android.com/studio). The source code for the client is located in the `android-client` directory. You should use the standardDebug [build variant](https://developer.android.com/studio/run#changing-variant).
 
-Once the camera is active, the application will be set to 'Clear Display' by default. This will show the  frames of the camera without a particular style. You can use the drop-down menu at the top to select a style to apply. Once selected, the frames from the camera will be sent to the server and the style will be applied. The results will be shipped back to the client and displayed. If the 'Iterate Styles Periodically' option is enabled, the dropdown menu will not be shown, and styles will change automatically based upon the interval defined.
+### Server Management
 
-#### Settings
+Servers can be added by pressing the + sign button, then entering a server name and address. Selecting a server connects to the corresponding OpenFluid server. Swipe left or right to remove a server from the list.
+
+### Fluid Simulation
+
+Post connection, the application showcases a simulation scene. Fluid motion is influenced by the mobile device's acceleration sensor. Various scene manipulation options are available. For guidance, tap the "?" icon at the top right.
+
+The interface offers modes like camera view adjustments, full-screen mode, screen orientation changes, simulation pausing/resuming, scene or liquid type switching, auto-sensor input generation, and rendering style toggling (particle/liquid). 
+
+
+### Settings
 
 ##### General
 
-* Show Screenshot/Recording Buttons - This will enable icons to allow you to capture video or screenshots while running OpenRTiST. __NOTE: If the 'Iterate Styles Periodically' option is enabled, styles will not iterate until the screen capture dialog has been accepted and recording has started.__
-* Display Metrics - Enabling this option will show the FPS and RTT as measured from the device.
-* Stereoscopic Effect - This option can be toggled for use in HUDs (heads-up displays) where there are both left and right channels.
-* Show Reference Style Image - If enabled, the original artwork will be inlaid on the display.
-* Iterate Styles Periodically - This can be enabled to automatically iterate through the list of styles after the set delay.
+* __Image Resolution__: Adjust the frame resolution. Higher resolutions might reduce FPS and increase latency.
+* __Gabriel Token Limit__: Allows configuration of the token-based flow control mechanism in the Gabriel platform. This indicates how many frames can be in flight before a response frame is received back from the server. The minimum of the token limit specified in the app and the number of tokens specified on the server will be used. With a stable network, "No limit" yields the highest FPS.
 
-##### Experimental
+##### UI
+* __Set FPS Limit (Vsync)__: Enables the server to cap the maximum simulation fps. If disabled, there's no FPS limit.
+* __Target FPS (Vsync) Limit__: When `Set FPS Limit` is true, set the desired limit for the FPS (60, 90, or 120)
+* __Autoplay Sequence Interval__:  Switch the interval between the auto-generate sensor input from changing. 
 
-* Resolution - Configure the resoultion to capture at. This will have a moderate impact in the computation time on the server.
-* Gabriel Token Limit - Allows configuration of the token-based flow control mechanism in the Gabriel platform. This indicates how many frames can be in flight before a response frame is received back from the server. The minimum of the token limit specified in the app and the number of tokens specified on the server will be used.
+## Using the MakeFile
 
-#### Front-facing Camera
+update ./Makefile:
+GITHUG_USERNAME to username of the github repositor --> change the default value
 
-Once connected to a server, an icon is displayed in the upper right hand corner which allows one to toggle between front- and rear-facing cameras.
+### Building the server-app docker image:
+Download cuda toolkit 9.2 from the link bellow, and place the /usr/local/cuda-9.2 in server/cuda-9.2 first
+https://developer.nvidia.com/cuda-92-download-archive
+```
+make docker-build [version] [username] 
+```
+--> username is github username (prob cmusatyalab)
 
-## Installation from source (PyTorch or OpenVINO, GPU or CPU)
 
-### 1. Install CUDA or OpenVINO
-
-The OpenRTiST server can use PyTorch or OpenVINO to execute style transfer networks. You may want to install CUDA or OpenVINO (or both). However, you can run OpenRTiST using pytorch on the CPU without CUDA or OpenVINO. 
-
-OpenRTiST has been tested with pytorch versions 0.2.0, 0.3.1, 1.0, and 1.2 with CUDA support.  As the APIs and layer names have been changed in newer releases, model files for both pre-1.0 and post-1.0 versions have been provided. __NOTE: Even if you do not have a CUDA-capable GPU, you can install pytorch with CUDA support and run OpenRTiST on CPU only.__
-
-#### Option A. Install CUDA
-
-Follow [NVIDIA's instructions](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation).
-
-#### Option B. Install OpenVINO
-
-We recommend Ubuntu 18.04 for a painless install.  We have had success with Ubuntu 18.10 and Ubuntu 16.04, but `setupvars.sh` may not set up the environment correctly, and on the older distro, a new Linux kernel will be needed to use the integrated GPU.  
-
-##### Install the latest OpenVINO
-
-You can find and download the latest OpenVINO release from <https://software.intel.com/en-us/openvino-toolkit>. Full installation instructions are available at <https://software.intel.com/en-us/articles/OpenVINO-Install-Linux>.
-
-For Ubuntu 16.04 / 18.04, you can install using `apt` by adding the custom repository as follows:
-
-```bash
-wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-echo "deb https://apt.repos.intel.com/openvino/2019/ all main" | sudo tee /etc/apt/sources.list.d/intel-openvino-2019.list
-sudo apt-get update
+### Running the local docker image
+```
+make docker-run [version] [username] 
 ```
 
-and then search for available packages using:
+### Pushing docker image to the github container registry
+```
+make docker-push <image-id> [version] [username] 
+```
+--> check the image-id by "docker image list" and see the IMAGE ID column
 
-```bash
-apt-cache search openvino-dev
+### Pulling docker image from the github container registry
+```
+make docker-pull [version] [username] 
 ```
 
-Finally, install a version matching your distro (ubuntu16 or ubuntu18, e.g.):
-
-```bash
-sudo apt-get install intel-openvino-dev-ubuntu18-2019.3.344
+### Running the image pulled from the github container registry
+```
+make docker-git-run [version] [username] 
 ```
 
-##### Setup OpenCL to use Processor Graphics (Optional)
-
-To utilize integrated Processor Graphics on Intel processors, the following are required:
-
-* An Intel processor with Gen 8 or later graphics (Broadwell and later)
-* A recent kernel release (4.14 or later).  This should already be the case for Ubuntu 18.04, but a new kernel will need to be installed for 16.04.
-* Generic OpenCL runtime support.  Can be installed by:
-
-```bash
-sudo apt install ocl-icd-libopencl1
+### Building the development environment image
+```
+make docker-env-build [username]
 ```
 
-* The Intel&reg; Graphics Compute Runtime for OpenCL&trade; Driver components. Installation instructions for various systems are found [here](https://github.com/intel/compute-runtime/blob/master/documentation/Neo_in_distributions.md).  For Ubuntu 16.04 and 18.04:
-
-```bash
-sudo add-apt-repository ppa:intel-opencl/intel-opencl
-sudo apt-get update
-sudo apt-get install intel-opencl-icd
+### Running the local environment image
+```
+make docker-env-run [username] 
 ```
 
-##### Setup Environment
+### Pushing, pulling environment image
+use docker-push with "env" for the version name
 
-Setup environment variables and paths to use OpenVINO in the current shell:
-
-```sh
-source /opt/intel/openvino/bin/setupvars.sh
+### Running the image pulled from the github container registry
 ```
-
-### 2. Install Openrtist Dependencies
-
-OpenRTiST requires Python 3.5 or later. We recommend using a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) to better control the Python environment and keep your distribution defaults clean.  
-
-To install dependencies for Openrtist, navigate to the server directory, activate a Python 3 virtual environment, then run:
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run the server
-
-With your virtual environment activated, start the server like this:
-
-```bash
-cd <openrtist-repo>/server/
-python main.py
-```
-
-__Note:  With OpenVINO using an integrated GPU, it may take up to a minute to preload all of the style models.  This is not the case for OpenVINO on CPU, or with PyTorch.  Once initialized, the server is ready for clients at this point.__
-
-With either PyTorch or OpenVINO, you can run the server in CPU-only mode by passing the --cpu CLI flag. By default, OpenRTiST tries to detect and use OpenVINO, and fails over to PyTorch.  To force it to use one system, pass the --openvino or --torch CLI flags.
-
-### 4.  Run a python or mobile client using source code at python-client or the Android client from the Google Play Store
-
-To run the python client:
-
-```bash
-cd <openrtist-repo>/python-client
-./ui.py <server ip address>
-```
-
-You can edit the config.py file to change webcam capture parameters.
-
-The prebuilt Android client from the Google Play Store provides an interface to add a server with a custom IP address.
-
-## Training New Styles (Pytorch 1.3.0)
-
-We use COCO 2014 Train Images as our default training dataset.
-
-### Option A. Launch on EC2
-
-An Amazon Machine Image with the model training frontend and training dataset configured out of the box is publicly available to deploy on Amazon EC2.
-
-* AMI ID: `ami-0d9512927124b3c3a`
-* Instance type (recommended): `g4dn.xlarge` (or alternatively any instance with an Nvidia GPU)
-* Public IP enabled
-* Security group
-* Inbound: TCP 22, TCP 5000
-
-After startup, connect to port 5000 of your machine to access the model training frontend.
-
-### Option B. Run model training web frontend
-
-Prequisites: A machine with an installed Nvidia driver and an accessible redis instance
-
-To start the model training web frontend, first install the requisite python dependencies:
-
-```bash
-cd <openrtist-repo>/model-app
-pip install -r requirements.txt
-```
-
-Then download the training data and point model-app/config.py accordingly:
-
-```bash
-wget http://images.cocodataset.org/zips/train2014.zip
-unzip train2014.zip -d coco-data/
-```
-
-Install OpenVINO or set `CONVERT_TO_OPEN_VINO=false` in model-app/config.py
-
-And then launch the web frontend:
-
-```bash
-cd <openrtist-repo>/model-app
-flask run --host=0.0.0.0
-```
-
-And finally launch a celery worker in a separate terminal:
-
-```bash
-cd <openrtist-repo>/model-app
-celery worker -A model-app.app.celery --loglevel=info
-```
-
-### Option C. Directly run training script
-
-```bash
-wget http://images.cocodataset.org/zips/train2014.zip
-unzip train2014.zip -d coco-data/
-cd <openrtist-repo>
-python model-app/train_style.py --dataset <coco-data> --style-image <style-image> --save-model-dir models/ --epochs 2
-```
-
-To disable flicker-loss which removes flicker for temporal consistency in real-time image stream, set --noise-count 0
-
-An additional script can convert from the generated PyTorch model to OpenVINO:
-
-```bash
-python model-app/openvino_convert.py <path_to_pytorch_model>
+make docker-env-git-run [username]  
 ```
 
 ## Protocol
 
-The Extras proto is defined in `android-client/app/src/main/proto/openrtist.proto`.
+The Extras proto is defined in `android-client/app/src/main/proto/openfluid.proto` and `server/Flex/demo/proto`.
 
-If you make changes to this proto, it will be recompiled for both Python and Android 
-the next time you start the Android client from Android Studio.
+As you make changes to this proto, make sure they are identical. After making changes, it will be recompiled for the android client the next time you start the Android client from Android Studio. Do following command in /server directory to recompile proto file for the server. 
+```
+make protoc 
+```
+
 
 ## Credits
 

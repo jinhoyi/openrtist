@@ -56,6 +56,16 @@
 <!--            android:title="@string/reference_option" />-->
 
         <ListPreference
+            android:entries="@array/fps_list_titles"
+            android:entryValues="@array/fps_list_titles"
+            android:defaultValue="120"
+            android:key="general_FPS"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_title_FPS_LIST"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
             android:entries="@array/pref_interval_list_titles"
             android:entryValues="@array/pref_interval_list_values"
             android:defaultValue="0"

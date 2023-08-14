@@ -599,6 +599,7 @@ inline void vSync() {
 	g_frameClock.stop();
 	sleep(g_dt - g_frameClock.lap - 0.0002f);
 	// sleep(g_dt - g_frameClock.lap);
+	// g_frameClock.lap > 1.0/110.0 ? g_dt = g_frameClock.lap - 0.0004f : g_dt = VSYNC_INTERVAL;
 	g_frameClock.start();
 }
 
@@ -617,7 +618,6 @@ std::atomic_bool ack_ar(false);
 std::atomic_bool flag_reset(false);
 std::atomic_bool ack_reset(false);
 std::atomic_bool latency_request(false);
-std::atomic_bool latency_feedback(false);
 std::atomic_bool latency_return(false);
 
 int zmq_port = 5559;
@@ -684,8 +684,6 @@ std::vector<unsigned char> compressJpeg(const uint32_t* bitmap, int width, int h
 }
 
 void video_compressor() {
-	// int *bitmap = (int*)(g_framebuffer.m_data);
-
 	while(running) {
 		if (new_frame){
 			new_frame = false;
@@ -995,7 +993,7 @@ void Init(int scene, bool centerCamera = true)
 	g_frame = 0;
 	g_pause = false;
 
-	g_dt = VSYNC_INTERVAL;
+	// g_dt = VSYNC_INTERVAL;
 	g_waveTime = 0.0f;
 	g_windTime = 0.0f;
 	g_windStrength = 1.0f;
@@ -2543,13 +2541,9 @@ void UpdateFrame()
 
 	// Acknowledge that user input is queued
 	latency_mtx.lock();
-		if (latency_feedback) {
-			latency_feedback = false;
-			latency_return = true;
-		}
 		if (latency_request) {
 			latency_request = false;
-			latency_feedback = true;
+			latency_return = true;
 		}
 	latency_mtx.unlock();
 
@@ -3265,7 +3259,9 @@ int main(int argc, char* argv[])
 		if (sscanf(argv[i], "-vsync=%d", &d))
 			g_vsync = d != 0;
 
-		
+		if (sscanf(argv[i], "-fpslimit=%d", &d)) {
+			g_dt = 1.0f/(float)d;
+		}
 
 		if (sscanf(argv[i], "-multiplier=%d", &d) == 1)
 		{
